@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="MapSource 6.16.3" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+
+  <metadata>
+    <link href="http://www.garmin.com">
+      <text>Garmin International</text>
+    </link>
+    <time>2011-05-22T15:51:31Z</time>
+    <bounds maxlat="39.90635097026825" maxlon="-8.130438197404146" minlat="39.893746431916952" minlon="-8.141010543331504"/>
+  </metadata>
+
+  <trk>
+    <name>Lisboa2</name>
+    <extensions>
+      <gpxx:TrackExtension xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+        <gpxx:DisplayColor>Red</gpxx:DisplayColor>
+      </gpxx:TrackExtension>
+    </extensions>
+    <trkseg>
+      <trkpt lat="38.444515339968085" lon="-9.101436893271213">
+        <ele>365.4383544921875</ele>
+        <time>2011-05-22T09:38:12Z</time>
+      </trkpt>
+            <trkpt lat="38.51725182357567" lon="-8.468537702862982">
+              <ele>365.4383544921875</ele>
+              <time>2011-05-22T09:38:12Z</time>
+            </trkpt>
+          </trkseg>
+        </trk>
+
+      </gpx>
