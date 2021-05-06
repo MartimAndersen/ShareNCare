@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello Maps</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css">
+        <link rel="stylesheet" href="css/hellomaps.css">
+    </head>
+    <body>
+        <script type="text/javascript" src="js/hellomaps.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJTXQYUpm17uIAVwOtymCEaBBXPmhB6EI&callback=initMap"></script>
+        <div id="map"></div>
+        <input type="text" id="cp" title="Codigopostal to Geocode" />
+        <input type="button" class="pure-button pure-button-primary" id="geocode" value="Geocode"/>
+    </body>
+</html>
