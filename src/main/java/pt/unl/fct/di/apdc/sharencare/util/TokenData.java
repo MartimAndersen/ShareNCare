@@ -1,14 +1,14 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-public class LogoutData {
+public class TokenData {
 	
 	public String tokenId;
 	
-	public LogoutData() {
+	public TokenData() {
 		
 	}
 	
-	public LogoutData(String tokenId) {
+	public TokenData(String tokenId) {
 		this.tokenId = tokenId;
 	}
 
