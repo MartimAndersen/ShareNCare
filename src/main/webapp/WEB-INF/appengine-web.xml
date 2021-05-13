@@ -10,4 +10,18 @@
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>
 
+<!--  <static-files>-->
+<!--    <include path="/.html" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.css" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.js" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.jpg" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.gif" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.png" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.mp3" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.wav" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.ttf" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/.ico" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--    <include path="/**.cur" expiration="0m" /> &lt;!&ndash; 1 minute, normal is 12h or more &ndash;&gt;-->
+<!--  </static-files>-->
+
 </appengine-web-app>

@@ -11,14 +11,12 @@ public class RegisterData {
 	public String postal;
 	public String role;
 	public String state;
-	public boolean extraData;
 
 	public RegisterData() {
 
 	}
 
-	public RegisterData(String username, String email, String password, String confirmation, String profileType,
-			String landLine, String mobile, String address, String secondAddress, String postal, String role,
+	public RegisterData(String username, String email, String password, String confirmation, String mobile, String address, String postal, String role,
 			String state) {
 		this.username = username;
 		this.password = password;

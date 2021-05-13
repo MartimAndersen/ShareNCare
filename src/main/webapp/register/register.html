@@ -1,59 +1,54 @@
-<meta charset="utf-8"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
 
-
-<script src="./register.js"></script>
-
-
-<form action="#" method="post">
+<form id="formID" action="#" method="post">
     <h2>Sign Up</h2>
     <p>
-        <label for="Username" class="floatLabel">Name</label>
-        <input id="username" name="Name" type="text">
+        <label for="Username" class="floatLabel">Username</label>
+        <input id="username" name="regInput" type="text">
     </p>
 
     <p>
         <label for="Email" class="floatLabel">Email</label>
-        <input id="email" name="Email" type="text">
+        <input id="email" name="regInput" type="text">
     </p>
     <p>
         <label for="password" class="floatLabel">Password</label>
-        <input id="password" name="password" type="password">
+        <input id="password" name="regInput" type="password">
         <span>Enter a password longer than 8 characters</span>
     </p>
     <p>
         <label for="confirmation" class="floatLabel">Confirm Password</label>
-        <input id="confirmation" name="confirm_password" type="password">
+        <input id="confirmation" name="regInput" type="password">
         <span>Your passwords do not match</span>
     </p>
     <p>
-        <label for="ProfileType" class="floatLabel">Profile Type</label>
-        <input id="profileType" name="Profile Type" type="text">
-    </p>
-    <p>
-        <label for="Landline" class="floatLabel">Fixed Phone</label>
-        <input id="landline" name="landLine" type="text">
-    </p>
-    <p>
-        <label for="Mobile" class="floatLabel">Mobile Phone</label>
-        <input id="mobile" name="Mobile Phone" type="text">
+        <label for="Mobile" class="floatLabel">Mobile Phone Number</label>
+        <input id="mobile" name="regInput" type="text">
     </p>
     <p>
         <label for="Address" class="floatLabel">Address</label>
-        <input id="address" name="Address" type="text">
-    </p>
-    <p>
-        <label for="SecondAddress" class="floatLabel">Second Address</label>
-        <input id="secondAddress" name="Second Address" type="text">
+        <input id="address" name="regInput" type="text">
     </p>
     <p>
         <label for="Postal" class="floatLabel">Postal Code</label>
-        <input id="postal" name="Postal Code" type="text">
+        <input id="postal" name="regInput" type="text">
     </p>
-
     <p>
-        <input type="submit" value="Create My Account " onclick="handleSubmit(10)" id="submit">
+        <input type="submit" value="Create My Account " id="submit">
     </p>
-
 
 
 </form>
+<script src="./register.js"></script>
+</body>
+</html>
+
+
