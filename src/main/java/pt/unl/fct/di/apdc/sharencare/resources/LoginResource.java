@@ -37,7 +37,7 @@ public class LoginResource {
 	
 	//op6 - logs a user
 	@POST
-	@Path("/op6")
+	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response loginUser(LoginData data) {
