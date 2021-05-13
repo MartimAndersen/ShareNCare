@@ -41,16 +41,16 @@ public class LoginResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response loginUser(LoginData data) {
-		LOG.fine("Attempt to login user: " + data.username);
+		LOG.fine("Attempt to login user: " + data.usernameLogin);
 		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.usernameLogin);
 		Entity user = datastore.get(userKey);
 		
 		if (user != null) {
 			String hashedPWD = user.getString("password");
 			//outra forma de obter a password??
-			if(hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
-				AuthToken t = new AuthToken(data.username, user.getString("role"));
+			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
+				AuthToken t = new AuthToken(data.usernameLogin, user.getString("role"));
 				
 				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
 				Entity token = Entity.newBuilder(tokenKey)
@@ -62,16 +62,16 @@ public class LoginResource {
 								.set("valid", t.valid)
 								.build();
 						
-				LOG.info("User '" + data.username + "' logged in sucessfully.");
+				LOG.info("User '" + data.usernameLogin + "' logged in sucessfully.");
 				datastore.add(token);
 				return Response.ok(g.toJson(token)).build();
 			} else {
-				LOG.warning("Wrong password for username: " + data.username);
+				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		}
 		else {
-			LOG.warning("Failed login attempt for username: " + data.username);
+			LOG.warning("Failed login attempt for username: " + data.usernameLogin);
 			return Response.status(Status.FORBIDDEN).build();
 		}
 

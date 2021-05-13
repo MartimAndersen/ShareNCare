@@ -22,6 +22,25 @@ public class RegisterResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
+    public RegisterResource() {
+        Key userKey = datastore.newKeyFactory().setKind("User").newKey("superUser");
+        Entity user = datastore.get(userKey);
+        if(user == null) {
+            user = Entity.newBuilder(userKey)
+                    .set("username", "superUser")
+                    .set("email", "superUser@gmail.com")
+                    .set("password", DigestUtils.sha512Hex("password"))
+                    .set("confirmation", DigestUtils.sha512Hex("password"))
+                    .set("mobile", "")
+                    .set("address", "")
+                    .set("postal", "")
+                    .set("role", "SU")
+                    .set("state", "ENABLED")
+                    .build();
+            datastore.add(user);
+        } else {}
+
+    }
 
     //private HttpServletRequest httpRequest;
 
@@ -29,31 +48,15 @@ public class RegisterResource {
     @POST
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
-    //@Consumes(MediaType.MULTIPART_FORM_DATA +";charset=utf-8")
     public Response registerUser(RegisterData data) {
-
-        System.out.println("Entrei no REGISTER_USER()");
-
-        System.out.println(data.username);
-        System.out.println(data.email);
-        System.out.println(data.password);
-        System.out.println(data.confirmation);
-        System.out.println(data.mobile);
-        System.out.println(data.address);
-        System.out.println(data.postal);
-
 
         LOG.fine("Attempt to register user: " + data.username);
 
 
-        //if (!validateData(data))
-        //	return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
-
-        System.out.println("ANTES DA TXN");
+        if (!data.validateData(data))
+        	return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
 
         Transaction txn = datastore.newTransaction();
-
-        System.out.println("DEPOIS DA TXN");
 
         try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
@@ -61,7 +64,7 @@ public class RegisterResource {
             if (user != null) {
                 txn.rollback();
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("User with username: " + data.username + " already exists").build();
+                        .entity("User " + data.username + " already exists.").build();
             } else {
                 user = Entity.newBuilder(userKey)
                         .set("username", data.username)
@@ -75,7 +78,7 @@ public class RegisterResource {
 
                 txn.add(user);
                 txn.commit();
-                return Response.ok("User registered " + data.username).build();
+                return Response.ok("User " + data.username + " registered.").build();
             }
         } finally {
             if (txn.isActive()) {
@@ -83,38 +86,6 @@ public class RegisterResource {
             }
         }
 
-//		System.out.println(data.username);
-//		System.out.println(data.email);
-//		System.out.println(data.password);
-//		System.out.println(data.confirmation);
-//		System.out.println(data.mobile);
-//		System.out.println(data.address);
-//		System.out.println(data.postal);
-//		System.out.println(data.role);
-//		System.out.println(data.state);
-//
-//		return Response.ok().build();
-
-    }
-
-    // checks if all data is valid
-    private boolean validateData(RegisterData data) {
-
-        String[] email = data.email.split("\\.");
-        String[] mobile = data.mobile.split(" ");
-        String[] postal = data.postal.split("-");
-
-        int emailSize = email.length - 1;
-
-        if (data.email.contains("@") && (email[emailSize].length() == 2 || email[emailSize].length() == 3))
-            if (data.password.equals(data.confirmation))
-                if (data.postal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))
-                    if (data.mobile.equals("")
-                            || (mobile[0].subSequence(0, 1).equals("+") && (mobile[1].substring(0, 2).equals("91")
-                            || mobile[1].substring(0, 2).equals("93") || mobile[1].substring(0, 2).equals("96"))
-                            && mobile[1].length() == 9))
-                        return true;
-        return false;
     }
 
 }
