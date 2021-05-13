@@ -48,6 +48,7 @@ public class LoginResource {
 		
 		if (user != null) {
 			String hashedPWD = user.getString("password");
+			//outra forma de obter a password??
 			if(hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 				AuthToken t = new AuthToken(data.username, user.getString("role"));
 				
