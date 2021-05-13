@@ -6,6 +6,11 @@ var map, 		// the map
 	track, 		// Polyline that represents the track
 	freq=100 ;		// Sampling frequency
 
+var datastore = DatastoreOptions.getDefaultInstance().getService();
+var userKey = datastore.newKeyFactory().setKind("Marker").newKey(data.username);
+var user = datastore.get(userKey);
+
+
 // Auxiliary function that sends an XMLHTTPREQUEST to load the contents of an external resource
 // This function works across different browsers (namely, it should work with IE)
 function LoadXMLDoc(dname, callback){
@@ -83,17 +88,17 @@ function Point(lat, lon, name) {
 	this.lat = function () { return parseFloat(this.latitude); }
 	this.lon = function () { return parseFloat(this.longitude); }
 
-/*
-	this.distanceFrom = function (other) {
-		return DistHaversine(this, other);
-	}
-	this.timeFrom = function (other) {
-		return 1;
-	}
-	this.climbFrom = function (other) {
-		return Math.max(0,parseFloat(this.elevation) - parseFloat(other.elevation));
-	}
-	*/
+	/*
+        this.distanceFrom = function (other) {
+            return DistHaversine(this, other);
+        }
+        this.timeFrom = function (other) {
+            return 1;
+        }
+        this.climbFrom = function (other) {
+            return Math.max(0,parseFloat(this.elevation) - parseFloat(other.elevation));
+        }
+        */
 
 }
 
@@ -116,8 +121,6 @@ function ComputeTotalClimb(idx) {
 	return total;
 }
 */
-
-
 
 function PopulateMap() {
 
@@ -145,7 +148,7 @@ function addListener(m, i) {
 
 	google.maps.event.addListener(m, 'click', function () {
 		infowindow.setContent(
-			+ "<strong>Position:</strong> " + points[i].lat() + " " + points[i].lon() + "<br />"
+			"<strong>Position:</strong> " + points[i].lat() + " " + points[i].lon() + "<br />"
 			+ "<strong>Name:</strong> " + points[i].name + "<br />"
 		);
 
@@ -214,4 +217,103 @@ function initMap() {
 		// TODO: Center map. The map should be centered at the center of the track bounding box
 	});
 	LoadData('data/track.gpx');
+}
+
+
+
+
+
+
+
+
+
+
+
+class AutocompleteDirectionsHandler {
+	constructor(map) {
+		this.map = map;
+		this.originPlaceId = "";
+		this.destinationPlaceId = "";
+		this.travelMode = google.maps.TravelMode.WALKING;
+		this.directionsService = new google.maps.DirectionsService();
+		this.directionsRenderer = new google.maps.DirectionsRenderer();
+		this.directionsRenderer.setMap(map);
+		const originInput = document.getElementById("origin-input");
+		const destinationInput = document.getElementById("destination-input");
+		const modeSelector = document.getElementById("mode-selector");
+		const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+		// Specify just the place data fields that you need.
+		originAutocomplete.setFields(["place_id"]);
+		const destinationAutocomplete = new google.maps.places.Autocomplete(
+			destinationInput
+		);
+		// Specify just the place data fields that you need.
+		destinationAutocomplete.setFields(["place_id"]);
+		this.setupClickListener(
+			"changemode-walking",
+			google.maps.TravelMode.WALKING
+		);
+		this.setupClickListener(
+			"changemode-transit",
+			google.maps.TravelMode.TRANSIT
+		);
+		this.setupClickListener(
+			"changemode-driving",
+			google.maps.TravelMode.DRIVING
+		);
+		this.setupPlaceChangedListener(originAutocomplete, "ORIG");
+		this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
+		this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+		this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(
+			destinationInput
+		);
+		this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+	}
+	// Sets a listener on a radio button to change the filter type on Places
+	// Autocomplete.
+	setupClickListener(id, mode) {
+		const radioButton = document.getElementById(id);
+		radioButton.addEventListener("click", () => {
+			this.travelMode = mode;
+			this.route();
+		});
+	}
+	setupPlaceChangedListener(autocomplete, mode) {
+		autocomplete.bindTo("bounds", this.map);
+		autocomplete.addListener("place_changed", () => {
+			const place = autocomplete.getPlace();
+
+			if (!place.place_id) {
+				window.alert("Please select an option from the dropdown list.");
+				return;
+			}
+
+			if (mode === "ORIG") {
+				this.originPlaceId = place.place_id;
+			} else {
+				this.destinationPlaceId = place.place_id;
+			}
+			this.route();
+		});
+	}
+	route() {
+		if (!this.originPlaceId || !this.destinationPlaceId) {
+			return;
+		}
+		const me = this;
+		this.directionsService.route(
+			{
+				origin: { placeId: this.originPlaceId },
+				destination: { placeId: this.destinationPlaceId },
+				travelMode: this.travelMode,
+			},
+			(response, status) => {
+				if (status === "OK") {
+					me.directionsRenderer.setDirections(response);
+				} else {
+					window.alert("Directions request failed due to " + status);
+				}
+			}
+		);
+	}
 }
