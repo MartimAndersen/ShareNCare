@@ -37,7 +37,7 @@ public class LoginResource {
 	
 	//op6 - logs a user
 	@POST
-	@Path("/op6")
+	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response loginUser(LoginData data) {
@@ -48,6 +48,7 @@ public class LoginResource {
 		
 		if (user != null) {
 			String hashedPWD = user.getString("password");
+			//outra forma de obter a password??
 			if(hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 				AuthToken t = new AuthToken(data.username, user.getString("role"));
 				
