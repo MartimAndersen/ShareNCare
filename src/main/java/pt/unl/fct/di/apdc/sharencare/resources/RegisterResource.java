@@ -23,10 +23,9 @@ public class RegisterResource {
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
-	
 	// op1 - registers an user
 	@POST
-	@Path("op1")
+	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerUser(RegisterData data) {
 		LOG.fine("Attempt to register user: " + data.username);
@@ -41,22 +40,14 @@ public class RegisterResource {
 			Entity user = txn.get(userKey);
 			if (user != null) {
 				txn.rollback();
-				return Response.status(Status.BAD_REQUEST).entity("User with username: " + data.username + " already exists").build();
+				return Response.status(Status.BAD_REQUEST)
+						.entity("User with username: " + data.username + " already exists").build();
 			} else {
-				user = Entity.newBuilder(userKey)
-						.set("email", data.email)
-						.set("password", DigestUtils.sha512Hex(data.password))
-						.set("profileType", data.profileType)
-						.set("landLine", data.landLine)
-						.set("mobile", data.mobile)
-						.set("adress", data.adress)
-						.set("secondAdress", data.secondAdress)
-						.set("postal", data.postal)
-						.set("role", "USER")
-						.set("state", "ENABLED")
-						.build();
-					
-				
+				user = Entity.newBuilder(userKey).set("email", data.email)
+						.set("password", DigestUtils.sha512Hex(data.password)).set("mobile", data.mobile)
+						.set("adress", data.adress).set("postal", data.postal).set("role", "USER")
+						.set("state", "ENABLED").build();
+
 				txn.add(user);
 				txn.commit();
 				return Response.ok("User registered " + data.username).build();
@@ -69,27 +60,23 @@ public class RegisterResource {
 
 	}
 
-	//checks if all data is valid
+	// checks if all data is valid
 	private boolean validateData(RegisterData data) {
-		
+
 		String[] email = data.email.split("\\.");
-		String[] landLine = data.landLine.split(" ");
 		String[] mobile = data.mobile.split(" ");
 		String[] postal = data.postal.split("-");
 
-		int emailSize = email.length-1;
-		
+		int emailSize = email.length - 1;
+
 		if (data.email.contains("@") && (email[emailSize].length() == 2 || email[emailSize].length() == 3))
 			if (data.password.equals(data.confirmation))
-					if (data.profileType.equals("") || data.profileType.equalsIgnoreCase("Publico") || data.profileType.equalsIgnoreCase("Privado")) 
-						if (data.landLine.equals("") || (landLine[0].subSequence(0, 1).equals("+") && landLine[1].length() == 9)) 
-							if(data.postal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))
-								if(data.mobile.equals("") || (mobile[0].subSequence(0, 1).equals("+") && (
-															  mobile[1].substring(0, 2).equals("91") || 
-															  mobile[1].substring(0, 2).equals("93") || 
-															  mobile[1].substring(0, 2).equals("96"))
-														   && mobile[1].length() == 9))
-																		return true;
+				if (data.postal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))
+					if (data.mobile.equals("")
+							|| (mobile[0].subSequence(0, 1).equals("+") && (mobile[1].substring(0, 2).equals("91")
+									|| mobile[1].substring(0, 2).equals("93") || mobile[1].substring(0, 2).equals("96"))
+									&& mobile[1].length() == 9))
+						return true;
 		return false;
 	}
 
