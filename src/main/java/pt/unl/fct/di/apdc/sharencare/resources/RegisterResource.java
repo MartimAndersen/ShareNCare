@@ -45,7 +45,7 @@ public class RegisterResource {
 			} else {
 				user = Entity.newBuilder(userKey).set("email", data.email)
 						.set("password", DigestUtils.sha512Hex(data.password)).set("mobile", data.mobile)
-						.set("adress", data.adress).set("postal", data.postal).set("role", "USER")
+						.set("address", data.address).set("postal", data.postal).set("role", "USER")
 						.set("state", "ENABLED").build();
 
 				txn.add(user);
