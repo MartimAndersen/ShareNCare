@@ -17,9 +17,9 @@ public class RegisterData {
 
 	}
 
-	public RegisterData(String username, String email, String password, String confirmation,
-			String mobile, String adress, String secondAdress, String postal, String role,
-			String state, String tokenId) {
+	public RegisterData(String username, String email, String password, String confirmation, String profileType,
+			String landLine, String mobile, String adress, String secondAdress, String postal, String role,
+			String state) {
 		this.username = username;
 		this.password = password;
 		this.confirmation = confirmation;
