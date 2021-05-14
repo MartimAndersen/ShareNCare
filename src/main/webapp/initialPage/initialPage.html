@@ -17,6 +17,11 @@
     }
 </style>
 
+
+<div class = "loginDiv">
+    <style>
+        .loginDiv{visibility: visible;}
+    </style>
 <form id="loginFormId" action="#" method="post">
     <h1>Login</h1>
     <p>
@@ -25,20 +30,23 @@
     </p>
     <p>
         <label for="passwordLogin" class="floatLabel"></label>
-        <input id="passwordLogin" name="loginInput" type="text" placeholder="Password">
+        <input id="passwordLogin" name="loginInput" type="password" placeholder="Password">
     </p>
 
     <p>
         <input type="submit" value="Sign In" id="submitLogin">
     </p>
-
-
 </form>
+</div>
 
 <br>
 <br>
 <br>
 
+<div class = "loginDiv">
+    <style>
+        .loginDiv{visibility: visible;}
+    </style>
 <form id="regFormId" action="#" method="post">
     <h1>Sign Up</h1>
     <p>
@@ -76,6 +84,9 @@
         <input type="submit" value="Sign Up" id="submitRegister">
     </p>
 </form>
+</div>
+
+<!--<button onclick="toggleVisibility()">Toggle Visibility</button>-->
 
 <script src="initialPage.js"></script>
 </body>

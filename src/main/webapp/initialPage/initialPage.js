@@ -35,6 +35,22 @@ function callLogin(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
+
+    // let res = false;
+    // fetch("/rest/login/user")
+    //     .then(response =>{
+    //     if(response.status===200){
+    //         res = true;
+    //     }
+    // })
+    //
+    // if(res){
+    //     //hide login and register
+    //     let divs = document.getElementsByClassName("loginDiv");
+    //     divs[0].style.visibility = "hidden";
+    //     divs[1].style.visibility = "hidden";
+    // }
+
 }
 
 
@@ -74,3 +90,14 @@ loginForm.onsubmit = () => {
     return false;
 }
 
+
+// function toggleVisibility() {
+//     let divs = document.getElementsByClassName("loginDiv")
+//     for (let i = 0; i < divs.length; i++) {
+//         if(divs[i].style.visibility === "hidden"){
+//             divs[i].style.visibility = "visible"
+//         } else{
+//             divs[i].style.visibility = "hidden"
+//         }
+//     }
+// }
