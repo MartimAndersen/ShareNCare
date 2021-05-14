@@ -63,7 +63,7 @@ public class LoginResource {
 						
 				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok("User " + data.usernameLogin + " is now logged in.").build();
+				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.FORBIDDEN).build();

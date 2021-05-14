@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share&Care</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+<body>
+
+<form id="logoutFormId" action="#" method="post">
+    <h1>Logout</h1>
+    <p>
+        <label for="tokenId" class="floatLabel"></label>
+        <input id="tokenId" name="logoutInput" type="text" placeholder="Token ID">
+    </p>
+
+    <p>
+        <input type="submit" value="Log Out" id="submitLogout">
+    </p>
+</form>
+
+<form id="changeRoleFormId" action="#" method="post">
+    <h1>ChangeRole</h1>
+    <p>
+        <label for="userToBeChanged" class="floatLabel"></label>
+        <input id="userToBeChanged" name="changeRoleInput" type="text" placeholder="User to be changed">
+    </p>
+    <p>
+        <label for="roleToChange" class="floatLabel"></label>
+        <input id="roleToChange" name="changeRoleInput" type="text" placeholder="New Role">
+    </p>
+    <p>
+        <label for="tokenIdChangeRole" class="floatLabel"></label>
+        <input id="tokenIdChangeRole" name="changeRoleInput" type="text" placeholder="Token ID">
+    </p>
+
+    <p>
+        <input type="submit" value="Change Role" id="submitChangeRole">
+    </p>
+</form>
+
+<script src="afterLogin.js"></script>
+</body>
+</html>

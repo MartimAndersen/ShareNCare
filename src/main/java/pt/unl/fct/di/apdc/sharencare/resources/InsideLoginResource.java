@@ -87,7 +87,7 @@ public class InsideLoginResource {
 		 */
 
 		datastore.delete(userKey);
-		return Response.ok(data.userToDelete + " was sucessfully removed").build();
+		return Response.ok(data.userToDelete + " was successfully removed").build();
 
 	}
 
@@ -101,8 +101,8 @@ public class InsideLoginResource {
 		String profileType = data.profileType;
 		String landLine = data.landLine;
 		String mobile = data.mobile;
-		String adress = data.adress;
-		String secondAdress = data.secondAdress;
+		String address = data.address;
+		String secondAddress = data.secondAddress;
 		String postal = data.postal;
 		
 		/*
@@ -141,10 +141,10 @@ public class InsideLoginResource {
 			landLine = user.getString("landLine");
 		if (data.mobile == "")
 			mobile = user.getString("mobile");
-		if (data.adress == "")
-			adress = user.getString("adress");
-		if (data.secondAdress == "")
-			secondAdress = user.getString("secondAdress");
+		if (data.address == "")
+			address = user.getString("address");
+		if (data.secondAddress == "")
+			secondAddress = user.getString("secondAddress");
 		if (data.postal == "")
 			postal = user.getString("postal");
 
@@ -156,8 +156,8 @@ public class InsideLoginResource {
 		 */
 
 		user = Entity.newBuilder(userKey).set("password", user.getString("password")).set("email", email)
-				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("adress", adress)
-				.set("secondAdress", secondAdress).set("postal", postal).set("role", user.getString("role"))
+				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
+				.set("secondAddress", secondAddress).set("postal", postal).set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
 
 		datastore.update(user);
@@ -166,7 +166,7 @@ public class InsideLoginResource {
 
 	// op4
 	@POST
-	@Path("/op4")
+	@Path("/changeRole")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeRole(ChangeRoleData data) {
 		
@@ -174,51 +174,68 @@ public class InsideLoginResource {
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
 
-		Key userToChangeKey = datastore.newKeyFactory().setKind("User").newKey(data.userToChange);
-		Entity userToChange = datastore.get(userToChangeKey);
+		Key userToChangeKey = datastore.newKeyFactory().setKind("User").newKey(data.userToBeChanged);
+		Entity userToBeChanged = datastore.get(userToChangeKey);
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangeRole);
 		Entity token = datastore.get(tokenKey);
 
-		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + " doesn't exist")
+		if (token == null){
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangeRole + " doesn't exist")
 					.build();
+		}
+
 		
-		if(!t.validToken(tokenKey)) 
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + 
-					" has expired. Please login again to continue using the application")
-					.build();
+//		if(!t.validToken(tokenKey)){
+//			System.out.println("The given token is expired.");
+//			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangeRole +
+//					" has expired. Please login again to continue using the application")
+//					.build();
+//		}
+
 		
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity currentUser = datastore.get(currentUserKey);
 		
-		if(currentUser.getString("state") == "DISABLED")
-			return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.")
-					.build();
+		if(currentUser.getString("state") == "DISABLED"){
+			System.out.println("The user with the given token is disabled.");
+			return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.").build();
+		}
 
 
-		if (userToChange == null)
-			return Response.status(Status.FORBIDDEN).entity(data.userToChange + " does not exist").build();
+
+		if (userToBeChanged == null){
+			System.out.println("User to be changed does not exist.");
+			return Response.status(Status.FORBIDDEN).entity(data.userToBeChanged + " does not exist.").build();
+		}
+
 		
 
-		if (!checkRoleChange(userToChange.getString("role"), data.roleToChange, token.getString("role")))
-			return Response.status(Status.FORBIDDEN)
-					.entity("You do not have permissions to change " + data.userToChange + " role").build();
+		if (!checkRoleChange(userToBeChanged.getString("role"), data.roleToChange, token.getString("role"))){
+			System.out.println("No have permissions to execute this operation");
+			return Response.status(Status.FORBIDDEN).entity("You do not have permissions to execute this operation").build();
+		}
+
 		
 		/*
 		 * END OF VERIFICATIONS
 		 */
 
-		userToChange = Entity.newBuilder(userToChangeKey).set("password", userToChange.getString("password"))
-				.set("email", userToChange.getString("email")).set("profileType", userToChange.getString("profileType"))
-				.set("landLine", userToChange.getString("landLine")).set("mobile", userToChange.getString("mobile"))
-				.set("adress", userToChange.getString("adress"))
-				.set("secondAdress", userToChange.getString("secondAdress"))
-				.set("postal", userToChange.getString("postal")).set("role", data.roleToChange)
-				.set("state", userToChange.getString("state")).build();
+		userToBeChanged = Entity.newBuilder(userToChangeKey)
+				.set("password", userToBeChanged.getString("password"))
+				.set("email", userToBeChanged.getString("email"))
+				.set("profileType", userToBeChanged.getString("profileType"))
+				.set("landLine", userToBeChanged.getString("landLine"))
+				.set("mobile", userToBeChanged.getString("mobile"))
+				.set("address", userToBeChanged.getString("address"))
+				.set("secondAddress", userToBeChanged.getString("secondAddress"))
+				.set("postal", userToBeChanged.getString("postal"))
+				.set("role", data.roleToChange)
+				.set("state", userToBeChanged.getString("state")).build();
 
-		datastore.update(userToChange);
-		return Response.ok(data.userToChange + " role was changed to: " + data.roleToChange).build();
+		datastore.update(userToBeChanged);
+		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).build();
 
 	}
 
@@ -273,8 +290,8 @@ public class InsideLoginResource {
 		userToChange = Entity.newBuilder(userToChangeKey).set("password", userToChange.getString("password"))
 				.set("email", userToChange.getString("email")).set("profileType", userToChange.getString("profileType"))
 				.set("landLine", userToChange.getString("landLine")).set("mobile", userToChange.getString("mobile"))
-				.set("adress", userToChange.getString("adress"))
-				.set("secondAdress", userToChange.getString("secondAdress"))
+				.set("address", userToChange.getString("address"))
+				.set("secondAddress", userToChange.getString("secondAddress"))
 				.set("postal", userToChange.getString("postal")).set("role", userToChange.getString("role"))
 				.set("state", data.state).build();
 
@@ -285,7 +302,7 @@ public class InsideLoginResource {
 
 	// op7
 	@POST
-	@Path("/op7")
+	@Path("/logout")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response logout(TokenData data) throws IOException {
 		
@@ -403,7 +420,7 @@ public class InsideLoginResource {
 				user = Entity.newBuilder(userKey).set("password", DigestUtils.sha512Hex(data.newPassword))
 						.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
 						.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-						.set("adress", user.getString("adress")).set("secondAdress", user.getString("secondAdress"))
+						.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
 						.set("postal", user.getString("postal")).set("role", user.getString("role"))
 						.set("state", user.getString("state")).build();
 
@@ -563,14 +580,16 @@ public class InsideLoginResource {
 		return false;
 	}
 	
-	private boolean checkRoleChange(String roleOfUser, String roleToChange, String currentUserRole) {
-		if (!roleOfUser.equals("USER")) {
-			if (roleToChange.equals("GBO") && (currentUserRole.equals("SU") || currentUserRole.equals("GA")))
-				return true;
-			else if (roleToChange.equals("GA") && currentUserRole.equals("SU"))
-				return true;
+	private boolean checkRoleChange(String userToBeChangedRole, String nextRole, String masterRole) {
+		boolean isValid = false;
+		if(userToBeChangedRole.equals("USER")){
+			if(masterRole.equals("SU") && ( nextRole.equals("GBO")|| nextRole.equals("GA") )) {
+				isValid = true;
+			} else if(masterRole.equals("GA") && nextRole.equals("GBO")){
+				isValid = true;
+			}
 		}
-		return false;
+		return isValid;
 	}
 
 }

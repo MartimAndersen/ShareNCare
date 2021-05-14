@@ -2,17 +2,17 @@ package pt.unl.fct.di.apdc.sharencare.util;
 
 public class ChangeRoleData {
 
-	public String userToChange;
+	public String userToBeChanged;
 	public String roleToChange;
-	public String tokenId;
+	public String tokenIdChangeRole;
 	
 	public ChangeRoleData() {
 		
 	}
 	
-	public ChangeRoleData(String userToChange, String roleToChange, String tokenId) {
-		this.userToChange = userToChange;
+	public ChangeRoleData(String userToBeChanged, String roleToChange, String tokenId) {
+		this.userToBeChanged = userToBeChanged;
 		this.roleToChange = roleToChange;
-		this.tokenId = tokenId;
+		this.tokenIdChangeRole = tokenIdChangeRole;
 	}
 }

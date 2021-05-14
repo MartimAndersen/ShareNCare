@@ -11,13 +11,17 @@ public class RegisterData {
 	public String postal;
 	public String role;
 	public String state;
+	public String profileType;
+	public String secondAddress;
+	public String landLine;
+
 
 	public RegisterData() {
 
 	}
 
 	public RegisterData(String username, String email, String password, String confirmation, String mobile, String address, String postal, String role,
-			String state) {
+			String state, String profileType, String secondAddress, String landLine) {
 		this.username = username;
 		this.password = password;
 		this.confirmation = confirmation;
@@ -27,6 +31,10 @@ public class RegisterData {
 		this.postal = postal;
 		this.role = role;
 		this.state = state;
+		this.profileType = profileType;
+		this.secondAddress = secondAddress;
+		this.landLine = landLine;
+
 	}
 
 //	public boolean validateData(RegisterData data) {

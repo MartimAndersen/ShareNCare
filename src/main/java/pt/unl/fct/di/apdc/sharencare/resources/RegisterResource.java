@@ -50,7 +50,6 @@ public class RegisterResource {
     @POST
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response registerUser(RegisterData data) {
 
         LOG.fine("Attempt to register user: " + data.username);
@@ -93,14 +92,17 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("mobile", data.mobile)
+                        .set("landLine", data.landLine)
                         .set("address", data.address)
+                        .set("secondAddress", data.secondAddress)
                         .set("postal", data.postal)
                         .set("role", "USER")
-                        .set("state", "ENABLED").build();
+                        .set("state", "ENABLED")
+                        .set("profileType", data.profileType)
+                        .build();
 
                 txn.add(user);
                 txn.commit();
-                System.out.println("RESPONSE OK: " + Response.Status.OK);
                 return Response.ok("User " + data.username + " registered.").build();
             }
         } finally {

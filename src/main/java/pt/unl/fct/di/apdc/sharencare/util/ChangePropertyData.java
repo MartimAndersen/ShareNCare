@@ -6,8 +6,8 @@ public class ChangePropertyData {
 	public String profileType;
 	public String landLine;
 	public String mobile;
-	public String adress;
-	public String secondAdress;
+	public String address;
+	public String secondAddress;
 	public String postal;
 	public String tokenId;
 
@@ -15,13 +15,13 @@ public class ChangePropertyData {
 		
 	}
 	
-	public ChangePropertyData(String email, String profileType, String landLine, String mobile, String adress, String secondAdress, String postal, String tokenId) {
+	public ChangePropertyData(String email, String profileType, String landLine, String mobile, String address, String secondAddress, String postal, String tokenId) {
 		this.email = email;
 		this.profileType = profileType;
 		this.landLine = landLine;
 		this.mobile = mobile;
-		this.adress = adress;
-		this.secondAdress = secondAdress;
+		this.address = address;
+		this.secondAddress = secondAddress;
 		this.postal = postal;
 		this.tokenId = tokenId;
 	}
