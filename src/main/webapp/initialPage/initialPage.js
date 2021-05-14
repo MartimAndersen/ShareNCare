@@ -11,6 +11,17 @@ function callRegister(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
+    // fetch("/rest/register/user")
+    //     .then(response =>{
+    //     let res;
+    //     if(response.status===200){
+    //         res = "User registered successfully.";
+    //     } else{
+    //         res ="Something went wrong.";
+    //     }
+    //     alert(res);
+    // })
+
 }
 
 function callLogin(data) {
@@ -25,6 +36,8 @@ function callLogin(data) {
     xhttp.send(data);
 
 }
+
+
 
 function handleRegister() {
     let inputs = document.getElementsByName("regInput")
@@ -56,7 +69,7 @@ regForm.onsubmit = () => {
 }
 
 let loginForm = document.getElementById("loginFormId");
-regForm.onsubmit = () => {
+loginForm.onsubmit = () => {
     handleLogin();
     return false;
 }

@@ -35,11 +35,10 @@ public class LoginResource {
 		
 	}
 	
-	//op6 - logs a user
+	//op6 - logs in a user
 	@POST
 	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response loginUser(LoginData data) {
 		LOG.fine("Attempt to login user: " + data.usernameLogin);
 		
@@ -62,9 +61,9 @@ public class LoginResource {
 								.set("valid", t.valid)
 								.build();
 						
-				LOG.info("User '" + data.usernameLogin + "' logged in sucessfully.");
+				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok(g.toJson(token)).build();
+				return Response.ok("User " + data.usernameLogin + " is now logged in.").build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.FORBIDDEN).build();

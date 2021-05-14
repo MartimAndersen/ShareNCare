@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -17,6 +18,7 @@ import pt.unl.fct.di.apdc.sharencare.util.RegisterData;
 //import pt.unl.fct.di.apdc.APDC56253.util.RegisterData;
 
 @Path("/register")
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
@@ -48,13 +50,33 @@ public class RegisterResource {
     @POST
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response registerUser(RegisterData data) {
 
         LOG.fine("Attempt to register user: " + data.username);
 
 
-        if (!data.validateData(data))
-        	return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+        if(!data.validEmail()){
+            System.out.println("Invalid email.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if(!data.validPassword()){
+            System.out.println("Invalid password.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if(!data.validPostalCode()){
+            System.out.println("Invalid postal code.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if(!data.validPhone()){
+            System.out.println("Invalid mobile phone number.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+//        if (!data.validData()){
+//            System.out.println("data inserida invalida " + data.username);
+//            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+//        }
 
         Transaction txn = datastore.newTransaction();
 
@@ -78,6 +100,7 @@ public class RegisterResource {
 
                 txn.add(user);
                 txn.commit();
+                System.out.println("RESPONSE OK: " + Response.Status.OK);
                 return Response.ok("User " + data.username + " registered.").build();
             }
         } finally {
