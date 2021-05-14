@@ -38,7 +38,7 @@
 <br>
 
 <form id="changeRoleFormId" action="#" method="post">
-    <h1>ChangeRole</h1>
+    <h1>Change Role</h1>
     <p>
         <label for="userToBeChanged" class="floatLabel"></label>
         <input id="userToBeChanged" name="changeRoleInput" type="text" placeholder="User to be changed">
@@ -56,6 +56,81 @@
         <input type="submit" value="Change Role" id="submitChangeRole">
     </p>
 </form>
+
+<br>
+<br>
+<br>
+
+<form id="changePasswordFormId" action="#" method="post">
+    <h1>Change Password</h1>
+    <p>
+        <label for="tokenIdChangePassword" class="floatLabel"></label>
+        <input id="tokenIdChangePassword" name="changePasswordInput" type="text" placeholder="Token ID">
+    </p>
+    <p>
+        <label for="oldPassword" class="floatLabel"></label>
+        <input id="oldPassword" name="changePasswordInput" type="password" placeholder="Old Password">
+    </p>
+    <p>
+        <label for="newPassword" class="floatLabel"></label>
+        <input id="newPassword" name="changePasswordInput" type="password" placeholder="New Password">
+    </p>
+    <p>
+        <label for="confirmation" class="floatLabel"></label>
+        <input id="confirmation" name="changePasswordInput" type="password" placeholder="Confirm Password">
+    </p>
+
+
+    <p>
+        <input type="submit" value="Change Password" id="submitChangePassword">
+    </p>
+</form>
+
+<br>
+<br>
+<br>
+
+<form id="changeAttributesFormId" action="#" method="post">
+    <h1>ChangeAttributes</h1>
+
+    <p>
+        <label for="newEmail" class="floatLabel"></label>
+        <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
+    </p>
+    <p>
+        <label for="newProfileType" class="floatLabel"></label>
+        <input id="newProfileType" name="changeAttributesInput" type="text" placeholder="ProfileType Type">
+    </p>
+    <p>
+        <label for="newLandLine" class="floatLabel"></label>
+        <input id="newLandLine" name="changeAttributesInput" type="text" placeholder="Landline">
+    </p>
+    <p>
+        <label for="newMobile" class="floatLabel"></label>
+        <input id="newMobile" name="changeAttributesInput" type="text" placeholder="Mobile">
+    </p>
+    <p>
+        <label for="newAddress" class="floatLabel"></label>
+        <input id="newAddress" name="changeAttributesInput" type="text" placeholder="Address">
+    </p>
+    <p>
+        <label for="newSecondAddress" class="floatLabel"></label>
+        <input id="newSecondAddress" name="changeAttributesInput" type="text" placeholder="Second Address">
+    </p>
+    <p>
+        <label for="newPostal" class="floatLabel"></label>
+        <input id="newPostal" name="changeAttributesInput" type="text" placeholder="Postal">
+    </p>
+    <p>
+        <label for="tokenIdChangeAttributes" class="floatLabel"></label>
+        <input id="tokenIdChangeAttributes" name="changeAttributesInput" type="text" placeholder="Token ID">
+    </p>
+
+    <p>
+        <input type="submit" value="Change Attributes" id="submitChangeAttributes">
+    </p>
+</form>
+
 
 <script src="afterLogin.js"></script>
 </body>

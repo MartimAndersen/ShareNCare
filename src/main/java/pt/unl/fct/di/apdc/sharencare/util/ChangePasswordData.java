@@ -5,17 +5,17 @@ public class ChangePasswordData {
 	public String oldPassword;
 	public String newPassword;
 	public String confirmation;
-	public String tokenId;
+	public String tokenIdChangePassword;
 	
 	public ChangePasswordData() {
 		
 	}
 	
-	public ChangePasswordData(String oldPassword, String newPassword, String confirmation, String tokenId) {
+	public ChangePasswordData(String oldPassword, String newPassword, String confirmation, String tokenIdChangePassword) {
 		this.oldPassword = oldPassword;
 		this.newPassword = newPassword;
 		this.confirmation = confirmation;
-		this.tokenId = tokenId;
+		this.tokenIdChangePassword = tokenIdChangePassword;
 	}
 
 }

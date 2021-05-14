@@ -7,37 +7,40 @@ import com.google.cloud.datastore.Key;
 
 public class AuthTokenResource {
 
-	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
-	public boolean validToken(Key tokenKey) {
+    public boolean validToken(Key tokenKey) {
 
-		Entity token = datastore.get(tokenKey);
-		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity user = datastore.get(userKey);
-		
-		String verifier = user.getString("username").concat(user.getString("role"));
-		
-		if (!token.getBoolean("valid")) 
-			return false;
-		
-		if(!token.getString("verifier").equals(verifier))
-			return false;
-		
-		if (token.getLong("expirationData") > System.currentTimeMillis() || user == null) 
-			return true;
-			
-			token = Entity.newBuilder(tokenKey)
-					.set("username", token.getString("username"))
-					.set("role", token.getString("role"))
-					.set("creationData", token.getLong("creationData"))
-					.set("expirationData", token.getLong("expirationData"))
-					//.set("verifier", token.getString("verifier"))
-					.set("valid", false)
-					.build();
-			
-			return false;
-		}
+        Entity token = datastore.get(tokenKey);
 
-	
+        Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+        Entity user = datastore.get(userKey);
+
+        String verifier = user.getString("username").concat(user.getString("role"));
+
+        if (user == null)
+            return false;
+
+        if (!token.getBoolean("valid"))
+            return false;
+
+        if (!token.getString("verifier").equals(verifier))
+            return false;
+
+        if (token.getLong("expirationData") > System.currentTimeMillis())
+            return true;
+
+        Entity.newBuilder(tokenKey)
+                .set("username", token.getString("username"))
+                .set("role", token.getString("role"))
+                .set("creationData", token.getLong("creationData"))
+                .set("expirationData", token.getLong("expirationData"))
+                .set("verifier", token.getString("verifier"))
+                .set("valid", false)
+                .build();
+
+        return false;
+    }
+
+
 }
