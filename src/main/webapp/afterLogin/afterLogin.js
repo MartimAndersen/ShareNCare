@@ -58,3 +58,7 @@ changeRoleForm.onsubmit = () => {
     handleChangeRole();
     return false;
 }
+
+function backToInitialPage() {
+    window.location.href = "../initialPage/initialPage.html";
+}

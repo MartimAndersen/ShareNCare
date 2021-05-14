@@ -96,6 +96,9 @@ loginForm.onsubmit = () => {
     return false;
 }
 
+function goToAfterLoginPage() {
+    window.location.href = "../afterLogin/afterLogin.html";
+}
 
 // function toggleVisibility() {
 //     let divs = document.getElementsByClassName("loginDiv")
