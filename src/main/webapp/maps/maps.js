@@ -2,9 +2,9 @@ document.getElementById("TrackFormId").style.visibility = "hidden";
 
 function initMap() {
     const map = new google.maps.Map(document.getElementById("map"), {
-        mapTypeControl: false,
-        center: {lat: -33.8688, lng: 151.2195},
-        zoom: 13,
+        mapTypeControl: true,
+        center: {lat:  38.659784, lng:  -9.202765},
+        zoom: 16
     });
     new AutocompleteDirectionsHandler(map);
 
