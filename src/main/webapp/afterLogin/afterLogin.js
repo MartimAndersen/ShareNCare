@@ -129,3 +129,7 @@ changeAttributesForm.onsubmit = () => {
 function backToInitialPage() {
     window.location.href = "../initialPage/initialPage.html";
 }
+
+function goToMapsPage() {
+    window.location.href = "../maps/maps.html";
+}

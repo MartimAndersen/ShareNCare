@@ -42,10 +42,10 @@ public class MapResource {
                 track = Entity.newBuilder(mapKey)
                         .set("title", data.title)
                         .set("description", data.description)
-                        .set("difficulty", data.difficulty)
-                        .set("distance", data.distance)
-                        .set("origin", data.origin)
-                        .set("destination", data.destination)
+//                        .set("difficulty", data.difficulty)
+//                        .set("distance", data.distance)
+//                        .set("origin", data.origin)
+//                        .set("destination", data.destination)
                         .build();
 
 
