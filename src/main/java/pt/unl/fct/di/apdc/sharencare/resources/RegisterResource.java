@@ -57,19 +57,23 @@ public class RegisterResource {
 
         if(!data.validEmail()){
             System.out.println("Invalid email.");
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
-        if(!data.validPassword()){
-            System.out.println("Invalid password.");
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        if(!data.validPasswordLenght()){
+            System.out.println("Invalid password. Please enter 5 or more characters.");
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        if(!data.validPasswordConfirmation()){
+            System.out.println("The passwords are not the same.");
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
         if(!data.validPostalCode()){
             System.out.println("Invalid postal code.");
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         if(!data.validPhone()){
             System.out.println("Invalid mobile phone number.");
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
 
 //        if (!data.validData()){
@@ -84,7 +88,7 @@ public class RegisterResource {
             Entity user = txn.get(userKey);
             if (user != null) {
                 txn.rollback();
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.CONFLICT)
                         .entity("User " + data.username + " already exists.").build();
             } else {
                 user = Entity.newBuilder(userKey)

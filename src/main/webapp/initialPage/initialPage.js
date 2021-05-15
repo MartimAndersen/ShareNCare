@@ -1,12 +1,35 @@
-
-
 function callRegister(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-        } else if(this.readyState === 4 && this.status===400){
-            alert("Wrong parameters.");
+        if (this.readyState === 4) {
+
+            if (this.status === 200) {
+                alert(this.responseText);
+            } else if (this.status === 409) {
+                alert("User already exists.");
+            } else if (this.status === 403) {
+                alert("Invalid email.");
+            } else if (this.status === 401) {
+                alert("Invalid password. Please enter 5 or more characters.");
+            } else if (this.status === 417) {
+                alert("The passwords are not the same.");
+            } else if (this.status === 404) {
+                alert("Invalid postal code.");
+            } else if (this.status === 406) {
+                alert("Invalid mobile phone number.");
+            } else if (this.status !== 200) {
+                alert("Wrong parameters.");
+            }
+            // switch (this.status) {
+            //     case 200: alert(this.responseText);
+            //     case 409: alert("User already exists.");
+            //     case 403: alert("Invalid email.");
+            //     case 401: alert("Invalid password. Please enter 5 or more characters.");
+            //     case 417: alert("The passwords are not the same.");
+            //     case 404: alert("Invalid postal code.");
+            //     case 406: alert("Invalid mobile phone number.");
+            //     default: alert("Wrong parameters.");
+            // }
         }
     };
     xhttp.open("POST", "/rest/register/user", true);
@@ -37,7 +60,7 @@ function callLogin(data) {
             // divs[1].style.visibility = "hidden";
             window.location.href = "../afterLogin/afterLogin.html";
 
-        } else if(this.readyState === 4 && this.status===403){
+        } else if (this.readyState === 4 && this.status === 403) {
             alert("Wrong parameters.");
         }
     };
@@ -55,7 +78,6 @@ function callLogin(data) {
 
 
 }
-
 
 
 function handleRegister() {

@@ -1,19 +1,14 @@
+document.getElementById("TrackFormId").style.visibility = "hidden";
 
 function initMap() {
     const map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: false,
-        center: { lat: -33.8688, lng: 151.2195 },
+        center: {lat: -33.8688, lng: 151.2195},
         zoom: 13,
     });
     new AutocompleteDirectionsHandler(map);
-}
 
-function backToInitialPage() {
-    window.location.href = "../initialPage/initialPage.html";
-}
 
-function goToAfterLoginPage() {
-    window.location.href = "../afterLogin/afterLogin.html";
 }
 
 class AutocompleteDirectionsHandler {
@@ -36,18 +31,6 @@ class AutocompleteDirectionsHandler {
         );
         // Specify just the place data fields that you need.
         destinationAutocomplete.setFields(["place_id"]);
-        this.setupClickListener(
-            "changemode-walking",
-            google.maps.TravelMode.WALKING
-        );
-        this.setupClickListener(
-            "changemode-transit",
-            google.maps.TravelMode.TRANSIT
-        );
-        this.setupClickListener(
-            "changemode-driving",
-            google.maps.TravelMode.DRIVING
-        );
         this.setupPlaceChangedListener(originAutocomplete, "ORIG");
         this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
         this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
@@ -56,15 +39,7 @@ class AutocompleteDirectionsHandler {
         );
         this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
     }
-    // Sets a listener on a radio button to change the filter type on Places
-    // Autocomplete.
-    setupClickListener(id, mode) {
-        const radioButton = document.getElementById(id);
-        radioButton.addEventListener("click", () => {
-            this.travelMode = mode;
-            this.route();
-        });
-    }
+
     setupPlaceChangedListener(autocomplete, mode) {
         autocomplete.bindTo("bounds", this.map);
         autocomplete.addListener("place_changed", () => {
@@ -83,6 +58,7 @@ class AutocompleteDirectionsHandler {
             this.route();
         });
     }
+
     route() {
         if (!this.originPlaceId || !this.destinationPlaceId) {
             return;
@@ -90,8 +66,8 @@ class AutocompleteDirectionsHandler {
         const me = this;
         this.directionsService.route(
             {
-                origin: { placeId: this.originPlaceId },
-                destination: { placeId: this.destinationPlaceId },
+                origin: {placeId: this.originPlaceId},
+                destination: {placeId: this.destinationPlaceId},
                 travelMode: this.travelMode,
             },
             (response, status) => {
@@ -102,7 +78,16 @@ class AutocompleteDirectionsHandler {
                 }
             }
         );
+        document.getElementById("TrackFormId").style.visibility = "visible";
     }
+}
+
+function backToInitialPage() {
+    window.location.href = "../initialPage/initialPage.html";
+}
+
+function goToAfterLoginPage() {
+    window.location.href = "../afterLogin/afterLogin.html";
 }
 
 function callCreateTrack(data) {
@@ -110,6 +95,10 @@ function callCreateTrack(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             alert(this.responseText);
+        } else if (this.readyState === 4 && this.status === 403) {
+            alert("Please insert a title.");
+        } else if (this.readyState === 4 && this.status === 409) {
+            alert("The track with the given title already exists.");
         } else if (this.readyState === 4 && this.status !== 200) {
             alert("Wrong parameters.");
         }
@@ -118,14 +107,16 @@ function callCreateTrack(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
-    window.location.href = "../maps/maps.html";
 }
 
 function handleCreateTrack() {
-    let inputs = document.getElementsByName("changeAttributesInput")
+    let inputs = document.getElementsByName("createTrack")
+
     let data = {
         title: inputs[0].value,
-        description: inputs[1].value
+        description: inputs[1].value,
+        origin: document.getElementById("origin-input").value,
+        destination: document.getElementById("destination-input").value
     }
     callCreateTrack(JSON.stringify(data));
 }

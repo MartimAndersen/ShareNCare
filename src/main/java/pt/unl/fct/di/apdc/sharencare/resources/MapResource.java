@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response.Status;
 import com.google.cloud.datastore.*;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
+
 @Path("/map")
 public class MapResource {
 
@@ -23,12 +24,12 @@ public class MapResource {
     @Path("/registerTrack")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerTrack(TrackData data) {
-        LOG.fine("Attempt to register track: " + data.title);
 
-            /*
-        if (!validateData(data))
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();*/
-        
+
+        if(data.title.equals("")){
+            System.out.println("Please insert a title.");
+            return Response.status(Status.FORBIDDEN).build();
+        }
 
         Transaction txn = datastore.newTransaction();
 
@@ -37,21 +38,22 @@ public class MapResource {
             Entity track = txn.get(mapKey);
             if (track != null) {
                 txn.rollback();
-                return Response.status(Response.Status.BAD_REQUEST).entity("Track with name: " + data.title + " already exists").build();
+                return Response.status(Status.CONFLICT).entity("The track with the given title already exists.").build();
             } else {
                 track = Entity.newBuilder(mapKey)
                         .set("title", data.title)
                         .set("description", data.description)
+                        .set("origin", data.origin)
+                        .set("destination", data.destination)
 //                        .set("difficulty", data.difficulty)
 //                        .set("distance", data.distance)
-//                        .set("origin", data.origin)
-//                        .set("destination", data.destination)
+
                         .build();
 
 
                 txn.add(track);
                 txn.commit();
-                return Response.ok("Track registered " + data.title).build();
+                return Response.ok("Track " + data.title + " registered.").build();
             }
         } finally {
             if (txn.isActive()) {

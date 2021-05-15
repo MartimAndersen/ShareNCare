@@ -62,8 +62,11 @@ public class RegisterData {
 		return (email.contains("@") && (splitEmail[emailSize].length() == 2 || splitEmail[emailSize].length() == 3));
 	}
 
-	public boolean validPassword() {
-		return (password.length()>=5 && password.equals(confirmation));
+	public boolean validPasswordLenght() {
+		return (password.length()>=5);
+	}
+	public boolean validPasswordConfirmation() {
+		return (password.equals(confirmation));
 	}
 
 	public boolean validPostalCode() {
