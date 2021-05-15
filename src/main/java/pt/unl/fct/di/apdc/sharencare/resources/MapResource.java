@@ -6,12 +6,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.google.cloud.datastore.*;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
-@Path("/registerTrack")
-public class RegisterTrackResource {
+@Path("/map")
+public class MapResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
@@ -19,15 +20,15 @@ public class RegisterTrackResource {
 
     // op1 - registers a track
     @POST
-    @Path("op1")
+    @Path("/registerTrack")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerTrack(TrackData data) {
         LOG.fine("Attempt to register track: " + data.title);
 
             /*
         if (!validateData(data))
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
-*/
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();*/
+        
 
         Transaction txn = datastore.newTransaction();
 
@@ -62,7 +63,7 @@ public class RegisterTrackResource {
 
     // op2 - registers a marker
     @POST
-    @Path("op2")
+    @Path("registerMarker")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerMarker(MarkerData data) {
         LOG.fine("Attempt to register marker: " + data.coordinates);

@@ -17,6 +17,5 @@ public class TrackData {
         this.origin = origin;
         this.difficulty = difficulty;
         this.destination = destination;
-
     }
 }
