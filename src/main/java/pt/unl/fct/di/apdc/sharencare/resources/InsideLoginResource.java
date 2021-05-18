@@ -97,18 +97,14 @@ public class InsideLoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changeProperty(ChangePropertyData data) {
 
-        System.out.println("1.1");
-
         if (data.tokenIdChangeAttributes.equals("")) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        System.out.println("1.2");
 
         if (data.allEmptyParameters()) {
             System.out.println("Please enter at least one new attribute.");
             return Response.status(Status.LENGTH_REQUIRED).build();
         }
-        System.out.println("1.3");
 
         String email = data.newEmail;
         String profileType = data.newProfileType;
@@ -119,13 +115,8 @@ public class InsideLoginResource {
         String postal = data.newPostal;
 
 
-
-        System.out.println("1.4");
-
         Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangeAttributes);
         Entity token = datastore.get(tokenKey);
-
-        System.out.println("1.5");
 
         if (token == null) {
             System.out.println("The given token does not exist.");
@@ -143,30 +134,16 @@ public class InsideLoginResource {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity user = datastore.get(userKey);
 
-        System.out.println("1.7");
-
         if (user == null) {
             System.out.println("The user with the given token does not exist.");
             return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist").build();
         }
-
-        System.out.println("1.8");
 
         if (user.getString("state").equals("DISABLED")) {
             System.out.println("The user with the given token is disabled.");
             return Response.status(Status.NOT_ACCEPTABLE).entity("User with id: " + user.getString("username") + " is disabled.")
                     .build();
         }
-
-        System.out.println("1.9");
-
-//        String oldEmail = user.getString("email");
-//        String oldProfileType = user.getString("profileType");
-//        String oldLandLine = user.getString("landLine");
-//        String oldMobile = user.getString("mobile");
-//        String oldAddress = user.getString("address");
-//        String oldSecondAddress = user.getString("secondAddress");
-//        String oldPostal = user.getString("postal");
 
         if (data.newEmail.equals("")) {
             email = user.getString("email");
@@ -176,23 +153,14 @@ public class InsideLoginResource {
                 return Response.status(Status.PRECONDITION_FAILED).build();
             }
         }
-        System.out.println("1.10");
 
         if (data.newProfileType.equals("")) {
-
-            System.out.println("1.10.1");
-            System.out.println("profile type: " + user.getString("profileType"));
-            System.out.println("1.10.2");
             profileType = user.getString("profileType");
-            System.out.println("1.10.3");
         }
-
-        System.out.println("1.11");
 
         if (data.newLandLine.equals("")) {
             landLine = user.getString("landLine");
         }
-        System.out.println("1.12");
 
         if (data.newMobile.equals("")) {
             mobile = user.getString("mobile");
@@ -203,19 +171,13 @@ public class InsideLoginResource {
             }
         }
 
-        System.out.println("1.13");
-
         if (data.newAddress.equals("")) {
             address = user.getString("address");
         }
 
-        System.out.println("1.14");
-
         if (data.newSecondAddress.equals("")) {
             secondAddress = user.getString("secondAddress");
         }
-
-        System.out.println("1.15");
 
         if (data.newPostal.equals("")) {
             postal = user.getString("postal");
@@ -225,9 +187,6 @@ public class InsideLoginResource {
                 return Response.status(Status.BAD_REQUEST).build();
             }
         }
-
-        System.out.println("1.16");
-
 
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
@@ -247,11 +206,7 @@ public class InsideLoginResource {
                 .set("state", user.getString("state"))
                 .build();
 
-        System.out.println("1.17");
-
         datastore.update(user);
-
-        System.out.println("1.18");
 
         return Response.ok("Properties changed").build();
     }
@@ -307,11 +262,6 @@ public class InsideLoginResource {
             System.out.println("You do not have permissions to execute this operation.");
             return Response.status(Status.NOT_ACCEPTABLE).build();
         }
-
-
-        /*
-         * END OF VERIFICATIONS
-         */
 
         userToBeChanged = Entity.newBuilder(userToChangeKey)
                 .set("username", data.userToBeChanged)
