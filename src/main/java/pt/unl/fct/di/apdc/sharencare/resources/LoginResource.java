@@ -40,14 +40,20 @@ public class LoginResource {
 	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response loginUser(LoginData data) {
-		LOG.fine("Attempt to login user: " + data.usernameLogin);
+
+		if(data.emptyParameters()){
+			System.out.println("Please fill in all non-optional fields.");
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.usernameLogin);
 		Entity user = datastore.get(userKey);
-		
+
+
+
 		if (user != null) {
 			String hashedPWD = user.getString("password");
-			//outra forma de obter a password??
+
 			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
 				AuthToken t = new AuthToken(data.usernameLogin, user.getString("role"));
 				
@@ -66,12 +72,11 @@ public class LoginResource {
 				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
-				return Response.status(Status.FORBIDDEN).build();
+				return Response.status(Status.EXPECTATION_FAILED).build();
 			}
-		}
-		else {
+		} else {
 			LOG.warning("Failed login attempt for username: " + data.usernameLogin);
-			return Response.status(Status.FORBIDDEN).build();
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
 	}

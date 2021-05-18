@@ -69,7 +69,7 @@ public class InsideLoginResource {
         Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity currentUser = datastore.get(currentUserKey);
 
-        if (currentUser.getString("state") == "DISABLED")
+        if (currentUser.getString("state").equals("DISABLED"))
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.")
                     .build();
 
@@ -97,6 +97,19 @@ public class InsideLoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changeProperty(ChangePropertyData data) {
 
+        System.out.println("1.1");
+
+        if (data.tokenIdChangeAttributes.equals("")) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        System.out.println("1.2");
+
+        if (data.allEmptyParameters()) {
+            System.out.println("Please enter at least one new attribute.");
+            return Response.status(Status.LENGTH_REQUIRED).build();
+        }
+        System.out.println("1.3");
+
         String email = data.newEmail;
         String profileType = data.newProfileType;
         String landLine = data.newLandLine;
@@ -105,17 +118,21 @@ public class InsideLoginResource {
         String secondAddress = data.newSecondAddress;
         String postal = data.newPostal;
 
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
+
+
+        System.out.println("1.4");
 
         Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangeAttributes);
         Entity token = datastore.get(tokenKey);
 
+        System.out.println("1.5");
+
         if (token == null) {
             System.out.println("The given token does not exist.");
-            return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangeAttributes + " doesn't exist").build();
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenIdChangeAttributes + " doesn't exist").build();
         }
+
+        System.out.println("1.6");
 
 
 //		if(!t.validToken(tokenKey))
@@ -126,64 +143,116 @@ public class InsideLoginResource {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity user = datastore.get(userKey);
 
+        System.out.println("1.7");
+
         if (user == null) {
             System.out.println("The user with the given token does not exist.");
-            return Response.status(Status.BAD_REQUEST).entity("User with username: " + token.getString("username") + " doesn't exist").build();
+            return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist").build();
         }
 
-        if (user.getString("state") == "DISABLED") {
+        System.out.println("1.8");
+
+        if (user.getString("state").equals("DISABLED")) {
             System.out.println("The user with the given token is disabled.");
-            return Response.status(Status.BAD_REQUEST).entity("User with id: " + user.getString("username") + " is disabled.")
+            return Response.status(Status.NOT_ACCEPTABLE).entity("User with id: " + user.getString("username") + " is disabled.")
                     .build();
         }
 
-        if (data.newEmail == "") {
+        System.out.println("1.9");
+
+//        String oldEmail = user.getString("email");
+//        String oldProfileType = user.getString("profileType");
+//        String oldLandLine = user.getString("landLine");
+//        String oldMobile = user.getString("mobile");
+//        String oldAddress = user.getString("address");
+//        String oldSecondAddress = user.getString("secondAddress");
+//        String oldPostal = user.getString("postal");
+
+        if (data.newEmail.equals("")) {
             email = user.getString("email");
         } else {
             if (!data.validEmail()) {
                 System.out.println("Invalid email.");
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.PRECONDITION_FAILED).build();
             }
         }
-        if (data.newProfileType == "")
+        System.out.println("1.10");
+
+        if (data.newProfileType.equals("")) {
+
+            System.out.println("1.10.1");
+            System.out.println("profile type: " + user.getString("profileType"));
+            System.out.println("1.10.2");
             profileType = user.getString("profileType");
-        if (data.newLandLine == "")
+            System.out.println("1.10.3");
+        }
+
+        System.out.println("1.11");
+
+        if (data.newLandLine.equals("")) {
             landLine = user.getString("landLine");
-        if (data.newMobile == "") {
+        }
+        System.out.println("1.12");
+
+        if (data.newMobile.equals("")) {
             mobile = user.getString("mobile");
         } else {
             if (!data.validPhone()) {
                 System.out.println("Invalid mobile phone number.");
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.EXPECTATION_FAILED).build();
             }
         }
-        if (data.newAddress == "")
+
+        System.out.println("1.13");
+
+        if (data.newAddress.equals("")) {
             address = user.getString("address");
-        if (data.newSecondAddress == "")
+        }
+
+        System.out.println("1.14");
+
+        if (data.newSecondAddress.equals("")) {
             secondAddress = user.getString("secondAddress");
-        if (data.newPostal == "") {
+        }
+
+        System.out.println("1.15");
+
+        if (data.newPostal.equals("")) {
             postal = user.getString("postal");
         } else {
             if (!data.validPostalCode()) {
                 System.out.println("Invalid postal code.");
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.BAD_REQUEST).build();
             }
         }
+
+        System.out.println("1.16");
 
 
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
 
-        /*
-         * END OF VERIFICATIONS
-         */
+        user = Entity.newBuilder(userKey)
+                .set("username", token.getString("username"))
+                .set("password", user.getString("password"))
+                .set("confirmation", user.getString("password"))
+                .set("email", email)
+                .set("profileType", profileType)
+                .set("landLine", landLine)
+                .set("mobile", mobile)
+                .set("address", address)
+                .set("secondAddress", secondAddress)
+                .set("postal", postal)
+                .set("role", user.getString("role"))
+                .set("state", user.getString("state"))
+                .build();
 
-        user = Entity.newBuilder(userKey).set("password", user.getString("password")).set("email", email)
-                .set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
-                .set("secondAddress", secondAddress).set("postal", postal).set("role", user.getString("role"))
-                .set("state", user.getString("state")).build();
+        System.out.println("1.17");
 
         datastore.update(user);
+
+        System.out.println("1.18");
+
         return Response.ok("Properties changed").build();
     }
 
@@ -193,9 +262,10 @@ public class InsideLoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changeRole(ChangeRoleData data) {
 
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
+        if (data.emptyParameters()) {
+            System.out.println("Please fill in all fields.");
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
 
         Key userToChangeKey = datastore.newKeyFactory().setKind("User").newKey(data.userToBeChanged);
         Entity userToBeChanged = datastore.get(userToChangeKey);
@@ -205,7 +275,7 @@ public class InsideLoginResource {
 
         if (token == null) {
             System.out.println("The given token does not exist.");
-            return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangeRole + " doesn't exist")
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenIdChangeRole + " doesn't exist")
                     .build();
         }
 
@@ -221,7 +291,7 @@ public class InsideLoginResource {
         Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity currentUser = datastore.get(currentUserKey);
 
-        if (currentUser.getString("state") == "DISABLED") {
+        if (currentUser.getString("state").equals("DISABLED")) {
             System.out.println("The user with the given token is disabled.");
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.").build();
         }
@@ -234,8 +304,8 @@ public class InsideLoginResource {
 
 
         if (!checkRoleChange(userToBeChanged.getString("role"), data.roleToChange, token.getString("role"))) {
-            System.out.println("No have permissions to execute this operation");
-            return Response.status(Status.FORBIDDEN).entity("You do not have permissions to execute this operation").build();
+            System.out.println("You do not have permissions to execute this operation.");
+            return Response.status(Status.NOT_ACCEPTABLE).build();
         }
 
 
@@ -244,7 +314,9 @@ public class InsideLoginResource {
          */
 
         userToBeChanged = Entity.newBuilder(userToChangeKey)
+                .set("username", data.userToBeChanged)
                 .set("password", userToBeChanged.getString("password"))
+                .set("confirmation", userToBeChanged.getString("password"))
                 .set("email", userToBeChanged.getString("email"))
                 .set("profileType", userToBeChanged.getString("profileType"))
                 .set("landLine", userToBeChanged.getString("landLine"))
@@ -253,7 +325,8 @@ public class InsideLoginResource {
                 .set("secondAddress", userToBeChanged.getString("secondAddress"))
                 .set("postal", userToBeChanged.getString("postal"))
                 .set("role", data.roleToChange)
-                .set("state", userToBeChanged.getString("state")).build();
+                .set("state", userToBeChanged.getString("state"))
+                .build();
 
         datastore.update(userToBeChanged);
         return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).build();
@@ -288,7 +361,7 @@ public class InsideLoginResource {
         Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity currentUser = datastore.get(currentUserKey);
 
-        if (currentUser.getString("state") == "DISABLED")
+        if (currentUser.getString("state").equals("DISABLED"))
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.")
                     .build();
 
@@ -308,12 +381,18 @@ public class InsideLoginResource {
          * END OF VERIFICATIONS
          */
 
-        userToChange = Entity.newBuilder(userToChangeKey).set("password", userToChange.getString("password"))
-                .set("email", userToChange.getString("email")).set("profileType", userToChange.getString("profileType"))
-                .set("landLine", userToChange.getString("landLine")).set("mobile", userToChange.getString("mobile"))
+        userToChange = Entity.newBuilder(userToChangeKey)
+                .set("username", data.userToChange)
+                .set("password", userToChange.getString("password"))
+                .set("confirmation", userToChange.getString("password"))
+                .set("email", userToChange.getString("email"))
+                .set("profileType", userToChange.getString("profileType"))
+                .set("landLine", userToChange.getString("landLine"))
+                .set("mobile", userToChange.getString("mobile"))
                 .set("address", userToChange.getString("address"))
                 .set("secondAddress", userToChange.getString("secondAddress"))
-                .set("postal", userToChange.getString("postal")).set("role", userToChange.getString("role"))
+                .set("postal", userToChange.getString("postal"))
+                .set("role", userToChange.getString("role"))
                 .set("state", data.state).build();
 
         datastore.put(userToChange);
@@ -325,22 +404,18 @@ public class InsideLoginResource {
     @POST
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response logout(TokenData data) throws IOException {
+    public Response logout(TokenData data) {
 
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
+        if (data.tokenId.equals("")) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
 
         Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
         Entity token = datastore.get(tokenKey);
 
-        if (token == null)
-            return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + " doesn't exist")
-                    .build();
-
-        /*
-         * END OF VERIFICATIONS
-         */
+        if (token == null) {
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist").build();
+        }
 
         String user = token.getString("username");
 
@@ -373,7 +448,7 @@ public class InsideLoginResource {
         Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity currentUser = datastore.get(currentUserKey);
 
-        if (currentUser.getString("state") == "DISABLED")
+        if (currentUser.getString("state").equals("DISABLED"))
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.")
                     .build();
 
@@ -385,7 +460,7 @@ public class InsideLoginResource {
                 .setFilter(PropertyFilter.eq("profileType", "Publico")).build();
 
         QueryResults<Entity> results = datastore.run(query);
-        List<String> r = new ArrayList<String>();
+        List<String> r = new ArrayList<>();
 
         if (results == null)
             return Response.status(Status.NO_CONTENT).entity("No users with profile type 'Publico'").build();
@@ -403,18 +478,18 @@ public class InsideLoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changePassword(ChangePasswordData data) {
 
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
+        if (data.emptyParameters()) {
+            System.out.println("Please fill in all non-optional fields.");
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
 
         Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangePassword);
         Entity token = datastore.get(tokenKey);
 
         if (token == null) {
             System.out.println("The given token does not exist.");
-            return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangePassword + " doesn't exist").build();
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenIdChangePassword + " doesn't exist").build();
         }
-
 
 //		if(!t.validToken(tokenKey))
 //			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangePassword +
@@ -424,39 +499,52 @@ public class InsideLoginResource {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity user = datastore.get(userKey);
 
-
         if (user == null) {
             System.out.println("The user with the given token does not exist.");
             return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();
         }
 
-        if (user.getString("state") == "DISABLED") {
+        if (user.getString("state").equals("DISABLED")) {
             System.out.println("The user with the given token is disabled.");
-            return Response.status(Status.BAD_REQUEST).entity("User with id: " + user.getString("username") + " is disabled.").build();
+            return Response.status(Status.NOT_ACCEPTABLE).entity("User with id: " + user.getString("username") + " is disabled.").build();
         }
-
-
-        /*
-         * END OF VERIFICATIONS
-         */
 
         String hashedPWD = user.getString("password");
+
         if (hashedPWD.equals(DigestUtils.sha512Hex(data.oldPassword))) {
-            if (data.newPassword.equals(data.confirmation)) {
+            if (data.validPasswordLenght()) {
+                if (data.newPassword.equals(data.confirmation)) {
 
-                user = Entity.newBuilder(userKey).set("password", DigestUtils.sha512Hex(data.newPassword))
-                        .set("email", user.getString("email")).set("profileType", user.getString("profileType"))
-                        .set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-                        .set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
-                        .set("postal", user.getString("postal")).set("role", user.getString("role"))
-                        .set("state", user.getString("state")).build();
+                    user = Entity.newBuilder(userKey)
+                            .set("username", token.getString("username"))
+                            .set("password", DigestUtils.sha512Hex(data.newPassword))
+                            .set("confirmation", DigestUtils.sha512Hex(data.newPassword))
+                            .set("email", user.getString("email"))
+                            .set("profileType", user.getString("profileType"))
+                            .set("landLine", user.getString("landLine"))
+                            .set("mobile", user.getString("mobile"))
+                            .set("address", user.getString("address"))
+                            .set("secondAddress", user.getString("secondAddress"))
+                            .set("postal", user.getString("postal"))
+                            .set("role", user.getString("role"))
+                            .set("state", user.getString("state"))
+                            .build();
 
-                datastore.put(user);
-                return Response.ok("Password was changed").build();
+                    datastore.put(user);
+
+                    return Response.ok("Password was changed").build();
+                } else {
+                    return Response.status(Status.EXPECTATION_FAILED).entity("Passwords don't match.").build();
+                }
+            } else {
+                System.out.println("Invalid password. Please enter 5 or more characters.");
+                return Response.status(Response.Status.LENGTH_REQUIRED).build();
             }
-            return Response.status(Status.BAD_REQUEST).entity("Passwords don't match").build();
+        } else {
+            return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
         }
-        return Response.status(Status.BAD_REQUEST).entity("Old password is incorrect").build();
+
+
     }
 
     // op8.2d
@@ -488,7 +576,7 @@ public class InsideLoginResource {
             return Response.status(Status.BAD_REQUEST).entity("User doesn't exist")
                     .build();
 
-        if (user.getString("state") == "DISABLED")
+        if (user.getString("state").equals("DISABLED"))
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + user.getString("username") + " is disabled.")
                     .build();
 
@@ -504,7 +592,7 @@ public class InsideLoginResource {
                     .setFilter(PropertyFilter.eq("role", data.role)).build();
 
             QueryResults<Entity> results = datastore.run(query);
-            List<String> r = new ArrayList<String>();
+            List<String> r = new ArrayList<>();
 
             while (results.hasNext())
                 r.add(results.next().getKey().getName());
@@ -542,7 +630,7 @@ public class InsideLoginResource {
         Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
         Entity currentUser = datastore.get(currentUserKey);
 
-        if (currentUser.getString("state") == "DISABLED")
+        if (currentUser.getString("state").equals("DISABLED"))
             return Response.status(Status.BAD_REQUEST).entity("User with id: " + currentUser.getString("username") + " is disabled.")
                     .build();
 

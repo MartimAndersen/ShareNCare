@@ -84,4 +84,8 @@ public class RegisterData {
 public boolean validPhone() {
 	return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14);
 }
+
+	public boolean emptyParameters() {
+		return username.equals("") || email.equals("") || password.equals("") || confirmation.equals("");
+	}
 }

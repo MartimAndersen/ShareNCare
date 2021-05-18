@@ -18,4 +18,11 @@ public class ChangePasswordData {
 		this.tokenIdChangePassword = tokenIdChangePassword;
 	}
 
+    public boolean emptyParameters() {
+		return oldPassword.equals("") || newPassword.equals("") || confirmation.equals("") || tokenIdChangePassword.equals("");
+    }
+
+    public boolean validPasswordLenght() {
+		return (newPassword.length()>=5);
+    }
 }

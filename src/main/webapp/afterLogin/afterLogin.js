@@ -1,11 +1,13 @@
 function callLogout(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-            window.location.href = "../initialPage/initialPage.html";
-        } else if (this.readyState === 4 && this.status === 400) {
-            alert("Wrong parameters.");
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); window.location.href = "../initialPage/initialPage.html"; break;
+                case 401: alert("Please enter a token."); break;
+                case 404: alert("Token does not exist."); break;
+                default: alert("Wrong parameters."); break;
+            }
         }
     };
     xhttp.open("POST", "/rest/loggedIn/logout", true);
@@ -17,10 +19,16 @@ function callLogout(data) {
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-        } else if (this.readyState === 4 && this.status !== 200) {
-            alert("Wrong parameters.");
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); break;
+                case 401: alert("Please fill in all fields."); break;
+                case 404: alert("Token does not exist."); break;
+                case 400: alert("The user with the given token is disabled."); break;
+                case 403: alert("User to be changed does not exist."); break;
+                case 406: alert("You do not have permissions to execute this operation."); break;
+                default: alert("Wrong parameters."); break;
+            }
         }
     };
     xhttp.open("POST", "/rest/loggedIn/changeRole", true);
@@ -32,10 +40,18 @@ function callChangeRole(data) {
 function callChangePassword(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-        } else if (this.readyState === 4 && this.status !== 200) {
-            alert("Wrong parameters.");
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); break;
+                case 401: alert("Please enter a token."); break;
+                case 404: alert("Token does not exist."); break;
+                case 403: alert("The user with the given token does not exist."); break;
+                case 406: alert("The user with the given token is disabled."); break;
+                case 409: alert("The old password is incorrect."); break;
+                case 411: alert("Invalid new password. Please enter 5 or more characters."); break;
+                case 417: alert("The new password and the confirmation password don't match."); break;
+                default: alert("Wrong parameters."); break;
+            }
         }
     };
     xhttp.open("POST", "/rest/loggedIn/changePassword", true);
@@ -46,10 +62,18 @@ function callChangePassword(data) {
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-        } else if (this.readyState === 4 && this.status !== 200) {
-            alert("Wrong parameters.");
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); break;
+                case 411: alert("Please enter at least one new attribute."); break;
+                case 401: alert("Please enter a token."); break;
+                case 404: alert("Token does not exist."); break;
+                case 403: alert("The user with the given token does not exist."); break;
+                case 406: alert("The user with the given token is disabled."); break;
+                case 412: alert("Invalid email."); break;
+                case 417: alert("Invalid mobile phone."); break;
+                default: alert("Wrong parameters."); break;
+            }
         }
     };
     xhttp.open("POST", "/rest/loggedIn/changeAttributes", true);

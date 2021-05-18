@@ -33,8 +33,11 @@ public class RegisterResource {
                     .set("email", "superUser@gmail.com")
                     .set("password", DigestUtils.sha512Hex("password"))
                     .set("confirmation", DigestUtils.sha512Hex("password"))
+                    .set("profileType", "")
+                    .set("landLine", "")
                     .set("mobile", "")
                     .set("address", "")
+                    .set("secondAddress", "")
                     .set("postal", "")
                     .set("role", "SU")
                     .set("state", "ENABLED")
@@ -54,14 +57,17 @@ public class RegisterResource {
 
         LOG.fine("Attempt to register user: " + data.username);
 
-
+        if(data.emptyParameters()){
+            System.out.println("Please fill in all non-optional fields.");
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
         if(!data.validEmail()){
             System.out.println("Invalid email.");
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         if(!data.validPasswordLenght()){
             System.out.println("Invalid password. Please enter 5 or more characters.");
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.LENGTH_REQUIRED).build();
         }
         if(!data.validPasswordConfirmation()){
             System.out.println("The passwords are not the same.");
@@ -95,6 +101,7 @@ public class RegisterResource {
                         .set("username", data.username)
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
+                        .set("confirmation", DigestUtils.sha512Hex(data.password))
                         .set("mobile", data.mobile)
                         .set("landLine", data.landLine)
                         .set("address", data.address)
