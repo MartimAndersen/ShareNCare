@@ -13,5 +13,8 @@ public class LoginData {
 		this.usernameLogin = usernameLogin;
 		this.passwordLogin = passwordLogin;
 	}
-	
+
+    public boolean emptyParameters() {
+		return usernameLogin.equals("") || passwordLogin.equals("");
+    }
 }

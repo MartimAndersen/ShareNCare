@@ -41,4 +41,9 @@ public class ChangePropertyData {
 	public boolean validPhone() {
 		return (newMobile.equals("") || newMobile.length() == 9 || newMobile.length() == 13 || newMobile.length() == 14);
 	}
+
+	public boolean allEmptyParameters() {
+		return newEmail.equals("") && newProfileType.equals("") && newLandLine.equals("") && newMobile.equals("")
+				&& newAddress.equals("") && newSecondAddress.equals("") && newPostal.equals("");
+	}
 }

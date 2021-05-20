@@ -10,9 +10,13 @@ public class ChangeRoleData {
 		
 	}
 	
-	public ChangeRoleData(String userToBeChanged, String roleToChange, String tokenId) {
+	public ChangeRoleData(String userToBeChanged, String roleToChange, String tokenIdChangeRole) {
 		this.userToBeChanged = userToBeChanged;
 		this.roleToChange = roleToChange;
 		this.tokenIdChangeRole = tokenIdChangeRole;
+	}
+
+	public boolean emptyParameters() {
+		return userToBeChanged.equals("") || roleToChange.equals("") || tokenIdChangeRole.equals("");
 	}
 }
