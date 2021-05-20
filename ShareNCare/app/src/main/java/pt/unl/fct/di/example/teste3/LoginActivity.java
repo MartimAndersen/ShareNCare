@@ -12,12 +12,12 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
-    private RadioGroup radioGroup;
     private EditText username, password;
     private Button send;
     private Button register;
@@ -45,21 +45,22 @@ public class LoginActivity extends AppCompatActivity {
                     password.getText().toString()
             );
 
-            loginRepository.getLoginService().loginUser(u).enqueue(new Callback<LoginUser>() {
+            loginRepository.getLoginService().loginUser(u).enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Call<LoginUser> call, Response<LoginUser> r) {
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                     findViewById(R.id.loading).setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), "RESPONSE: " + r, Toast.LENGTH_SHORT).show();
                     if(r.isSuccessful()){
-                        startActivity(new Intent(LoginActivity.this, MapActivity.class));
-
+                        Intent openWelcomeActivity = new Intent(LoginActivity.this, WelcomeActivity.class);
+                        openWelcomeActivity.putExtra("name_key", u.getUsername());
+                        startActivity(openWelcomeActivity);
                     } else{
                         findViewById(R.id.wrong_credentials).setVisibility(View.VISIBLE);
                     }
                 }
                 @Override
-                public void onFailure(Call<LoginUser> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), "Error Logging User: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                  Toast.makeText(getApplicationContext(), "Error Logging User: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
                 }
             });
             return;

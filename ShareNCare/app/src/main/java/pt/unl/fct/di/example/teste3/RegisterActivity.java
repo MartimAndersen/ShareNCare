@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,10 +60,11 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-                    registerRepository.getRegisterService().registerUser(u).enqueue(new Callback<RegisterUser>() {
+                    registerRepository.getRegisterService().registerUser(u).enqueue(new Callback<ResponseBody>() {
                         @Override
-                        public void onResponse(Call<RegisterUser> call, Response<RegisterUser> r) {
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                             if(r.isSuccessful()){
+                                Toast.makeText(getApplicationContext(), "User Registered", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                             }
                            else{
@@ -71,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         }
                         @Override
-                        public void onFailure(Call<RegisterUser> call, Throwable t) {
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
                             Toast.makeText(getApplicationContext(), "Error registering User: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });

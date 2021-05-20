@@ -2,6 +2,7 @@ package pt.unl.fct.di.example.teste3;
 
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -12,7 +13,7 @@ import retrofit2.http.POST;
 public interface RegisterService {
 
     @POST("/rest/register/user")
-    Call<RegisterUser> registerUser(@Body RegisterUser user);
+    Call<ResponseBody> registerUser(@Body RegisterUser user);
 
  /*   @FormUrlEncoded
     @POST("comments")

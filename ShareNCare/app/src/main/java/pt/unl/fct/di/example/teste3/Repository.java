@@ -14,7 +14,6 @@ public final class Repository {
     private LoginService loginService;
     private RegisterService registerService;
 
-
     public static Repository getInstance() {
         if (instance == null) {
             instance = new Repository();
@@ -39,6 +38,7 @@ public final class Repository {
 
         loginService = retrofit.create(LoginService.class);
         registerService = retrofit.create(RegisterService.class);
+
     }
 
     public LoginService getLoginService() {
