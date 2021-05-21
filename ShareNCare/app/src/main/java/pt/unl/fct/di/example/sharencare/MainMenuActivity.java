@@ -14,6 +14,8 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.ref.WeakReference;
+
 import pt.unl.fct.di.example.sharencare.databinding.ActivityMainMenuBinding;
 import pt.unl.fct.di.example.sharencare.login.LoginActivity;
 
@@ -21,6 +23,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainMenuBinding binding;
+    private static WeakReference<LoginActivity> loginActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +68,10 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     public void logoutUser(){
-        LoginActivity act = new LoginActivity();
-        act.logoutUser();
+        loginActivity.get().logoutUser();
+    }
+
+    public static void updateActivity(LoginActivity activity) {
+        loginActivity = new WeakReference<LoginActivity>(activity);
     }
 }

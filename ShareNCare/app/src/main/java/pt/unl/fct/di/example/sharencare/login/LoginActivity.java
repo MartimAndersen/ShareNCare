@@ -2,17 +2,22 @@ package pt.unl.fct.di.example.sharencare.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.Serializable;
+
 import okhttp3.ResponseBody;
+import pt.unl.fct.di.example.sharencare.MainMenuActivity;
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.register.RegisterActivity;
 import pt.unl.fct.di.example.sharencare.Repository;
@@ -21,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements Serializable {
     private EditText username, password;
     private Button send;
     private Button register;
@@ -32,16 +37,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainMenuActivity.updateActivity(this);
 
-        sharedpreferences = getApplicationContext().getSharedPreferences("Preferences", 0);
+        sharedpreferences = getApplicationContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         String login = sharedpreferences.getString("LOGIN", null);
         Intent openWelcomeActivity = new Intent(LoginActivity.this, WelcomeActivity.class);
         // input username
-        openWelcomeActivity.putExtra("name_key","hello");
 
-        if (login != null)
+        if (login != null) {
+            openWelcomeActivity.putExtra("name_key", "hello");
             startActivity(openWelcomeActivity);
-        else {
+        } else {
             setContentView(R.layout.activity_login);
             username = findViewById(R.id.activity_login_username);
             password = findViewById(R.id.activity_login_password);
@@ -93,14 +99,13 @@ public class LoginActivity extends AppCompatActivity {
     public void loginUser(String username){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("LOGIN", username);
-        editor.commit();
+        editor.apply();
     }
 
     public void logoutUser(){
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(this);
+    //    SharedPreferences sharedPreferences = la.getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.remove("LOGIN");
-        editor.commit();
+        editor.clear();
+        editor.apply();
     }
 }

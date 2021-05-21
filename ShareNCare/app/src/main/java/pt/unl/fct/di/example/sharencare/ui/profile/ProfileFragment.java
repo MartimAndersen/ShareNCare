@@ -56,12 +56,14 @@ public class ProfileFragment extends Fragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Activity act = getActivity();
-                if (act instanceof MainMenuActivity) ((MainMenuActivity) act).logoutUser();
+                if (act instanceof MainMenuActivity)
+                    ((MainMenuActivity) act).logoutUser();
 
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-                startActivity(new Intent(getActivity(), LoginActivity.class));
+                startActivity(intent);
             }
         });
     }
