@@ -72,7 +72,7 @@ public class LoginResource {
 				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
 //				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).cookie(cookie).build();
-				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).build();
+				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).entity(t.tokenID).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.EXPECTATION_FAILED).build();
