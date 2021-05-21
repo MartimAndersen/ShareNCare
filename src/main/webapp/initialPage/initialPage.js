@@ -1,3 +1,41 @@
+let regForm = document.getElementById("regFormId");
+regForm.onsubmit = () => {
+    handleRegister();
+    return false;
+}
+
+let loginForm = document.getElementById("loginFormId");
+loginForm.onsubmit = () => {
+    handleLogin();
+    return false;
+}
+
+function handleRegister() {
+    let inputs = document.getElementsByName("regInput")
+    let data = {
+        username: inputs[0].value,
+        email: inputs[1].value,
+        password: inputs[2].value,
+        confirmation: inputs[3].value,
+        mobile: inputs[4].value,
+        landLine: inputs[5].value,
+        address: inputs[6].value,
+        secondAddress: inputs[7].value,
+        postal: inputs[8].value,
+        profileType: inputs[9].value
+    }
+    callRegister(JSON.stringify(data));
+}
+
+function handleLogin() {
+    let inputs = document.getElementsByName("loginInput")
+    let data = {
+        usernameLogin: inputs[0].value,
+        passwordLogin: inputs[1].value
+    }
+    callLogin(JSON.stringify(data));
+}
+
 function callRegister(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -58,45 +96,6 @@ function callLogin(data) {
     // })
 
 
-}
-
-
-function handleRegister() {
-    let inputs = document.getElementsByName("regInput")
-    let data = {
-        username: inputs[0].value,
-        email: inputs[1].value,
-        password: inputs[2].value,
-        confirmation: inputs[3].value,
-        mobile: inputs[4].value,
-        landLine: inputs[5].value,
-        address: inputs[6].value,
-        secondAddress: inputs[7].value,
-        postal: inputs[8].value,
-        profileType: inputs[9].value
-    }
-    callRegister(JSON.stringify(data));
-}
-
-function handleLogin() {
-    let inputs = document.getElementsByName("loginInput")
-    let data = {
-        usernameLogin: inputs[0].value,
-        passwordLogin: inputs[1].value
-    }
-    callLogin(JSON.stringify(data));
-}
-
-let regForm = document.getElementById("regFormId");
-regForm.onsubmit = () => {
-    handleRegister();
-    return false;
-}
-
-let loginForm = document.getElementById("loginFormId");
-loginForm.onsubmit = () => {
-    handleLogin();
-    return false;
 }
 
 function goToAfterLoginPage() {
