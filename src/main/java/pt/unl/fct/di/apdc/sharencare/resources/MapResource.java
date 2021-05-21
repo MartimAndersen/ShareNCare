@@ -29,6 +29,9 @@ public class MapResource {
         if(data.title.equals("")){
             System.out.println("Please insert a title.");
             return Response.status(Status.FORBIDDEN).build();
+        } else if(data.tokenId.equals("")) {
+            System.out.println("Please insert the current session's tokenId.");
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -43,6 +46,7 @@ public class MapResource {
                 track = Entity.newBuilder(mapKey)
                         .set("title", data.title)
                         .set("description", data.description)
+                        .set("tokenId", data.tokenId)
                         .set("origin", data.origin)
                         .set("destination", data.destination)
 //                        .set("difficulty", data.difficulty)
