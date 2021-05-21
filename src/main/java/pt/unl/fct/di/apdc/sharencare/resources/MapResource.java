@@ -49,7 +49,7 @@ public class MapResource {
                         .set("tokenId", data.tokenId)
                         .set("origin", data.origin)
                         .set("destination", data.destination)
-//                        .set("difficulty", data.difficulty)
+                        .set("difficulty", data.difficulty)
                         .set("distance", data.distance)
                         .build();
 

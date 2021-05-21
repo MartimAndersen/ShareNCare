@@ -15,11 +15,9 @@
 
 <br>
 <br>
-<br>
 
 <button onclick="goToAfterLoginPage()">Go back</button>
 
-<br>
 <br>
 <br>
 
@@ -42,12 +40,14 @@
 
 <div id="map"></div>
 
+<h2>Track Information</h2>
+
 <textarea id="distanceBox" readonly>
 Distance:
 </textarea>
 
 <form id="TrackFormId" action="#" method="post">
-    <h1>Track Information</h1>
+
     <p>
         <label for="title" class="floatLabel"></label>
         <input id="title" name="createTrack" type="text" placeholder="Track Title">
@@ -62,8 +62,13 @@ Distance:
         <input id="tokenId" name="createTrack" type="text" placeholder="Token ID">
     </p>
 
+    <div class="slider">
+        Difficulty:   <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput" oninput="this.nextElementSibling.value = this.value">
+        <output id="sliderOutput">5</output>
+    </div>
+
     <p>
-        <input type="submit" value="Submit Track" id="submitTrackDescription">
+        <input id="submitButton" type="submit" value="Submit Track" id="submitTrackDescription">
     </p>
 
 </form>

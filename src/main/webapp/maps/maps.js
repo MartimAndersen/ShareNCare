@@ -1,4 +1,4 @@
-document.getElementById("TrackFormId").style.visibility = "hidden";
+document.getElementById("submitButton").style.visibility = "hidden";
 
 function initMap() {
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -81,7 +81,7 @@ class AutocompleteDirectionsHandler {
             }
         );
 
-        document.getElementById("TrackFormId").style.visibility = "visible";
+        document.getElementById("submitButton").style.visibility = "visible";
     }
 }
 
@@ -113,6 +113,14 @@ function callCreateTrack(data) {
     xhttp.send(data);
 }
 
+function changeSliderValue(value){
+    document.getElementById('sliderInput').value = value;
+}
+
+document.getElementById("sliderInput").oninput = function(){
+    document.getElementById("sliderOutput").value = document.getElementById("sliderInput").value;
+}
+
 function handleCreateTrack() {
     let inputs = document.getElementsByName("createTrack")
 
@@ -122,7 +130,8 @@ function handleCreateTrack() {
         tokenId:inputs[2].value,
         origin: document.getElementById("origin-input").value,
         destination: document.getElementById("destination-input").value,
-        distance: dist
+        distance: dist,
+        difficulty: document.getElementById("sliderOutput").value
     }
     callCreateTrack(JSON.stringify(data));
 }
@@ -134,19 +143,3 @@ createTrackForm.onsubmit = () => {
 }
 
 
-
-// Functions to compute distance between two points on earth's surface
-Rad = function(x) {return x*Math.PI/180;}
-
-DistHaversine = function(p1, p2) {
-    var R = 6371; // earth's mean radius in km
-    var dLat  = Rad(p2.lat() - p1.lat());
-    var dLong = Rad(p2.lon() - p1.lon());
-
-    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(Rad(p1.lat())) * Math.cos(Rad(p2.lat())) * Math.sin(dLong/2) * Math.sin(dLong/2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    var d = R * c;
-
-    return d;
-}
