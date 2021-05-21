@@ -7,6 +7,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -56,6 +57,7 @@ public class LoginResource {
 
 			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
 				AuthToken t = new AuthToken(data.usernameLogin, user.getString("role"));
+//				NewCookie cookie = new NewCookie("token", t.tokenID);
 				
 				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
 				Entity token = Entity.newBuilder(tokenKey)
@@ -69,6 +71,7 @@ public class LoginResource {
 						
 				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
+//				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).cookie(cookie).build();
 				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);

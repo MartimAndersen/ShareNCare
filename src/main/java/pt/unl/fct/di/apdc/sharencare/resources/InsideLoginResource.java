@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.datastore.Datastore;
@@ -372,6 +370,31 @@ public class InsideLoginResource {
         datastore.delete(tokenKey);
         return Response.ok(user + " has logged out").build();
     }
+
+//    // op7
+//    @POST
+//    @Path("/logout")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response logout(TokenData data, @CookieParam("token") NewCookie cookie) {
+//
+//        NewCookie cookieAux = new NewCookie(cookie.getName(), null);
+//
+//        if (data.tokenId.equals("")) {
+//            return Response.status(Status.UNAUTHORIZED).build();
+//        }
+//
+//        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+//        Entity token = datastore.get(tokenKey);
+//
+//        if (token == null) {
+//            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist").build();
+//        }
+//
+//        String user = token.getString("username");
+//
+//        datastore.delete(tokenKey);
+//        return Response.ok(user + " has logged out").cookie(cookieAux).build();
+//    }
 
     // op8.1d
     @POST
