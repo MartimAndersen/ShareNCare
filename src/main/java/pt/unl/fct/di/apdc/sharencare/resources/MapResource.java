@@ -50,8 +50,7 @@ public class MapResource {
                         .set("origin", data.origin)
                         .set("destination", data.destination)
 //                        .set("difficulty", data.difficulty)
-//                        .set("distance", data.distance)
-
+                        .set("distance", data.distance)
                         .build();
 
 

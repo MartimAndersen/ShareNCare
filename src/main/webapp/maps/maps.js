@@ -9,6 +9,8 @@ function initMap() {
     new AutocompleteDirectionsHandler(map);
 }
 
+let dist = 0;
+
 class AutocompleteDirectionsHandler {
     constructor(map) {
         this.map = map;
@@ -71,11 +73,14 @@ class AutocompleteDirectionsHandler {
             (response, status) => {
                 if (status === "OK") {
                     me.directionsRenderer.setDirections(response);
+                    dist = response.routes[0].legs[0].distance.text;
+                    document.getElementById("distanceBox").innerHTML = "Distance: " + dist;
                 } else {
                     window.alert("Directions request failed due to " + status);
                 }
             }
         );
+
         document.getElementById("TrackFormId").style.visibility = "visible";
     }
 }
@@ -94,7 +99,7 @@ function callCreateTrack(data) {
         if (this.readyState === 4 && this.status === 200) {
             alert(this.responseText);
         } else if (this.readyState === 4 && this.status === 400) {
-            alert("Token is invalid.");
+            alert("Please insert a valid token.");
         }else if (this.readyState === 4 && this.status === 403) {
             alert("Please insert a title.");
         } else if (this.readyState === 4 && this.status === 409) {
@@ -116,7 +121,8 @@ function handleCreateTrack() {
         description: inputs[1].value,
         tokenId:inputs[2].value,
         origin: document.getElementById("origin-input").value,
-        destination: document.getElementById("destination-input").value
+        destination: document.getElementById("destination-input").value,
+        distance: dist
     }
     callCreateTrack(JSON.stringify(data));
 }
@@ -125,4 +131,22 @@ let createTrackForm = document.getElementById("TrackFormId");
 createTrackForm.onsubmit = () => {
     handleCreateTrack();
     return false;
+}
+
+
+
+// Functions to compute distance between two points on earth's surface
+Rad = function(x) {return x*Math.PI/180;}
+
+DistHaversine = function(p1, p2) {
+    var R = 6371; // earth's mean radius in km
+    var dLat  = Rad(p2.lat() - p1.lat());
+    var dLong = Rad(p2.lon() - p1.lon());
+
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(Rad(p1.lat())) * Math.cos(Rad(p2.lat())) * Math.sin(dLong/2) * Math.sin(dLong/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+
+    return d;
 }
