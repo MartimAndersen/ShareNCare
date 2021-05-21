@@ -7,8 +7,6 @@ function initMap() {
         zoom: 16
     });
     new AutocompleteDirectionsHandler(map);
-
-
 }
 
 class AutocompleteDirectionsHandler {
@@ -95,7 +93,9 @@ function callCreateTrack(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             alert(this.responseText);
-        } else if (this.readyState === 4 && this.status === 403) {
+        } else if (this.readyState === 4 && this.status === 400) {
+            alert("Token is invalid.");
+        }else if (this.readyState === 4 && this.status === 403) {
             alert("Please insert a title.");
         } else if (this.readyState === 4 && this.status === 409) {
             alert("The track with the given title already exists.");
@@ -106,7 +106,6 @@ function callCreateTrack(data) {
     xhttp.open("POST", "/rest/map/registerTrack", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
-
 }
 
 function handleCreateTrack() {
@@ -115,6 +114,7 @@ function handleCreateTrack() {
     let data = {
         title: inputs[0].value,
         description: inputs[1].value,
+        tokenId:inputs[2].value,
         origin: document.getElementById("origin-input").value,
         destination: document.getElementById("destination-input").value
     }
@@ -126,5 +126,3 @@ createTrackForm.onsubmit = () => {
     handleCreateTrack();
     return false;
 }
-
-
