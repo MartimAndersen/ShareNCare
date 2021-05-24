@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment {
                     ((MainMenuActivity) act).logoutUser();
 
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+              //  intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 startActivity(intent);
             }

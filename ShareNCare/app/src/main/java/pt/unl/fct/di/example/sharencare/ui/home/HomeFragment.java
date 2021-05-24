@@ -38,6 +38,8 @@ import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.databinding.FragmentHomeBinding;
 
@@ -47,6 +49,9 @@ public class HomeFragment extends Fragment{
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
     private Button getLocation;
+    private Double lat;
+    private Double lon;
+    private String title;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -101,15 +106,15 @@ public class HomeFragment extends Fragment{
                 @Override
                 public void onComplete(@NonNull @NotNull Task<Location> task) {
                     Location location = task.getResult();
-                    Double lat = 38.66115666594457;
-                    Double lon = -9.205866646456688;
-                    String title = "Nova School of Science & Technology";
+                    lat = 38.66115666594457;
+                    lon = -9.205866646456688;
+                    title = "Nova School of Science & Technology";
                     if (location != null) {
                         lat = location.getLatitude();
                         lon = location.getLongitude();
                         title = "Current Location";
                     } else {
-                       /* LocationRequest locationRequest = new LocationRequest()
+                        LocationRequest locationRequest = new LocationRequest()
                                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                                 .setInterval(10000)
                                 .setFastestInterval(1000)
@@ -120,13 +125,13 @@ public class HomeFragment extends Fragment{
                             public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
                                 Location location1 = locationResult.getLastLocation();
 
-                                lat[0] = location1.getLatitude();
-                                lon[0] = location1.getLongitude();
-                                title[0] = "Nova School of Science & Technology";
+                                lat = location1.getLatitude();
+                                lon = location1.getLongitude();
+                                title = "Current Location";
                             }
                         };
 
-                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());*/
+                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                     }
 
                     LatLng loc = new LatLng(lat, lon);
