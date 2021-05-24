@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
     private Button register;
     private CheckBox remember;
     private SharedPreferences sharedpreferences;
+    private Double token;
 
     private Repository loginRepository;
     @Override
@@ -45,7 +46,7 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
         // input username
 
         if (login != null) {
-            openWelcomeActivity.putExtra("name_key", "hello");
+            openWelcomeActivity.putExtra("name_key", login);
             startActivity(openWelcomeActivity);
         } else {
             setContentView(R.layout.activity_login);
@@ -74,12 +75,15 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                         findViewById(R.id.loading).setVisibility(View.GONE);
                         if (r.isSuccessful()) {
+                         //   String token = r.message().string();
                             if(remember.isChecked()) {
                                 loginUser(u.getUsername());
                             }
                             openWelcomeActivity.putExtra("name_key", username.getText().toString());
                             startActivity(openWelcomeActivity);
                         } else {
+                            username.setBackgroundResource(R.drawable.red_error_corner);
+                            password.setBackgroundResource(R.drawable.red_error_corner);
                             findViewById(R.id.wrong_credentials).setVisibility(View.VISIBLE);
                         }
                     }

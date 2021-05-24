@@ -32,22 +32,24 @@ import retrofit2.Response;
 
 public class DirectionsFragment extends Fragment {
 
-    private DirectionsViewModel directionsViewModel;
     private FragmentDirectionsBinding binding;
-    private EditText title, description, origin, destination;
+    private EditText title, description, origin, destination, distance, difficulty;
     private Button register;
     private Repository directionsRepository;
+    private String tokenId;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_directions, container, false);
 
-        title = getActivity().findViewById(R.id.fragment_directions_title);
-        description = getActivity().findViewById(R.id.fragment_directions_description);
-        origin = getActivity().findViewById(R.id.fragment_directions_origin);
-        destination = getActivity().findViewById(R.id.fragment_directions_destination);
-        register = getActivity().findViewById(R.id.fragment_directions_register);
+        title = view.findViewById(R.id.fragment_directions_title);
+        description = view.findViewById(R.id.fragment_directions_description);
+        origin = view.findViewById(R.id.fragment_directions_origin);
+        destination = view.findViewById(R.id.fragment_directions_destination);
+        //distance = view.findViewById(R.id.fragment_directions_distance);
+        difficulty = view.findViewById(R.id.fragment_directions_difficulty);
+        register = view.findViewById(R.id.fragment_directions_register);
 
         return view;
     }
@@ -63,15 +65,21 @@ public class DirectionsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         directionsRepository = directionsRepository.getInstance();
-
+    }
+/*
         register.setOnClickListener(v -> {
-          //  getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
-            TrackData t = new TrackData(
-                    title.getText().toString(),
-                    description.getText().toString(),
-                    origin.getText().toString(),
-                    destination.getText().toString()
-            );
+                    //  getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
+                    TrackData t = new TrackData(
+                            title.getText().toString(),
+                            description.getText().toString(),
+                            tokenId,
+                            origin.getText().toString(),
+                            destination.getText().toString(),
+                            distance.getText().toString(),
+                            difficulty.getText().toString()
+
+                    );
+                }
 
             directionsRepository.getMapService().registerTrack(t).enqueue(new Callback<ResponseBody>() {
                 @Override
@@ -99,5 +107,5 @@ public class DirectionsFragment extends Fragment {
             return;
 
         });
-    }
+    }*/
 }

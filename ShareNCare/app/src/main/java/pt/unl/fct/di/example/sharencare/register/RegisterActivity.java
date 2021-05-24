@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerRepository = registerRepository.getInstance();
 
         send.setOnClickListener(v -> {
+            findViewById(R.id.loading_register).setVisibility(View.VISIBLE);
             RegisterUser u = new RegisterUser(
                     username.getText().toString(),
                     password.getText().toString(),
@@ -61,12 +63,39 @@ public class RegisterActivity extends AppCompatActivity {
                     registerRepository.getRegisterService().registerUser(u).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                            findViewById(R.id.loading).setVisibility(View.GONE);
+                            findViewById(R.id.email_invalid).setVisibility(View.GONE);
+                            email.setBackgroundResource(R.drawable.rounded_corner);
+                            findViewById(R.id.username_invalid).setVisibility(View.GONE);
+                            email.setBackgroundResource(R.drawable.rounded_corner);
+                            findViewById(R.id.password_invalid).setVisibility(View.GONE);
+                            password.setBackgroundResource(R.drawable.rounded_corner);
+                            findViewById(R.id.confirmation_invalid).setVisibility(View.GONE);
+                            confirmation.setBackgroundResource(R.drawable.rounded_corner);
+
                             if(r.isSuccessful()){
                                 Toast.makeText(getApplicationContext(), "User Registered", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                             }
                            else{
-                                Toast.makeText(getApplicationContext(), "Credentials are invalid: " + r, Toast.LENGTH_SHORT).show();
+                               if(r.code() == 403){
+                                   findViewById(R.id.email_invalid).setVisibility(View.VISIBLE);
+                                   email.setBackgroundResource(R.drawable.red_error_corner);
+                                //   Toast.makeText(getApplicationContext(), "Email is invalid" + r, Toast.LENGTH_SHORT).show();
+                               } if(r.code() == 411){
+                                    findViewById(R.id.password_invalid).setVisibility(View.VISIBLE);
+                                    password.setBackgroundResource(R.drawable.red_error_corner);
+                                  //  Toast.makeText(getApplicationContext(), "Password must be length 5 or higher" + r, Toast.LENGTH_SHORT).show();
+                               } if(r.code() == 417){
+                                    findViewById(R.id.confirmation_invalid).setVisibility(View.VISIBLE);
+                                    confirmation.setBackgroundResource(R.drawable.red_error_corner);
+                                    //Toast.makeText(getApplicationContext(), "Passwords are not equal" + r, Toast.LENGTH_SHORT).show();
+                               } if(r.code() == 409){
+                                    findViewById(R.id.username_invalid).setVisibility(View.VISIBLE);
+                                    username.setBackgroundResource(R.drawable.red_error_corner);
+                                    //Toast.makeText(getApplicationContext(), "Username is taken" + r, Toast.LENGTH_SHORT).show();
+                               }
+                               // Toast.makeText(getApplicationContext(), "Credentials are invalid: " + r, Toast.LENGTH_SHORT).show();
                             }
 
                         }

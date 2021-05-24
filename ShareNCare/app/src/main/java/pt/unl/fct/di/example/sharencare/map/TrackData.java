@@ -1,17 +1,17 @@
 package pt.unl.fct.di.example.sharencare.map;
 
 public class TrackData {
-    public String title, description, tokenId, origin, destination/*, distance, difficulty*/;
+    public String title, description, tokenId, origin, destination, distance, difficulty;
 
 
-    public TrackData(String title, String description, String origin, String destination/*, String distance, String difficulty*/){
+    public TrackData(String title, String description, String origin, String destination, String tokenId, String distance, String difficulty){
         this.title = title;
         this.description = description;
-//        this.tokenId = tokenId;
+        this.tokenId = tokenId;
         this.origin = origin;
         this.destination = destination;
-//        this.distance = distance;
-//        this.difficulty = difficulty;
+        this.distance = distance;
+        this.difficulty = difficulty;
     }
 
     public String getTitle() {
@@ -54,4 +54,19 @@ public class TrackData {
         this.destination = destination;
     }
 
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
 }
