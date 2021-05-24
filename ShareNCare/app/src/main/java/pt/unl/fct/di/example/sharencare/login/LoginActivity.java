@@ -57,7 +57,6 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
             remember = findViewById(R.id.remember_me);
 
             register.setOnClickListener(v -> {
-                Toast.makeText(getApplicationContext(), "HERE ", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             });
 

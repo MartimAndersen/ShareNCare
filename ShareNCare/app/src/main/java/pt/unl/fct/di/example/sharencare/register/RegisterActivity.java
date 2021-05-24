@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                     registerRepository.getRegisterService().registerUser(u).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
-                            findViewById(R.id.loading).setVisibility(View.GONE);
+                            findViewById(R.id.loading_register).setVisibility(View.GONE);
                             findViewById(R.id.email_invalid).setVisibility(View.GONE);
                             email.setBackgroundResource(R.drawable.rounded_corner);
                             findViewById(R.id.username_invalid).setVisibility(View.GONE);
