@@ -6,35 +6,20 @@ public class RegisterData {
 	public String email;
 	public String password;
 	public String confirmation;
-	public String mobile;
-	public String address;
-	public String postal;
 	public String role;
 	public String state;
-	public String profileType;
-	public String secondAddress;
-	public String landLine;
-
 
 	public RegisterData() {
 
 	}
 
-	public RegisterData(String username, String email, String password, String confirmation, String mobile, String address, String postal, String role,
-			String state, String profileType, String secondAddress, String landLine) {
+	public RegisterData(String username, String email, String password, String confirmation) {
 		this.username = username;
 		this.password = password;
 		this.confirmation = confirmation;
 		this.email = email;
-		this.mobile = mobile;
-		this.address = address;
-		this.postal = postal;
-		this.role = role;
-		this.state = state;
-		this.profileType = profileType;
-		this.secondAddress = secondAddress;
-		this.landLine = landLine;
-
+		this.role = "USER";
+		this.state = "ENABLED";
 	}
 
 //	public boolean validateData(RegisterData data) {
@@ -55,6 +40,10 @@ public class RegisterData {
 //						return true;
 //		return false;
 //	}
+	
+	public boolean emptyParameters() {
+		return username.equals("") || email.equals("") || password.equals("") || confirmation.equals("");
+	}
 
 	public boolean validEmail() {
 		String[] splitEmail = email.split("\\.");
@@ -69,23 +58,4 @@ public class RegisterData {
 		return (password.equals(confirmation));
 	}
 
-	public boolean validPostalCode() {
-		String[] splitPostal = postal.split("-");
-		return (postal.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
-	}
-
-//	public boolean validPhone() {
-//		String[] splitMobile = mobile.split(" ");
-//		return (mobile.equals("")
-//				|| (splitMobile[0].subSequence(0, 1).equals("+") && (splitMobile[1].substring(0, 2).equals("91")
-//				|| splitMobile[1].substring(0, 2).equals("93") || splitMobile[1].substring(0, 2).equals("96"))
-//				&& splitMobile[1].length() == 9));
-//	}
-public boolean validPhone() {
-	return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14);
-}
-
-	public boolean emptyParameters() {
-		return username.equals("") || email.equals("") || password.equals("") || confirmation.equals("");
-	}
 }

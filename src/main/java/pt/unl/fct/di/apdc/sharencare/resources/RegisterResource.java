@@ -73,14 +73,6 @@ public class RegisterResource {
             System.out.println("The passwords are not the same.");
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
-        if(!data.validPostalCode()){
-            System.out.println("Invalid postal code.");
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        if(!data.validPhone()){
-            System.out.println("Invalid mobile phone number.");
-            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
-        }
 
 //        if (!data.validData()){
 //            System.out.println("data inserida invalida " + data.username);
@@ -102,14 +94,6 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("confirmation", DigestUtils.sha512Hex(data.password))
-                        .set("mobile", data.mobile)
-                        .set("landLine", data.landLine)
-                        .set("address", data.address)
-                        .set("secondAddress", data.secondAddress)
-                        .set("postal", data.postal)
-                        .set("role", "USER")
-                        .set("state", "ENABLED")
-                        .set("profileType", data.profileType)
                         .build();
 
                 txn.add(user);
