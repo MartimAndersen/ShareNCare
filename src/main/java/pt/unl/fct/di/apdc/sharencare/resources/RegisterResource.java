@@ -146,7 +146,7 @@ public class RegisterResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.nif);
             Entity user = txn.get(userKey);
             if (user != null) {
                 txn.rollback();
@@ -154,8 +154,8 @@ public class RegisterResource {
                         .entity("Company " + data.username + " already exists.").build();
             } else {
                 user = Entity.newBuilder(userKey)
+                		.set("nif", data.nif)
                         .set("username", data.username)
-                        .set("nif", data.nif)
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("confirmation", DigestUtils.sha512Hex(data.password))
