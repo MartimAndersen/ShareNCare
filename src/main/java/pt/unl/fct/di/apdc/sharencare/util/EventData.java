@@ -1,5 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.util.List;
+import com.google.cloud.datastore.Value;
 
 
 public class EventData {
@@ -9,7 +11,7 @@ public class EventData {
     //public String coordinates;
     public String temporary;
     public String date;
-    public String tag;
+    public List<Value<String>>  tags;
     public String lat, lon;
     
     
@@ -18,17 +20,17 @@ public class EventData {
     }
     
     public EventData(String name, String description,String minParticipants,String maxParticipants,
-    		String lat, String lon, String temporary, String date, String tag) {
+    		String lat, String lon, String temporary, String date, List<Value<String>>  tags) {
     
     	this.name = name;
-    	this.description=description;
+    	this.description = description;
     	this.minParticipants = minParticipants;
-    	this.maxParticipants=minParticipants;
-        this.lat= lat;
+    	this.maxParticipants = minParticipants;
+        this.lat = lat;
         this.lon = lon;
-        this.temporary=temporary;
+        this.temporary = temporary;
         this.date = date;
-        this.tag = tag;
+        this.tags = tags;
     	
     }
 	

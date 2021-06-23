@@ -1,7 +1,14 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.util.List;
+
+import com.google.cloud.datastore.Blob;
+import com.google.cloud.datastore.Value;
+
 public class ProfileData {
 
+//	public enum TAGS {animals, environment, supplies, building, children, elderly, homeless, sports, summer, holidays, turism};
+	
 	public String email;
 	public String mobile;
 	public String landLine;
@@ -10,12 +17,14 @@ public class ProfileData {
 	public String postal;
 	public boolean profileType;
 	public String tokenId;
+	public List<Value<String>>  tags;
+	public Blob profilePic;
 	
 	public ProfileData() {
 		
 	}
 	
-	public ProfileData(String email, String mobile, String landLine, String address, String postal, boolean profileType, String secondAddress, String tokenId) {
+	public ProfileData(String email, String mobile, String landLine, String address, String postal, boolean profileType, String secondAddress, List<Value<String>>  tags, Blob profilePic, String tokenId) {
 		this.email = email;
 		this.mobile = mobile;
 		this.address = address;
@@ -23,6 +32,8 @@ public class ProfileData {
 		this.profileType = profileType;
 		this.secondAddress = secondAddress;
 		this.landLine = landLine;
+		this.tags = tags;
+		this.profilePic = profilePic;
 		this.tokenId = tokenId;
 	}
 

@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -14,6 +15,7 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Transaction;
+import com.google.cloud.datastore.Value;
 
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 
@@ -58,8 +60,10 @@ public class EventResource {
                         .set("coordinates", coordinates)
                         .set("temporary", data.temporary)
                         .set("date", data.date)
-                        .set("tag", data.tag)
+                        .set("tags", data.tags)
                         .build();
+                
+                
 
 
                 txn.add(event);

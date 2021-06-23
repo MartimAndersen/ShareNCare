@@ -9,13 +9,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
+import com.google.cloud.datastore.Blob;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
+import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.ChangePasswordData;
@@ -94,22 +97,25 @@ public class InsideLoginResource {
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeProperty(ProfileData data) {
-		if (data.tokenId.equals("")) {
+		
+		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-		}
 
 		if (data.allEmptyParameters()) {
 			System.out.println("Please enter at least one new attribute.");
 			return Response.status(Status.LENGTH_REQUIRED).build();
 		}
 
-		 String email = data.email;
+		//TODO
+		String email = data.email;
 		boolean profileType = data.profileType;
 		String landLine = data.landLine;
 		String mobile = data.mobile;
 		String address = data.address;
 		String secondAddress = data.secondAddress;
 		String postal = data.postal;
+		List<Value<String>> tags = data.tags;
+		Blob profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
 		Entity token = datastore.get(tokenKey);
@@ -148,39 +154,42 @@ public class InsideLoginResource {
 		 * Response.status(Status.PRECONDITION_FAILED).build(); } }
 		 */
 
-		if (data.profileType) {
+		if (data.profileType)
 			profileType = true;
-		}
 
-		if (data.landLine.equals("")) {
+		if (data.landLine.equals(""))
 			landLine = user.getString("landLine");
-		}
 
-		if (data.mobile.equals("")) {
+		if (data.mobile.equals(""))
 			mobile = user.getString("mobile");
-		} else {
+		else {
 			if (!data.validPhone()) {
 				System.out.println("Invalid mobile phone number.");
 				return Response.status(Status.EXPECTATION_FAILED).build();
 			}
 		}
 
-		if (data.address.equals("")) {
+		if (data.address.equals(""))
 			address = user.getString("address");
-		}
 
-		if (data.secondAddress.equals("")) {
+		if (data.secondAddress.equals(""))
 			secondAddress = user.getString("secondAddress");
-		}
 
-		if (data.postal.equals("")) {
+		if (data.postal.equals("")) 
 			postal = user.getString("postal");
-		} else {
+	
+	    else {
 			if (!data.validPostalCode()) {
 				System.out.println("Invalid postal code.");
 				return Response.status(Status.BAD_REQUEST).build();
 			}
 		}
+		
+		if(data.tags == null)
+			tags = user.getList("tags");
+		
+		if(data.profilePic == null)
+			profilePic = user.getBlob("profilePic");
 
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
@@ -188,9 +197,17 @@ public class InsideLoginResource {
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("confirmation", user.getString("password"))
 				// .set("email", email)
-				.set("email", user.getString("email")).set("profileType", profileType).set("landLine", landLine)
-				.set("mobile", mobile).set("address", address).set("secondAddress", secondAddress).set("postal", postal)
-				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+				.set("email", user.getString("email"))
+				.set("profileType", profileType)
+				.set("landLine", landLine)
+				.set("mobile", mobile)
+				.set("address", address)
+				.set("secondAddress", secondAddress)
+				.set("postal", postal)
+				.set("tags", tags)
+				.set("profilePic", profilePic)
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state")).build();
 
 		datastore.update(user);
 
@@ -252,10 +269,13 @@ public class InsideLoginResource {
 				.set("email", userToBeChanged.getString("email"))
 				.set("profileType", userToBeChanged.getString("profileType"))
 				.set("landLine", userToBeChanged.getString("landLine"))
-				.set("mobile", userToBeChanged.getString("mobile")).set("address", userToBeChanged.getString("address"))
+				.set("mobile", userToBeChanged.getString("mobile"))
+				.set("address", userToBeChanged.getString("address"))
 				.set("secondAddress", userToBeChanged.getString("secondAddress"))
-				.set("postal", userToBeChanged.getString("postal")).set("role", data.roleToChange)
-				.set("state", userToBeChanged.getString("state")).build();
+				.set("postal", userToBeChanged.getString("postal"))
+				.set("role", data.roleToChange)
+				.set("state", userToBeChanged.getString("state"))
+				.build();
 
 		datastore.update(userToBeChanged);
 		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).build();

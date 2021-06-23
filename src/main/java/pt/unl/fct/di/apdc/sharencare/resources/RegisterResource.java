@@ -96,6 +96,7 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("confirmation", DigestUtils.sha512Hex(data.password))
+                        .set("tags", data.tags)
                         .build();
 
                 txn.add(user);
