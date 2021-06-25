@@ -99,6 +99,8 @@ public class RegisterResource {
         				.set("address", "")
         				.set("secondAddress", "")
         				.set("postal", "")
+                        .set("role", "USER")
+                        .set("state", "ENABLED")
         				.set("profilePic", "")
                         .set("tags", "")
                         .set("events", "")
