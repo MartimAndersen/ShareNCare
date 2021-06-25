@@ -81,12 +81,12 @@ function handleRegister() {
         email: inputs[1].value,
         password: inputs[2].value,
         confirmation: inputs[3].value,
-        mobile: inputs[4].value,
-        landLine: inputs[5].value,
-        address: inputs[6].value,
-        secondAddress: inputs[7].value,
-        postal: inputs[8].value,
-        profileType: inputs[9].value
+        // mobile: inputs[4].value,
+        // landLine: inputs[5].value,
+        // address: inputs[6].value,
+        // secondAddress: inputs[7].value,
+        // postal: inputs[8].value,
+        // profileType: inputs[9].value
     }
     callRegister(JSON.stringify(data));
 }
