@@ -1,7 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -49,9 +49,6 @@ public class RegisterResource {
 
     }
 
-    //private HttpServletRequest httpRequest;
-
-    // op1 - registers a user
     @POST
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -82,7 +79,7 @@ public class RegisterResource {
 //        }
 
         Transaction txn = datastore.newTransaction();
-
+        
         try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
             Entity user = txn.get(userKey);
@@ -96,7 +93,15 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("confirmation", DigestUtils.sha512Hex(data.password))
-                        .set("tags", data.tags)
+        				.set("publicProfile", false)
+        				.set("landLine", "")
+        				.set("mobile", "")
+        				.set("address", "")
+        				.set("secondAddress", "")
+        				.set("postal", "")
+        				.set("profilePic", "")
+                        .set("tags", "")
+                        .set("events", "")
                         .build();
 
                 txn.add(user);

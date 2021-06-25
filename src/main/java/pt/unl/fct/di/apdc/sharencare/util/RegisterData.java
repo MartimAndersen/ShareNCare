@@ -1,7 +1,5 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-import java.util.List;
-import com.google.cloud.datastore.Value;
 
 public class RegisterData {
 
@@ -11,18 +9,16 @@ public class RegisterData {
 	public String confirmation;
 	public String role;
 	public String state;
-	public List<Value<String>> tags;
 
 	public RegisterData() {
 
 	}
 
-	public RegisterData(String username, String email, String password, String confirmation, List<Value<String>> tags) {
+	public RegisterData(String username, String email, String password, String confirmation) {
 		this.username = username;
 		this.password = password;
 		this.confirmation = confirmation;
 		this.email = email;
-		this.tags = tags;
 		this.role = "USER";
 		this.state = "ENABLED";
 	}

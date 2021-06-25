@@ -1,12 +1,10 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.datastore.Blob;
@@ -14,7 +12,6 @@ import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
-import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
@@ -92,7 +89,6 @@ public class InsideLoginResource {
 
 	}
 
-	// op3
 	@POST
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -108,13 +104,13 @@ public class InsideLoginResource {
 
 		//TODO
 		String email = data.email;
-		boolean profileType = data.profileType;
-		String landLine = data.landLine;
 		String mobile = data.mobile;
+		String landLine = data.landLine;
 		String address = data.address;
 		String secondAddress = data.secondAddress;
-		String postal = data.postal;
-		List<Value<String>> tags = data.tags;
+		String zipCode = data.zipCode;
+		boolean publicProfile = data.publicProfile;
+		String tags = data.tags;
 		Blob profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
@@ -148,14 +144,17 @@ public class InsideLoginResource {
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
 
-		/*
-		 * if (data.email.equals("")) { email = user.getString("email"); } else { if
-		 * (!data.validEmail()) { System.out.println("Invalid email."); return
-		 * Response.status(Status.PRECONDITION_FAILED).build(); } }
-		 */
-
-		if (data.profileType)
-			profileType = true;
+		  if (data.email.equals(""))
+			  email = user.getString("email"); 
+		  else {
+			  if(!data.validEmail()) { 
+				  System.out.println("Invalid email."); 
+				  return Response.status(Status.PRECONDITION_FAILED).build(); 
+			  } 
+		  }
+		 //TODO
+		if (data.publicProfile)
+			publicProfile = true;
 
 		if (data.landLine.equals(""))
 			landLine = user.getString("landLine");
@@ -175,8 +174,8 @@ public class InsideLoginResource {
 		if (data.secondAddress.equals(""))
 			secondAddress = user.getString("secondAddress");
 
-		if (data.postal.equals("")) 
-			postal = user.getString("postal");
+		if (data.zipCode.equals("")) 
+			zipCode = user.getString("postal");
 	
 	    else {
 			if (!data.validPostalCode()) {
@@ -186,24 +185,26 @@ public class InsideLoginResource {
 		}
 		
 		if(data.tags == null)
-			tags = user.getList("tags");
+			tags = user.getString("tags");
 		
 		if(data.profilePic == null)
 			profilePic = user.getBlob("profilePic");
 
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
+		
 
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("confirmation", user.getString("password"))
-				// .set("email", email)
-				.set("email", user.getString("email"))
-				.set("profileType", profileType)
+		user = Entity.newBuilder(userKey)
+				.set("username", token.getString("username"))
+				.set("password", user.getString("password"))
+				.set("confirmation", user.getString("password"))
+				.set("email", email)
+				.set("publicProfile", publicProfile)
 				.set("landLine", landLine)
 				.set("mobile", mobile)
 				.set("address", address)
 				.set("secondAddress", secondAddress)
-				.set("postal", postal)
+				.set("postal", zipCode)
 				.set("tags", tags)
 				.set("profilePic", profilePic)
 				.set("role", user.getString("role"))
