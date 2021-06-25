@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.*;
@@ -14,14 +15,17 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
+import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangePasswordData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangePropertyData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangeRoleData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangeStateData;
+import pt.unl.fct.di.apdc.sharencare.util.ListEventsData;
 import pt.unl.fct.di.apdc.sharencare.util.ListRolesData;
 import pt.unl.fct.di.apdc.sharencare.util.LogoutUserData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
@@ -213,6 +217,95 @@ public class InsideLoginResource {
 		datastore.update(user);
 
 		return Response.ok("Properties changed").build();
+	}
+	
+	// op4
+	@POST
+	@Path("/addEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response addEvent(AddEventData data) {
+		
+		if (data.tokenId.equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
+					.build();
+		}
+
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The user with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		}
+		
+		user = Entity.newBuilder(userKey)
+				.set("username", token.getString("username"))
+				.set("password", user.getString("password"))
+				.set("confirmation", user.getString("password"))
+				.set("email", user.getString("email"))
+				.set("publicProfile", user.getString("publicProfile"))
+				.set("landLine", user.getString("landLine"))
+				.set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address"))
+				.set("secondAddress", user.getString("secondAddress"))
+				.set("postal", user.getString("postal"))
+				.set("tags",user.getString("tags"))
+				//.set("profilePic", profilePic)
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.set("eventos", data.events)
+				.build();
+
+		datastore.update(user);
+
+		return Response.ok("Properties changed").build();
+
+		
+	
+	}
+	
+	@GET
+	@Path("/getEvents")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getEvents(ListEventsData data) {
+		
+		if (data.tokenId.equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
+					.build();
+		}
+		
+		
+		Query<Entity> query = Query.newEntityQueryBuilder()
+				.setKind("Event")
+				.build();
+		
+		QueryResults<Entity> logs = datastore.run(query);
+		
+		
+		return Response.ok(g.toJson(logs)).build();
+		
 	}
 
 	// op4
