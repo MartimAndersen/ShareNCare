@@ -18,9 +18,9 @@ public class ProfileData {
 	public String zipCode;
 	public boolean publicProfile;
 	public String tokenId;
-	public String tags;
+	public List<Integer> tags;
 	public String events;
-	public Blob profilePic;
+	//public Blob profilePic;
 	
 	private Gson gson;
 	
@@ -28,7 +28,7 @@ public class ProfileData {
 		
 	}
 	
-	public ProfileData(String email, String mobile, String landLine, String address, String postal, boolean publicProfile, String secondAddress, List<Integer> tags, Blob profilePic, String tokenId) {
+	public ProfileData(String email, String mobile, String landLine, String address, String postal, boolean publicProfile, String secondAddress,List<Integer> tags, String tokenId) {
 		gson = new Gson();
 		
 		this.email = email;
@@ -38,17 +38,10 @@ public class ProfileData {
 		this.publicProfile = publicProfile;
 		this.secondAddress = secondAddress;
 		this.landLine = landLine;
-		this.tags = convertToString(tags);
-		this.profilePic = profilePic;
+		this.tags = tags;
+		//this.profilePic = profilePic;
 		this.events = 
 		this.tokenId = tokenId;
-	}
-	
-	public String convertToString(List<Integer> t) {
-		List<String> arrayList = new ArrayList<String>();
-		for(int i = 0; i < t.size(); i++)
-			arrayList.add(TAGS[t.get(i)]);
-		return gson.toJson(arrayList);
 	}
 	
 	public boolean validEmail() {
@@ -75,6 +68,7 @@ public class ProfileData {
 	}
 	
 	public boolean allEmptyParameters() {
+		//to do: uncomment email for allEmptyParameters to work
 		return// newEmail.equals("") && 
 				landLine.equals("") && mobile.equals("")
 				&& address.equals("") && secondAddress.equals("") && zipCode.equals("");

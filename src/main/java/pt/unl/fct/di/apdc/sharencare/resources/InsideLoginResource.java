@@ -110,8 +110,8 @@ public class InsideLoginResource {
 		String secondAddress = data.secondAddress;
 		String zipCode = data.zipCode;
 		boolean publicProfile = data.publicProfile;
-		String tags = data.tags;
-		Blob profilePic = data.profilePic;
+		String tags = g.toJson(data.tags);
+		//Blob profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
 		Entity token = datastore.get(tokenKey);
@@ -180,16 +180,16 @@ public class InsideLoginResource {
 	    else {
 			if (!data.validPostalCode()) {
 				System.out.println("Invalid postal code.");
-				return Response.status(Status.BAD_REQUEST).build();
+				return Response.status(Status.METHOD_NOT_ALLOWED).build();
 			}
 		}
 		
 		if(data.tags == null)
-			tags = user.getString("tags");
-		
+			tags = g.toJson(user.getString("tags"));
+		/*
 		if(data.profilePic == null)
 			profilePic = user.getBlob("profilePic");
-
+	*/
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
 		
@@ -206,7 +206,7 @@ public class InsideLoginResource {
 				.set("secondAddress", secondAddress)
 				.set("postal", zipCode)
 				.set("tags", tags)
-				.set("profilePic", profilePic)
+				//.set("profilePic", profilePic)
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
 
@@ -666,6 +666,10 @@ public class InsideLoginResource {
 			}
 		}
 		return isValid;
+	}
+	
+	private String convertToString(List<Integer> t) {
+		return g.toJson(t);
 	}
 
 }
