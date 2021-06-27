@@ -15,6 +15,23 @@ function callLogout(data) {
     xhttp.send(data);
 
 }
+function callLogout2() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); window.location.href = "../initialPage/initialPage.html"; break;
+                default: alert("Something went wrong."); break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/loggedIn/logout2", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    // xhttp.send(null);
+     xhttp.send("");
+
+}
 
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();

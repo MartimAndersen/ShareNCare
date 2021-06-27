@@ -47,7 +47,7 @@ function callLogin(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/login/user", true);
+    xhttp.open("POST", "/rest/login/user2", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 

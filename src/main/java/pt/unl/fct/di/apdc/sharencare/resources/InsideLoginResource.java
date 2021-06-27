@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.datastore.Blob;
@@ -368,30 +370,35 @@ public class InsideLoginResource {
 		return Response.ok(user + " has logged out").build();
 	}
 
-//    // op7
-//    @POST
-//    @Path("/logout")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response logout(TokenData data, @CookieParam("token") NewCookie cookie) {
-//
-//        NewCookie cookieAux = new NewCookie(cookie.getName(), null);
-//
-//        if (data.tokenId.equals("")) {
-//            return Response.status(Status.UNAUTHORIZED).build();
-//        }
-//
-//        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
-//        Entity token = datastore.get(tokenKey);
-//
-//        if (token == null) {
-//            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist").build();
-//        }
-//
-//        String user = token.getString("username");
-//
-//        datastore.delete(tokenKey);
-//        return Response.ok(user + " has logged out").cookie(cookieAux).build();
-//    }
+    // op7
+    @POST
+    @Path("/logout2")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response logout(@CookieParam("Token") NewCookie cookie) {
+
+		System.out.println("ENTREI NO LOGOUT2");
+
+		System.out.println("NAME DO COOKIE: " + cookie.getName());
+
+
+		System.out.println("VALUE DO COOKIE: " + cookie.getValue());
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			return Response.status(Status.NOT_FOUND).entity("Token doesn't exist").build();
+		}
+
+		String user = token.getString("username");
+
+		datastore.delete(tokenKey);
+
+		Cookie cookiee = new Cookie("Token", null, "/", null);
+		NewCookie cookieAux = new NewCookie(cookiee,null,-1,null,true,true);
+
+        return Response.ok(user + " has logged out").cookie(cookieAux).build();
+    }
 
 	// op8.1d
 	@POST
