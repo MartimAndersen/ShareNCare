@@ -99,7 +99,7 @@ function callCreateTrack(data) {
         if (this.readyState === 4 && this.status === 200) {
             alert(this.responseText);
         } else if (this.readyState === 4 && this.status === 400) {
-            alert("Please insert a valid token.");
+            alert("You need to be logged in to execute this operation.");
         }else if (this.readyState === 4 && this.status === 403) {
             alert("Please insert a title.");
         } else if (this.readyState === 4 && this.status === 409) {
@@ -127,7 +127,6 @@ function handleCreateTrack() {
     let data = {
         title: inputs[0].value,
         description: inputs[1].value,
-        tokenId:inputs[2].value,
         origin: document.getElementById("origin-input").value,
         destination: document.getElementById("destination-input").value,
         distance: dist,
