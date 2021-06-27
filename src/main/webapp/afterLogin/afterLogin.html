@@ -27,23 +27,9 @@
 <br>
 <br>
 
-<form id="logoutFormId" action="#" method="post">
-    <h1>Logout</h1>
-    <p>
-        <label for="tokenId" class="floatLabel"></label>
-        <input id="tokenId" name="logoutInput" type="text" placeholder="Token ID">
-    </p>
+<h1>Logout</h1>
 
-    <p>
-        <input type="submit" value="Log Out" id="submitLogout">
-    </p>
-</form>
-
-<br>
-<br>
-<br>
-
-<button onclick="callLogout2()">Logout</button>
+<button onclick="callLogout()">Logout</button>
 
 <br>
 <br>
@@ -76,10 +62,6 @@
 <form id="changePasswordFormId" action="#" method="post">
     <h1>Change Password</h1>
     <p>
-        <label for="tokenIdChangePassword" class="floatLabel"></label>
-        <input id="tokenIdChangePassword" name="changePasswordInput" type="text" placeholder="Token ID">
-    </p>
-    <p>
         <label for="oldPassword" class="floatLabel"></label>
         <input id="oldPassword" name="changePasswordInput" type="password" placeholder="Old Password">
     </p>
@@ -103,7 +85,7 @@
 <br>
 
 <form id="changeAttributesFormId" action="#" method="post">
-    <h1>ChangeAttributes</h1>
+    <h1>Update Personal Info</h1>
 
     <p>
         <label for="newEmail" class="floatLabel"></label>
@@ -139,7 +121,7 @@
     </p>
 
     <p>
-        <input type="submit" value="Change Attributes" id="submitChangeAttributes">
+        <input type="submit" value="Update" id="submitChangeAttributes">
     </p>
 </form>
 

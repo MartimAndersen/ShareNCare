@@ -37,60 +37,12 @@ public class LoginResource {
 	public LoginResource() {
 		
 	}
-	
+
 	//op6 - logs in a user
 	@POST
 	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response loginUser(LoginData data) {
-
-		if(data.emptyParameters()){
-			System.out.println("Please fill in all non-optional fields.");
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
-		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.usernameLogin);
-		Entity user = datastore.get(userKey);
-
-
-
-		if (user != null) {
-			String hashedPWD = user.getString("password");
-
-			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
-				AuthToken t = new AuthToken(data.usernameLogin, user.getString("role"));
-//				NewCookie cookie = new NewCookie("token", t.tokenID);
-
-				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
-				Entity token = Entity.newBuilder(tokenKey)
-								.set("tokenId", t.tokenID)
-								.set("username", t.username)
-								.set("role", t.role)
-								.set("creationData", t.creationData)
-								.set("expirationData", t.expirationData)
-								.set("valid", t.valid)
-								.build();
-						
-				LOG.info("User " + data.usernameLogin + " logged in successfully.");
-				datastore.add(token);
-//				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).cookie(cookie).build();
-				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).entity(t.tokenID).build();
-			} else {
-				LOG.warning("Wrong password for username: " + data.usernameLogin);
-				return Response.status(Status.EXPECTATION_FAILED).build();
-			}
-		} else {
-			LOG.warning("Failed login attempt for username: " + data.usernameLogin);
-			return Response.status(Status.NOT_FOUND).build();
-		}
-
-	}
-
-	//op6 - logs in a user
-	@POST
-	@Path("/user2")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response loginUser2(LoginData data) {
 
 		if(data.emptyParameters()){
 			System.out.println("Please fill in all non-optional fields.");
@@ -111,10 +63,6 @@ public class LoginResource {
 				Cookie cookiee = new Cookie("Token", t.tokenID, "/", null);
 				NewCookie cookie = new NewCookie(cookiee,null,-1,null,true,true);
 
-
-				System.out.println("ID DO TOKEN: " + t.tokenID);
-				System.out.println("VALUE DO COOKIE: " + cookie.getValue());
-
 				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
 				Entity token = Entity.newBuilder(tokenKey)
 						.set("tokenId", t.tokenID)
@@ -127,7 +75,7 @@ public class LoginResource {
 
 				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok("User " + data.usernameLogin + " is now logged in. Your token is: " + t.tokenID).cookie(cookie).build();
+				return Response.ok("User " + data.usernameLogin + " is now logged in.").cookie(cookie).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.EXPECTATION_FAILED).build();

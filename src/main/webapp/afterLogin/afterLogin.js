@@ -1,31 +1,15 @@
-function callLogout(data) {
+
+function callLogout() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200: alert(this.responseText); window.location.href = "../initialPage/initialPage.html"; break;
-                case 401: alert("Please enter a token."); break;
-                case 404: alert("Token does not exist."); break;
-                default: alert("Wrong parameters."); break;
+                default: alert("You need to be logged in to execute this operation."); break;
             }
         }
     };
     xhttp.open("POST", "/rest/loggedIn/logout", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(data);
-
-}
-function callLogout2() {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4) {
-            switch (this.status) {
-                case 200: alert(this.responseText); window.location.href = "../initialPage/initialPage.html"; break;
-                default: alert("Something went wrong."); break;
-            }
-        }
-    };
-    xhttp.open("POST", "/rest/loggedIn/logout2", true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     // xhttp.send(null);
@@ -120,10 +104,9 @@ function handleChangeRole() {
 function handleChangePassword() {
     let inputs = document.getElementsByName("changePasswordInput")
     let data = {
-        tokenIdChangePassword: inputs[0].value,
-        oldPassword: inputs[1].value,
-        newPassword: inputs[2].value,
-        confirmation: inputs[3].value
+        oldPassword: inputs[0].value,
+        newPassword: inputs[1].value,
+        confirmation: inputs[2].value
     }
     callChangePassword(JSON.stringify(data));
 }
@@ -141,12 +124,6 @@ function handleChangeAttributes() {
         tokenIdChangeAttributes: inputs[7].value
     }
     callChangeAttributes(JSON.stringify(data));
-}
-
-let logoutForm = document.getElementById("logoutFormId");
-logoutForm.onsubmit = () => {
-    handleLogout();
-    return false;
 }
 
 let changeRoleForm = document.getElementById("changeRoleFormId");

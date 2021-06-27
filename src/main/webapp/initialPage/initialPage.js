@@ -42,12 +42,12 @@ function callLogin(data) {
                 case 200: alert(this.responseText); window.location.href = "../afterLogin/afterLogin.html"; break;
                 case 401: alert("Please fill in all non-optional fields."); break;
                 case 404: alert("User does not exist."); break;
-                case 417: alert("The passwords are not the same."); break;
+                case 417: alert("Incorrect password."); break;
                 default: alert("Wrong parameters."); break;
             }
         }
     };
-    xhttp.open("POST", "/rest/login/user2", true);
+    xhttp.open("POST", "/rest/login/user", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
@@ -80,13 +80,7 @@ function handleRegister() {
         username: inputs[0].value,
         email: inputs[1].value,
         password: inputs[2].value,
-        confirmation: inputs[3].value,
-        // mobile: inputs[4].value,
-        // landLine: inputs[5].value,
-        // address: inputs[6].value,
-        // secondAddress: inputs[7].value,
-        // postal: inputs[8].value,
-        // profileType: inputs[9].value
+        confirmation: inputs[3].value
     }
     callRegister(JSON.stringify(data));
 }

@@ -1,7 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.*;
@@ -10,16 +9,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
-import com.google.cloud.datastore.Blob;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
-import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
-import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
@@ -439,42 +435,11 @@ public class InsideLoginResource {
 
 	}
 
-	// op7
-	@POST
-	@Path("/logout")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response logout(TokenData data) {
-
-		if (data.tokenId.equals("")) {
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null) {
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
-					.build();
-		}
-
-		String user = token.getString("username");
-
-		datastore.delete(tokenKey);
-		return Response.ok(user + " has logged out").build();
-	}
-
     // op7
     @POST
-    @Path("/logout2")
+    @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response logout(@CookieParam("Token") NewCookie cookie) {
-
-		System.out.println("ENTREI NO LOGOUT2");
-
-		System.out.println("NAME DO COOKIE: " + cookie.getName());
-
-
-		System.out.println("VALUE DO COOKIE: " + cookie.getValue());
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -490,7 +455,7 @@ public class InsideLoginResource {
 		Cookie cookiee = new Cookie("Token", null, "/", null);
 		NewCookie cookieAux = new NewCookie(cookiee,null,-1,null,true,true);
 
-        return Response.ok(user + " has logged out").cookie(cookieAux).build();
+        return Response.ok(user + " is now logged out.").cookie(cookieAux).build();
     }
 
 	// op8.1d
@@ -545,20 +510,27 @@ public class InsideLoginResource {
 	@POST
 	@Path("/changePassword")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response changePassword(ChangePasswordData data) {
+	public Response changePassword(@CookieParam("Token") NewCookie cookie, ChangePasswordData data) {
+
+		System.out.println("ENTREI NO changePassword()!!!!!!!!3");
+
+		System.out.println("OLD PASS: " + data.getOldPassword());
+		System.out.println("NEW PASS: " + data.getNewPassword());
+		System.out.println("CONFIRMATION PASS: " + data.getConfirmation());
 
 		if (data.emptyParameters()) {
 			System.out.println("Please fill in all non-optional fields.");
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
+		System.out.println("NAME DO COOKIE: " + cookie.getName());
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangePassword);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null) {
 			System.out.println("The given token does not exist.");
 			return Response.status(Status.NOT_FOUND)
-					.entity("Token with id: " + data.tokenIdChangePassword + " doesn't exist").build();
+					.entity("Token with id: " + cookie.getName() + " doesn't exist").build();
 		}
 
 //		if(!t.validToken(tokenKey))
@@ -583,22 +555,30 @@ public class InsideLoginResource {
 		String hashedPWD = user.getString("password");
 
 		if (hashedPWD.equals(DigestUtils.sha512Hex(data.oldPassword))) {
-			if (data.validPasswordLenght()) {
+			if (data.validPasswordLength()) {
 				if (data.newPassword.equals(data.confirmation)) {
 
 					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 							.set("password", DigestUtils.sha512Hex(data.newPassword))
 							.set("confirmation", DigestUtils.sha512Hex(data.newPassword))
-							.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
-							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+							.set("email", user.getString("email"))
+							.set("publicProfile", user.getBoolean("publicProfile"))
+							.set("landLine", user.getString("landLine"))
+							.set("mobile", user.getString("mobile"))
 							.set("address", user.getString("address"))
 							.set("secondAddress", user.getString("secondAddress"))
-							.set("postal", user.getString("postal")).set("role", user.getString("role"))
-							.set("state", user.getString("state")).build();
+							.set("postal", user.getString("postal"))
+							.set("role", user.getString("role"))
+							.set("state", user.getString("state"))
+//							.set("profilePic", user.getString("profilePic"))
+//							.set("tags", user.getString("tags"))
+//							.set("events", user.getString("events"))
+							.build();
+
 
 					datastore.put(user);
 
-					return Response.ok("Password was changed").build();
+					return Response.ok("Password was changed").cookie(cookie).build();
 				} else {
 					return Response.status(Status.EXPECTATION_FAILED).entity("Passwords don't match.").build();
 				}
@@ -609,7 +589,6 @@ public class InsideLoginResource {
 		} else {
 			return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
 		}
-
 	}
 
 	// op8.2d

@@ -1,28 +1,50 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
 public class ChangePasswordData {
-	
+
 	public String oldPassword;
 	public String newPassword;
 	public String confirmation;
-	public String tokenIdChangePassword;
-	
-	public ChangePasswordData() {
-		
+
+	public ChangePasswordData(){
+
 	}
 	
-	public ChangePasswordData(String oldPassword, String newPassword, String confirmation, String tokenIdChangePassword) {
+	public ChangePasswordData(String oldPassword, String newPassword, String confirmation) {
 		this.oldPassword = oldPassword;
 		this.newPassword = newPassword;
 		this.confirmation = confirmation;
-		this.tokenIdChangePassword = tokenIdChangePassword;
 	}
 
     public boolean emptyParameters() {
-		return oldPassword.equals("") || newPassword.equals("") || confirmation.equals("") || tokenIdChangePassword.equals("");
+		return oldPassword.equals("") || newPassword.equals("") || confirmation.equals("");
     }
 
-    public boolean validPasswordLenght() {
+    public boolean validPasswordLength() {
 		return (newPassword.length()>=5);
     }
+
+	public String getOldPassword() {
+		return oldPassword;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String getConfirmation() {
+		return confirmation;
+	}
+
+	public void setConfirmation(String confirmation) {
+		this.confirmation = confirmation;
+	}
 }
