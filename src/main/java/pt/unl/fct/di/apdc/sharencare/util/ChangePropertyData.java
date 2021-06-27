@@ -32,8 +32,12 @@ public class ChangePropertyData {
 	}
 
 	public boolean validPostalCode() {
-		String[] splitPostal = newPostal.split("-");
-		return (newPostal.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
+		boolean isValid = false;
+		if(newPostal.contains("-")) {
+			String[] splitPostal = newPostal.split("-");
+			isValid = (newPostal.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
+		}
+		return isValid;
 	}
 
 	public boolean validPhone() {
@@ -42,6 +46,6 @@ public class ChangePropertyData {
 
 	public boolean allEmptyParameters() {
 		return newEmail.equals("") && newLandLine.equals("") && newMobile.equals("")
-				&& newAddress.equals("") && newSecondAddress.equals("") && newPostal.equals("");
+				&& newAddress.equals("") && newSecondAddress.equals("") && newPostal.equals("") && newProfileType.equals("");
 	}
 }
