@@ -96,8 +96,7 @@ function handleChangeRole() {
     let inputs = document.getElementsByName("changeRoleInput")
     let data = {
         userToBeChanged: inputs[0].value,
-        roleToChange: inputs[1].value,
-        tokenIdChangeRole: inputs[2].value
+        roleToChange: inputs[1].value
     }
     callChangeRole(JSON.stringify(data));
 }

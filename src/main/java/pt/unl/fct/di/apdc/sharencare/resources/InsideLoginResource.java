@@ -411,7 +411,7 @@ public class InsideLoginResource {
 	@POST
 	@Path("/changeRole")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response changeRole(ChangeRoleData data) {
+	public Response changeRole(@CookieParam("Token") NewCookie cookie, ChangeRoleData data) {
 
 		if (data.emptyParameters()) {
 			System.out.println("Please fill in all fields.");
@@ -421,13 +421,13 @@ public class InsideLoginResource {
 		Key userToChangeKey = datastore.newKeyFactory().setKind("User").newKey(data.userToBeChanged);
 		Entity userToBeChanged = datastore.get(userToChangeKey);
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenIdChangeRole);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null) {
 			System.out.println("The given token does not exist.");
 			return Response.status(Status.NOT_FOUND)
-					.entity("Token with id: " + data.tokenIdChangeRole + " doesn't exist").build();
+					.entity("Token with id doesn't exist").build();
 		}
 
 //		if(!t.validToken(tokenKey)){
@@ -471,7 +471,7 @@ public class InsideLoginResource {
 				.build();
 
 		datastore.update(userToBeChanged);
-		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).build();
+		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).cookie(cookie).build();
 
 	}
 
