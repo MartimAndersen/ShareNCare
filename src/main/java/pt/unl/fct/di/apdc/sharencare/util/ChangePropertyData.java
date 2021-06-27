@@ -9,13 +9,12 @@ public class ChangePropertyData {
 	public String newAddress;
 	public String newSecondAddress;
 	public String newPostal;
-	public String tokenIdChangeAttributes;
 
 	public ChangePropertyData() {
 		
 	}
 	
-	public ChangePropertyData(String newEmail, String newProfileType, String newLandLine, String newMobile, String newAddress, String newSecondAddress, String newPostal, String tokenIdChangeAttributes) {
+	public ChangePropertyData(String newEmail, String newProfileType, String newLandLine, String newMobile, String newAddress, String newSecondAddress, String newPostal) {
 		this.newEmail = newEmail;
 		this.newProfileType = newProfileType;
 		this.newLandLine = newLandLine;
@@ -23,7 +22,6 @@ public class ChangePropertyData {
 		this.newAddress = newAddress;
 		this.newSecondAddress = newSecondAddress;
 		this.newPostal = newPostal;
-		this.tokenIdChangeAttributes = tokenIdChangeAttributes;
 	}
 
 
@@ -43,7 +41,7 @@ public class ChangePropertyData {
 	}
 
 	public boolean allEmptyParameters() {
-		return newEmail.equals("") && newProfileType.equals("") && newLandLine.equals("") && newMobile.equals("")
+		return newEmail.equals("") && newLandLine.equals("") && newMobile.equals("")
 				&& newAddress.equals("") && newSecondAddress.equals("") && newPostal.equals("");
 	}
 }

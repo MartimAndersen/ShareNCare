@@ -77,7 +77,7 @@ function callChangeAttributes(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/changeAttributes", true);
+    xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
@@ -120,8 +120,7 @@ function handleChangeAttributes() {
         newMobile: inputs[3].value,
         newAddress: inputs[4].value,
         newSecondAddress: inputs[5].value,
-        newPostal: inputs[6].value,
-        tokenIdChangeAttributes: inputs[7].value
+        newPostal: inputs[6].value
     }
     callChangeAttributes(JSON.stringify(data));
 }

@@ -216,6 +216,71 @@ public class InsideLoginResource {
 
 		return Response.ok("Properties changed").build();
 	}
+
+	@POST
+	@Path("/changeAttributesWeb")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response changeProperty(@CookieParam("Token") NewCookie cookie, ChangePropertyData data) {
+
+
+		String email = data.newEmail;
+		String profileType = data.newProfileType;
+		String landLine = data.newLandLine;
+		String mobile = data.newMobile;
+		String address = data.newAddress;
+		String secondAddress = data.newSecondAddress;
+		String postal = data.newPostal;
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+//		if(!t.validToken(tokenKey))
+//			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + cookie.getName() +
+//					" has expired. Please login again to continue using the application")
+//					.build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+
+		if(user.getString("state") == "DISABLED")
+			return Response.status(Status.BAD_REQUEST).entity("User with id: " + user.getString("username") + " is disabled.")
+					.build();
+
+		if (data.newEmail.equals(""))
+			email = user.getString("email");
+		if (data.newProfileType.equals(""))
+			profileType = user.getString("profileType");
+		if (data.newLandLine.equals(""))
+			landLine = user.getString("landLine");
+		if (data.newMobile.equals(""))
+			mobile = user.getString("mobile");
+		if (data.newAddress.equals(""))
+			address = user.getString("address");
+		if (data.newSecondAddress.equals(""))
+			secondAddress = user.getString("secondAddress");
+		if (data.newPostal.equals(""))
+			postal = user.getString("postal");
+
+		if (!validateData(data))
+			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
+
+		user = Entity.newBuilder(userKey).set("password", user.getString("password")).set("email", email)
+				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
+				.set("secondAddress", secondAddress).set("postal", postal).set("role", user.getString("role"))
+				.set("state", user.getString("state")).build();
+
+		datastore.update(user);
+
+		return Response.ok("Properties changed").cookie(cookie).build();
+	}
 	
 	// op4
 	@POST
@@ -256,7 +321,7 @@ public class InsideLoginResource {
 				.set("password", user.getString("password"))
 				.set("confirmation", user.getString("password"))
 				.set("email", user.getString("email"))
-				.set("publicProfile", user.getString("publicProfile"))
+				.set("profileType", user.getString("profileType"))
 				.set("landLine", user.getString("landLine"))
 				.set("mobile", user.getString("mobile"))
 				.set("address", user.getString("address"))
@@ -491,13 +556,13 @@ public class InsideLoginResource {
 		 */
 
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
-				.setFilter(PropertyFilter.eq("profileType", "Publico")).build();
+				.setFilter(PropertyFilter.eq("profileType", "public")).build();
 
 		QueryResults<Entity> results = datastore.run(query);
 		List<String> r = new ArrayList<>();
 
 		if (results == null)
-			return Response.status(Status.NO_CONTENT).entity("No users with profile type 'Publico'").build();
+			return Response.status(Status.NO_CONTENT).entity("No users with profile type 'public'").build();
 
 		while (results.hasNext())
 			r.add(results.next().getKey().getName());
@@ -511,12 +576,6 @@ public class InsideLoginResource {
 	@Path("/changePassword")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changePassword(@CookieParam("Token") NewCookie cookie, ChangePasswordData data) {
-
-		System.out.println("ENTREI NO changePassword()!!!!!!!!3");
-
-		System.out.println("OLD PASS: " + data.getOldPassword());
-		System.out.println("NEW PASS: " + data.getNewPassword());
-		System.out.println("CONFIRMATION PASS: " + data.getConfirmation());
 
 		if (data.emptyParameters()) {
 			System.out.println("Please fill in all non-optional fields.");
@@ -562,7 +621,7 @@ public class InsideLoginResource {
 							.set("password", DigestUtils.sha512Hex(data.newPassword))
 							.set("confirmation", DigestUtils.sha512Hex(data.newPassword))
 							.set("email", user.getString("email"))
-							.set("publicProfile", user.getBoolean("publicProfile"))
+							.set("profileType", user.getString("profileType"))
 							.set("landLine", user.getString("landLine"))
 							.set("mobile", user.getString("mobile"))
 							.set("address", user.getString("address"))
@@ -722,8 +781,8 @@ public class InsideLoginResource {
 		int emailSize = email.length - 1;
 
 		if (data.newEmail.contains("@") && (email[emailSize].length() == 2 || email[emailSize].length() == 3))
-			if (data.newProfileType.equals("") || data.newProfileType.equalsIgnoreCase("Publico")
-					|| data.newProfileType.equalsIgnoreCase("Privado"))
+			if (data.newProfileType.equals("") || data.newProfileType.equalsIgnoreCase("public")
+					|| data.newProfileType.equalsIgnoreCase("private"))
 				if (data.newLandLine.equals("")
 						|| (landLine[0].subSequence(0, 1).equals("+") && landLine[1].length() == 9))
 					if (data.newPostal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))

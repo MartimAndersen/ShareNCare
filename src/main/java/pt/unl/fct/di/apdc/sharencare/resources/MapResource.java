@@ -118,7 +118,7 @@ public class MapResource {
 
         if (data.email.contains("@") && (email[emailSize].length() == 2 || email[emailSize].length() == 3))
             if (data.password.equals(data.confirmation))
-                if (data.profileType.equals("") || data.profileType.equalsIgnoreCase("Publico") || data.profileType.equalsIgnoreCase("Privado"))
+                if (data.profileType.equals("") || data.profileType.equalsIgnoreCase("public") || data.profileType.equalsIgnoreCase("private"))
                     if (data.landLine.equals("") || (landLine[0].subSequence(0, 1).equals("+") && landLine[1].length() == 9))
                         if (data.postal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))
                             if (data.mobile.equals("") || (mobile[0].subSequence(0, 1).equals("+") && (

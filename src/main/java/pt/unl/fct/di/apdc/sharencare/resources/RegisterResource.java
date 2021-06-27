@@ -35,7 +35,7 @@ public class RegisterResource {
                     .set("email", "superUser@gmail.com")
                     .set("password", DigestUtils.sha512Hex("password"))
                     .set("confirmation", DigestUtils.sha512Hex("password"))
-                    .set("profileType", "")
+                    .set("profileType", "private")
                     .set("landLine", "")
                     .set("mobile", "")
                     .set("address", "")
@@ -43,6 +43,9 @@ public class RegisterResource {
                     .set("postal", "")
                     .set("role", "SU")
                     .set("state", "ENABLED")
+                    .set("profilePic", "")
+                    .set("tags", "")
+                    .set("events", "")
                     .build();
             datastore.add(user);
         } else {}
@@ -93,7 +96,7 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("confirmation", DigestUtils.sha512Hex(data.password))
-        				.set("publicProfile", false)
+        				.set("profileType", "private")
         				.set("landLine", "")
         				.set("mobile", "")
         				.set("address", "")
