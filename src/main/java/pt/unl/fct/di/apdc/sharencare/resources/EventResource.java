@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -89,33 +90,35 @@ public class EventResource {
 
     }
 	
-	@GET
-	@Path("/getAllEvents")
-	@Consumes(MediaType.APPLICATION_JSON)
 //TODO	@Produces
-	public Response getAllEvents(ListEventsData data) {
+	@GET
+	@Path("/getAllEvents/{tokenId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getAllEvents(@PathParam("tokenId") String tokenId) {
 		
-		if (data.tokenId.equals(""))
+		if (tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null) {
 			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
 		}
-		
 		
 		Query<Entity> query = Query.newEntityQueryBuilder()
 				.setKind("Event")
 				.build();
 		
-		QueryResults<Entity> logs = datastore.run(query);
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<Entity> events = new ArrayList<>();	
+			while (eventsQuery.hasNext())	
+				events.add(eventsQuery.next());	
 		
 		
-		return Response.ok(g.toJson(logs)).build();
+		return Response.ok(g.toJson(events)).build();
 		
 	}
 		
