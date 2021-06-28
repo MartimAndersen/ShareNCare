@@ -10,7 +10,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
-import com.google.cloud.datastore.Blob;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -43,6 +47,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class InsideLoginResource {
 
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+	Storage storage = StorageOptions.getDefaultInstance().getService();
+	Bucket bucket = storage.create(BucketInfo.of("profilepic"));
+	
 	private final Gson g = new Gson();
 	AuthTokenResource t = new AuthTokenResource();
 
