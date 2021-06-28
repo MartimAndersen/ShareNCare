@@ -11,6 +11,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
@@ -124,7 +125,7 @@ public class InsideLoginResource {
 		String zipCode = data.zipCode;
 		String profileType = data.profileType;
 		String tags = g.toJson(data.tags); 
-		//Blob profilePic = data.profilePic;
+		byte[] profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
 		Entity token = datastore.get(tokenKey);
@@ -134,6 +135,9 @@ public class InsideLoginResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
 					.build();
 		}
+		
+		//falta saber que identificador utilizar para a profile pic
+		Blob blob = bucket.create(token.getString("username") , profilePic);
 
 //		if(!t.validToken(tokenKey))
 //			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId +
@@ -218,7 +222,6 @@ public class InsideLoginResource {
 				.set("postal", zipCode)
 				.set("tags", tags)
 				.set("events", g.toJson(user.getString("events")))
-				//.set("profilePic", profilePic)
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
 
@@ -238,7 +241,8 @@ public class InsideLoginResource {
 		if (data.allEmptyParameters()) {	
 			System.out.println("Please enter at least one new attribute.");	
 			return Response.status(Status.LENGTH_REQUIRED).build();	
-		}	
+		}
+		
 		String email = data.newEmail;	
 		String profileType = data.newProfileType;	
 		String landLine = data.newLandLine;	
@@ -246,12 +250,15 @@ public class InsideLoginResource {
 		String address = data.newAddress;	
 		String secondAddress = data.newSecondAddress;	
 		String postal = data.newPostal;	
+		
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());	
 		Entity token = datastore.get(tokenKey);	
+		
 		if (token == null) {	
 			System.out.println("The given token does not exist.");	
 			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();	
 		}	
+		
 //		if(!t.validToken(tokenKey))	
 //			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + cookie.getName() +	
 //					" has expired. Please login again to continue using the application")	

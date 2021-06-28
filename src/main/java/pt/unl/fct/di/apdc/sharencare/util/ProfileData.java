@@ -20,7 +20,7 @@ public class ProfileData {
 	public String tokenId;
 	public List<Integer> tags;
 	public List<String> events;
-	public Blob profilePic;
+	public byte[] profilePic;
 	
 	private Gson gson;
 	
@@ -28,7 +28,7 @@ public class ProfileData {
 		
 	}
 	
-	public ProfileData(String email, String mobile, String landLine, String address, String postal, String profileType, String secondAddress, List<Integer> tags, //Blob profilePic, 
+	public ProfileData(String email, String mobile, String landLine, String address, String postal, String profileType, String secondAddress, List<Integer> tags, byte[] profilePic, 
 			List<String> events, String tokenId) {
 		gson = new Gson();
 		
@@ -40,7 +40,7 @@ public class ProfileData {
 		this.secondAddress = secondAddress;
 		this.landLine = landLine;
 		this.tags = tags;
-		//this.profilePic = profilePic;
+		this.profilePic = profilePic;
 		this.events = events;
 		this.tokenId = tokenId;
 	}
