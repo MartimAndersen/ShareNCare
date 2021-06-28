@@ -11,7 +11,7 @@ function initMap() {
 
 let dist = 0;
 
-class AutocompleteDirectionsHandler {
+class AutocompleteDirectionsHandler { 
     constructor(map) {
         this.map = map;
         this.originPlaceId = "";
