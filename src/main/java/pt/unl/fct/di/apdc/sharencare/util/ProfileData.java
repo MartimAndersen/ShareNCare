@@ -16,11 +16,11 @@ public class ProfileData {
 	public String address;
 	public String secondAddress;
 	public String zipCode;
-	public boolean publicProfile;
+	public String profileType;
 	public String tokenId;
-	public String tags;
-	public String events;
-	public Blob profilePic;
+	public List<Integer> tags;
+	public List<String> events;
+	public byte[] profilePic;
 	
 	private Gson gson;
 	
@@ -28,27 +28,21 @@ public class ProfileData {
 		
 	}
 	
-	public ProfileData(String email, String mobile, String landLine, String address, String postal, boolean publicProfile, String secondAddress, List<Integer> tags, Blob profilePic, String tokenId) {
+	public ProfileData(String email, String mobile, String landLine, String address, String postal, String profileType, String secondAddress, List<Integer> tags, byte[] profilePic, 
+			List<String> events, String tokenId) {
 		gson = new Gson();
 		
 		this.email = email;
 		this.mobile = mobile;
 		this.address = address;
 		this.zipCode = postal;
-		this.publicProfile = publicProfile;
+		this.profileType = profileType;
 		this.secondAddress = secondAddress;
 		this.landLine = landLine;
-		this.tags = convertToString(tags);
+		this.tags = tags;
 		this.profilePic = profilePic;
-		this.events = 
+		this.events = events;
 		this.tokenId = tokenId;
-	}
-	
-	public String convertToString(List<Integer> t) {
-		List<String> arrayList = new ArrayList<String>();
-		for(int i = 0; i < t.size(); i++)
-			arrayList.add(TAGS[t.get(i)]);
-		return gson.toJson(arrayList);
 	}
 	
 	public boolean validEmail() {

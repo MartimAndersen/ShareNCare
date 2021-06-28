@@ -9,8 +9,6 @@
 </head>
 <body>
 
-<br>
-
 <button onclick="backToInitialPage()">Back To Initial Page</button>
 
 <br>
@@ -57,13 +55,9 @@ Distance:
         <textarea id="description" name="createTrack" type="text" style="height:170px; width:750px;"
                   placeholder="Track Description (optional)"></textarea>
     </p>
-    <p>
-        <label for="tokenId" class="floatLabel"></label>
-        <input id="tokenId" name="createTrack" type="text" placeholder="Token ID">
-    </p>
 
     <div class="slider">
-        Difficulty:   <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput" oninput="this.nextElementSibling.value = this.value">
+        Difficulty of the walk:   <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput" oninput="this.nextElementSibling.value = this.value">
         <output id="sliderOutput">5</output>
     </div>
 

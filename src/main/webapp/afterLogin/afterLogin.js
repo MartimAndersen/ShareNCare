@@ -67,11 +67,12 @@ function callChangeAttributes(data) {
             switch (this.status) {
                 case 200: alert(this.responseText); break;
                 case 411: alert("Please enter at least one new attribute."); break;
-                case 401: alert("Please enter a token."); break;
+                case 401: alert("You need to be logged in to execute this operation."); break;
                 case 404: alert("Token does not exist."); break;
                 case 403: alert("The user with the given token does not exist."); break;
                 case 406: alert("The user with the given token is disabled."); break;
                 case 412: alert("Invalid email."); break;
+                case 409: alert("Invalid postal code."); break;
                 case 417: alert("Invalid mobile phone."); break;
                 default: alert("Wrong parameters."); break;
             }
@@ -95,8 +96,7 @@ function handleChangeRole() {
     let inputs = document.getElementsByName("changeRoleInput")
     let data = {
         userToBeChanged: inputs[0].value,
-        roleToChange: inputs[1].value,
-        tokenIdChangeRole: inputs[2].value
+        roleToChange: inputs[1].value
     }
     callChangeRole(JSON.stringify(data));
 }

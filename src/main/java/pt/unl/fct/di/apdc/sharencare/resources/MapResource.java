@@ -2,9 +2,11 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -23,14 +25,13 @@ public class MapResource {
     @POST
     @Path("/registerTrack")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerTrack(TrackData data) {
-
+    public Response registerTrack(@CookieParam("Token") NewCookie cookie, TrackData data) {
 
         if(data.title.equals("")){
             System.out.println("Please insert a title.");
             return Response.status(Status.FORBIDDEN).build();
-        } else if(data.tokenId.equals("")) {
-            System.out.println("Please insert the current session's tokenId.");
+        } else if(cookie.getName().equals("")) {
+            System.out.println("You need to be logged in to execute this operation.");
             return Response.status(Status.BAD_REQUEST).build();
         }
 
@@ -46,7 +47,6 @@ public class MapResource {
                 track = Entity.newBuilder(mapKey)
                         .set("title", data.title)
                         .set("description", data.description)
-                        .set("tokenId", data.tokenId)
                         .set("origin", data.origin)
                         .set("destination", data.destination)
                         .set("difficulty", data.difficulty)
@@ -56,7 +56,7 @@ public class MapResource {
 
                 txn.add(track);
                 txn.commit();
-                return Response.ok("Track " + data.title + " registered.").build();
+                return Response.ok("Track " + data.title + " registered.").cookie(cookie).build();
             }
         } finally {
             if (txn.isActive()) {

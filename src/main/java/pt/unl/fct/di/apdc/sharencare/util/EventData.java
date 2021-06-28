@@ -11,8 +11,8 @@ public class EventData {
     //public String coordinates;
     public String temporary;
     public String date;
-    public List<Value<String>>  tags;
-    public String lat, lon;
+    public List<Integer> tags;
+    public Double lat, lon;
     
     
     public EventData() {
@@ -20,7 +20,7 @@ public class EventData {
     }
     
     public EventData(String name, String description,String minParticipants,String maxParticipants,
-    		String lat, String lon, String temporary, String date, List<Value<String>>  tags) {
+    		Double lat, Double lon, String temporary, String date, List<Integer>  tags) {
     
     	this.name = name;
     	this.description = description;
