@@ -8,6 +8,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import pt.unl.fct.di.example.sharencare.login.LoginService;
 import pt.unl.fct.di.example.sharencare.map.MapService;
 import pt.unl.fct.di.example.sharencare.register.RegisterService;
+import pt.unl.fct.di.example.sharencare.ui.events.EventsService;
+import pt.unl.fct.di.example.sharencare.ui.profile.ProfileService;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -17,6 +19,8 @@ public final class Repository {
     private LoginService loginService;
     private RegisterService registerService;
     private MapService mapService;
+    private ProfileService profileService;
+    private EventsService eventsService;
 
     public static Repository getInstance() {
         if (instance == null) {
@@ -43,6 +47,8 @@ public final class Repository {
         loginService = retrofit.create(LoginService.class);
         registerService = retrofit.create(RegisterService.class);
         mapService = retrofit.create(MapService.class);
+        profileService = retrofit.create(ProfileService.class);
+        eventsService = retrofit.create(EventsService.class);
 
     }
 
@@ -55,4 +61,8 @@ public final class Repository {
     }
 
     public MapService getMapService(){return mapService;}
+
+    public ProfileService getProfileService(){return profileService;}
+
+    public EventsService getEventsService(){return eventsService;}
 }
