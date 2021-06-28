@@ -41,6 +41,8 @@ public class RegisterResource {
                     .set("address", "")
                     .set("secondAddress", "")
                     .set("postal", "")
+                    .set("tags", "")
+                    .set("events", "")
                     .set("role", "SU")
                     .set("state", "ENABLED")
                     .set("profilePic", "")
