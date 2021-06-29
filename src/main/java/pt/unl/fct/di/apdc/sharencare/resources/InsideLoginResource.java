@@ -48,8 +48,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class InsideLoginResource {
 
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-	Storage storage = StorageOptions.getDefaultInstance().getService();
-	Bucket bucket = storage.create(BucketInfo.of("profilepic"));
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build().getService();
+	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021", Storage.BucketGetOption.fields(Storage.BucketField.values()));
 	
 	private final Gson g = new Gson();
 	AuthTokenResource t = new AuthTokenResource();
