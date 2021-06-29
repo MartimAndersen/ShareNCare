@@ -127,6 +127,8 @@ public class RegisterResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerInstitution(RegisterInstitutionData data) {
 
+        System.out.println("ENTREI O REGISTER");
+
         LOG.fine("Attempt to register institution: " + data.username);
 
         if(data.emptyParameters()){
@@ -163,7 +165,7 @@ public class RegisterResource {
             if (user != null) {
                 txn.rollback();
                 return Response.status(Response.Status.CONFLICT)
-                        .entity("Company " + data.username + " already exists.").build();
+                        .entity("Institution " + data.username + " already exists.").build();
             } else {
                 user = Entity.newBuilder(userKey)
                 		.set("nif", data.nif)

@@ -124,7 +124,7 @@ public class LoginResource {
 				
 				LOG.info("Institution " + username + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok(username).cookie(cookie).build();
+				return Response.ok("Institution " + username + " is now logged in.").cookie(cookie).build();
 			} else {
 				LOG.warning("Wrong password for username: " + username);
 				return Response.status(Status.EXPECTATION_FAILED).build();
@@ -135,5 +135,6 @@ public class LoginResource {
 		}
 
 	}
+
 
 }
