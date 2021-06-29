@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share&Care</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+<body>
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<button onclick="goBack()">Go back</button>
+
+<br>
+<br>
+<br>
+
+<form id="createEventId" action="#" method="post">
+    <h1>Create new event</h1>
+
+    <p>
+        <label for="name" class="floatLabel"></label>
+        <input id="name" name="createEventInput" type="text" placeholder="Name">
+    </p>
+    <p>
+        <label for="description" class="floatLabel"></label>
+        <input id="description" name="createEventInput" type="text" placeholder="description">
+    </p>
+    <p>
+        <label for="minParticipants" class="floatLabel"></label>
+        <input id="minParticipants" name="createEventInput" type="text" placeholder="min number os participants">
+    </p>
+    <p>
+        <label for="maxParticipants" class="floatLabel"></label>
+        <input id="maxParticipants" name="createEventInput" type="text" placeholder="max number os participants">
+    </p>
+    <p>
+        <label for="lat" class="floatLabel"></label>
+        <input id="lat" name="createEventInput" type="text" placeholder="latitude of event">
+
+        <label for="lon" class="floatLabel"></label>
+        <input id="lon" name="createEventInput" type="text" placeholder="longitude of event">
+    </p>
+    <p>
+        <label for="date" class="floatLabel"></label>
+        <input id="date" name="createEventInput" type="text" placeholder="date of event">
+    </p>
+    <p>
+        <label for="temporary" class="floatLabel"></label>
+        <input id="temporary" name="createEventInput" type="text" placeholder="temporary or persistent">
+    </p>
+
+    <p>
+        <input type="submit" value="create" id="submitCreatedEvent">
+    </p>
+</form>
+
+
+<script src="eventPage.js"></script>
+</body>
+</html>
