@@ -187,23 +187,23 @@ public class EventResource {
 	}
     
     @POST
-	@Path("/listUserEvents")
+	@Path("/listUserEvents/{tokenId}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response listUserEvents(TokenData data) {
+	public Response listUserEvents(@PathParam("tokenId") String tokenId) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
 
 		if (!t.validToken(tokenKey))
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId
 					+ " has expired. Please login again to continue using the application").build();
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));

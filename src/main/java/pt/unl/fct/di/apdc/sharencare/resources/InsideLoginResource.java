@@ -48,8 +48,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class InsideLoginResource {
 
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-	Storage storage = StorageOptions.getDefaultInstance().getService();
-	Bucket bucket = storage.create(BucketInfo.of("profilepic"));
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build().getService();
+	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021", Storage.BucketGetOption.fields(Storage.BucketField.values()));
 	
 	private final Gson g = new Gson();
 	AuthTokenResource t = new AuthTokenResource();
@@ -204,7 +204,7 @@ public class InsideLoginResource {
 			tags = g.toJson(user.getString("tags"));
 		
 		//falta saber que identificador utilizar para a profile pic
-		Blob blob = bucket.create(token.getString("username") , profilePic);
+		bucket.create(token.getString("username") , profilePic);
 		/*
 		if(data.profilePic == null)
 			profilePic = user.getBlob("profilePic");
@@ -232,6 +232,32 @@ public class InsideLoginResource {
 		datastore.update(user);
 
 		return Response.ok("Properties changed").build();
+	}
+	
+	@GET
+	@Path("/getUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUser(@QueryParam("username") String username, @QueryParam("tokenId") String tokenId) {
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+		
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + username + " doesn't exist").build();
+		}
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+		
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist")
+					.build();
+
+		}
+
+		return Response.ok(user).build();		
 	}
 	
 	@POST	
@@ -680,4 +706,5 @@ public class InsideLoginResource {
  	private String convertToString(List<Integer> t) {	
  		return g.toJson(t);	
  	}	
+ 	
  }	

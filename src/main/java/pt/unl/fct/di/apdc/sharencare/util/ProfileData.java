@@ -69,8 +69,8 @@ public class ProfileData {
 	}
 	
 	public boolean allEmptyParameters() {
-		return// newEmail.equals("") && 
-				landLine.equals("") && mobile.equals("")
+		return  email.equals("") && profilePic.length == 0 && tags == null &&
+				landLine.equals("") && mobile.equals("") && profileType.equals("")
 				&& address.equals("") && secondAddress.equals("") && zipCode.equals("");
 	}
 
