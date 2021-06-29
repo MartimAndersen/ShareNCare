@@ -247,10 +247,20 @@ public class InsideLoginResource {
 					.entity("User with username: " + username + " doesn't exist").build();
 		}
 		
+<<<<<<< Updated upstream
 		String hashedPWD = user.getString("password");
 		if(!hashedPWD.equals(DigestUtils.sha512Hex(password))) {
 			System.out.println("Wrong password for username: " + username);
 			return Response.status(Status.EXPECTATION_FAILED).build();
+=======
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+		
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist")
+					.build();
+>>>>>>> Stashed changes
 		}
 
 		return Response.ok(user).build();		
