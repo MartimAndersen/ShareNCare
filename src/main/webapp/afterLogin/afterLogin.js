@@ -1,4 +1,4 @@
-
+/*
 function callLogout() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -16,7 +16,9 @@ function callLogout() {
      xhttp.send("");
 
 }
+ */
 
+/*
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -37,7 +39,9 @@ function callChangeRole(data) {
     xhttp.send(data);
 
 }
+ */
 
+/*
 function callChangePassword(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -59,7 +63,9 @@ function callChangePassword(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
+ */
 
+/*
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -82,8 +88,9 @@ function callChangeAttributes(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
+ */
 
-
+/*
 function handleLogout() {
     let inputs = document.getElementsByName("logoutInput")
     let data = {
@@ -91,7 +98,9 @@ function handleLogout() {
     }
     callLogout(JSON.stringify(data));
 }
+ */
 
+/*
 function handleChangeRole() {
     let inputs = document.getElementsByName("changeRoleInput")
     let data = {
@@ -100,7 +109,9 @@ function handleChangeRole() {
     }
     callChangeRole(JSON.stringify(data));
 }
+ */
 
+/*
 function handleChangePassword() {
     let inputs = document.getElementsByName("changePasswordInput")
     let data = {
@@ -110,7 +121,9 @@ function handleChangePassword() {
     }
     callChangePassword(JSON.stringify(data));
 }
+ */
 
+/*
 function handleChangeAttributes() {
     let inputs = document.getElementsByName("changeAttributesInput")
     let data = {
@@ -124,28 +137,37 @@ function handleChangeAttributes() {
     }
     callChangeAttributes(JSON.stringify(data));
 }
+ */
 
+/*
 let changeRoleForm = document.getElementById("changeRoleFormId");
 changeRoleForm.onsubmit = () => {
     handleChangeRole();
     return false;
 }
+ */
 
+/*
 let changePasswordForm = document.getElementById("changePasswordFormId");
 changePasswordForm.onsubmit = () => {
     handleChangePassword();
     return false;
 }
+ */
 
+/*
 let changeAttributesForm = document.getElementById("changeAttributesFormId");
 changeAttributesForm.onsubmit = () => {
     handleChangeAttributes();
     return false;
 }
+ */
 
+/*
 function backToInitialPage() {
     window.location.href = "../initialPage/initialPage.html";
 }
+ */
 
 function goToMapsPage() {
     window.location.href = "../maps/maps.html";

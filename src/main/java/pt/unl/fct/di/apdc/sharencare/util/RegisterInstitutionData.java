@@ -79,6 +79,7 @@ public class RegisterInstitutionData {
 			return false;
 		} finally {
 		}
+//		return nif.length()==9;
 	}
 
 }

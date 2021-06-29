@@ -11,84 +11,127 @@
 </head>
 <body>
 
-<br>
-<br>
-<br>
 
-<button onclick="goToAfterLoginPage()">I already have a token</button>
 
-<br>
-<br>
-<br>
+<div class="split left">
+    <div class="centered">
 
-<form id="loginFormId" action="#" method="post">
-    <h1>Login</h1>
-    <p>
-        <label for="usernameLogin" class="floatLabel"></label>
-        <input id="usernameLogin" name="loginInput" type="text" placeholder="Username">
-    </p>
-    <p>
-        <label for="passwordLogin" class="floatLabel"></label>
-        <input id="passwordLogin" name="loginInput" type="password" placeholder="Password">
-    </p>
+        <form id="loginFormId" action="#" method="post">
+            <h1>Login</h1>
+            <p>
+                <label for="usernameLogin" class="floatLabel"></label>
+                <input id="usernameLogin" name="loginInput" type="text" placeholder="Username">
+            </p>
+            <p>
+                <label for="passwordLogin" class="floatLabel"></label>
+                <input id="passwordLogin" name="loginInput" type="password" placeholder="Password">
+            </p>
 
-    <p>
-        <input type="submit" value="Sign In" id="submitLogin">
-    </p>
-</form>
+            <p>
+                <input type="submit" value="Sign In" id="submitLogin">
+            </p>
+        </form>
 
 <br>
 <br>
 <br>
 
-<form id="regFormId" action="#" method="post">
-    <h1>Sign Up</h1>
-    <p>
-        <label for="username" class="floatLabel"></label>
-        <input id="username" name="regInput" type="text" placeholder="Username">
-    </p>
+        <form id="regFormId" action="#" method="post">
+            <h1>Sign Up</h1>
+            <p>
+                <label for="username" class="floatLabel"></label>
+                <input id="username" name="regInput" type="text" placeholder="Username">
+            </p>
 
-    <p>
-        <label for="email" class="floatLabel"></label>
-        <input id="email" name="regInput" type="text" placeholder="Email">
-    </p>
-    <p>
-        <label for="password" class="floatLabel"></label>
-        <input id="password" name="regInput" type="password" placeholder="Password">
-        <!--        <span>Enter a password with 5 or more characters</span>-->
-    </p>
-    <p>
-        <label for="confirmation" class="floatLabel"></label>
-        <input id="confirmation" name="regInput" type="password" placeholder="Confirm Password">
-    </p>
-<!--    <p>-->
-<!--        <label for="mobile" class="floatLabel"></label>-->
-<!--        <input id="mobile" name="regInput" type="text" placeholder="Mobile Phone (optional)">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="landLine" class="floatLabel"></label>-->
-<!--        <input id="landLine" name="regInput" type="text" placeholder="Landline (optional)">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="address" class="floatLabel"></label>-->
-<!--        <input id="address" name="regInput" type="text" placeholder="Address (optional)">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="secondAddress" class="floatLabel"></label>-->
-<!--        <input id="secondAddress" name="regInput" type="text" placeholder="Second Address (optional)">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="postal" class="floatLabel"></label>-->
-<!--        <input id="postal" name="regInput" type="text" placeholder="Postal Code (optional)">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="profileType" class="floatLabel"></label>-->
-<!--        <input id="profileType" name="regInput" type="text" placeholder="Profile Type (optional)">-->
-<!--    </p>-->
-    <p>
-        <input type="submit" value="Sign Up" id="submitRegister">
-    </p>
-</form>
+            <p>
+                <label for="email" class="floatLabel"></label>
+                <input id="email" name="regInput" type="text" placeholder="Email">
+            </p>
+            <p>
+                <label for="password" class="floatLabel"></label>
+                <input id="password" name="regInput" type="password" placeholder="Password">
+                <!--        <span>Enter a password with 5 or more characters</span>-->
+            </p>
+            <p>
+                <label for="confirmation" class="floatLabel"></label>
+                <input id="confirmation" name="regInput" type="password" placeholder="Confirm Password">
+            </p>
+            <p>
+                <input type="submit" value="Sign Up" id="submitRegister">
+            </p>
+        </form>
+
+        <br>
+        <br>
+        <br>
+
+        <button onclick="goToAfterLoginPage()">I already have a token</button>
+
+        <br>
+        <br>
+        <br>
+
+    </div>
+</div>
+
+
+
+
+
+<div class="split right">
+    <div class="centered">
+
+        <form id="loginCompanyFormId" action="#" method="post">
+            <h1>Login an Institution</h1>
+            <p>
+                <label for="usernameLoginCompany" class="floatLabel"></label>
+                <input id="usernameLoginCompany" name="loginInputCompany" type="text" placeholder="Identification number">
+            </p>
+            <p>
+                <label for="passwordLoginCompany" class="floatLabel"></label>
+                <input id="passwordLoginCompany" name="loginInputCompany" type="password" placeholder="Password">
+            </p>
+
+            <p>
+                <input type="submit" value="Sign In an Institution" id="submitLoginCompany">
+            </p>
+        </form>
+
+<br>
+<br>
+<br>
+
+        <form id="regCompanyFormId" action="#" method="post">
+            <h1>Sign Up an Institution</h1>
+            <p>
+                <label for="usernameCompany" class="floatLabel"></label>
+                <input id="usernameCompany" name="regInputCompany" type="text" placeholder="Username">
+            </p>
+            <p>
+                <label for="idNrCompany" class="floatLabel"></label>
+                <input id="idNrCompany" name="regInputCompany" type="text" placeholder="Identification number">
+            </p>
+
+            <p>
+                <label for="emailCompany" class="floatLabel"></label>
+                <input id="emailCompany" name="regInputCompany" type="text" placeholder="Email">
+            </p>
+            <p>
+                <label for="passwordCompany" class="floatLabel"></label>
+                <input id="passwordCompany" name="regInputCompany" type="password" placeholder="Password">
+            </p>
+            <p>
+                <label for="confirmationCompany" class="floatLabel"></label>
+                <input id="confirmationCompany" name="regInputCompany" type="password" placeholder="Confirm Password">
+            </p>
+            <p>
+                <input type="submit" value="Sign Up an Institution" id="submitRegisterCompany">
+            </p>
+        </form>
+
+
+</div>
+</div>
 
 <!--<button onclick="toggleVisibility()">Toggle Visibility</button>-->
 
