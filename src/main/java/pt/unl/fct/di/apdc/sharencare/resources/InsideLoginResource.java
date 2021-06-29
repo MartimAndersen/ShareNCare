@@ -204,7 +204,7 @@ public class InsideLoginResource {
 			tags = g.toJson(user.getString("tags"));
 		
 		//falta saber que identificador utilizar para a profile pic
-		Blob blob = bucket.create(token.getString("username") , profilePic);
+		bucket.create(token.getString("username") , profilePic);
 		/*
 		if(data.profilePic == null)
 			profilePic = user.getBlob("profilePic");
@@ -232,6 +232,28 @@ public class InsideLoginResource {
 		datastore.update(user);
 
 		return Response.ok("Properties changed").build();
+	}
+	
+	@GET
+	@Path("/getUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUser(@QueryParam("username") String username, @QueryParam("password") String password ) {
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+		
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + username + " doesn't exist").build();
+		}
+		
+		String hashedPWD = user.getString("password");
+		if(!hashedPWD.equals(DigestUtils.sha512Hex(password))) {
+			System.out.println("Wrong password for username: " + username);
+			return Response.status(Status.EXPECTATION_FAILED).build();
+		}
+
+		return Response.ok(user).build();		
 	}
 	
 	@POST	
@@ -680,4 +702,5 @@ public class InsideLoginResource {
  	private String convertToString(List<Integer> t) {	
  		return g.toJson(t);	
  	}	
+ 	
  }	
