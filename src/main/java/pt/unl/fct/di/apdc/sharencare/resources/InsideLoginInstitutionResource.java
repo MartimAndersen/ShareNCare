@@ -39,12 +39,11 @@ public class InsideLoginInstitutionResource {
 		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		/*if (data.allEmptyParameters()) {
+		if (data.allEmptyParameters()) {
 			System.out.println("Please enter at least one new attribute.");
 			return Response.status(Status.LENGTH_REQUIRED).build();
-		}*/
+		}
 
-		String username = data.username;
 		String email = data.email;
 		String mobile = data.mobile;
 		String landLine = data.landLine;
