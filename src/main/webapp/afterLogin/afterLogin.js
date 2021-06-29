@@ -150,3 +150,7 @@ function backToInitialPage() {
 function goToMapsPage() {
     window.location.href = "../maps/maps.html";
 }
+
+function goToEventsPage() {
+    window.location.href = "../event/eventPage.html";
+}
