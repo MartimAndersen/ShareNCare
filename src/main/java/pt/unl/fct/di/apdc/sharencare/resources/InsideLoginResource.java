@@ -136,8 +136,6 @@ public class InsideLoginResource {
 					.build();
 		}
 		
-		//falta saber que identificador utilizar para a profile pic
-		Blob blob = bucket.create(token.getString("username") , profilePic);
 
 //		if(!t.validToken(tokenKey))
 //			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId +
@@ -168,6 +166,9 @@ public class InsideLoginResource {
 			  } 
 		  }
 		 //TODO
+		if(data.profilePic.length == 0) {
+			profilePic = null;
+		}
 		if (data.profileType.equals(""))
 			profileType = user.getString("profileType");
 
@@ -201,6 +202,9 @@ public class InsideLoginResource {
 		
 		if(data.tags == null)
 			tags = g.toJson(user.getString("tags"));
+		
+		//falta saber que identificador utilizar para a profile pic
+		Blob blob = bucket.create(token.getString("username") , profilePic);
 		/*
 		if(data.profilePic == null)
 			profilePic = user.getBlob("profilePic");
