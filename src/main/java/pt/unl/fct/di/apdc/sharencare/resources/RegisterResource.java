@@ -175,12 +175,15 @@ public class RegisterResource {
         				.set("landLine", "")
         				.set("mobile", "")
         				.set("address", "")
-        				.set("secondAddress", "")
         				.set("postal", "")
-                        .set("role", "INSTITUTION")
-                        .set("state", "ENABLED")
-        				.set("profilePic", "")
-                        .set("events", "")
+        				.set("website", "")
+        				.set("twitter", "")
+        				.set("instagram", "")
+        				.set("youtube", "")
+        				.set("facebook", "")
+        				.set("fax", "")
+        				.set("members", "")
+        				.set("events", "")
                         .build();
 
                 txn.add(user);
