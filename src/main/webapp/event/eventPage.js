@@ -1,13 +1,14 @@
 
 
 
-function callChangeAttributes(data) {
+function callCreateEvent(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200: alert(this.responseText); break;
                 case 406: alert("Wrong parameters."); break;
+                case 409: alert("Event already exists"); break;
                 default: alert("Something went wrong"); break;
             }
         }
@@ -29,7 +30,7 @@ function handleCreateEvent() {
         lon: inputs[5].value,
         date: inputs[6].value,
         temporary: inputs[6].value,
-        tags : ""
+        tags : []
 
     }
     callCreateEvent(JSON.stringify(data));
@@ -37,8 +38,8 @@ function handleCreateEvent() {
 
 
 
-let changeAttributesForm = document.getElementById("changeAttributesId");
-changeAttributesForm.onsubmit = () => {
+let createEventForm = document.getElementById("createEventId");
+createEventForm.onsubmit = () => {
     handleCreateEvent();
     return false;
 }

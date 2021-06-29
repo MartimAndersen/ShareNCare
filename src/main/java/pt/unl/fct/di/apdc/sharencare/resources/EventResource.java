@@ -43,6 +43,8 @@ public class EventResource {
     public Response registerEvent(EventData data) {
     	LOG.fine("Attempt to register event: " + data.name);
     	
+    	System.out.println("estoua chegar");
+    	
     	
     	if( Integer.parseInt(data.minParticipants) <= 0 || Integer.parseInt(data.maxParticipants) < Integer.parseInt(data.minParticipants)) {
     		System.out.println("Number of participants is incorrect");
