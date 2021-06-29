@@ -29,7 +29,7 @@ function handleCreateEvent() {
         lat: inputs[4].value,
         lon: inputs[5].value,
         date: inputs[6].value,
-        temporary: inputs[6].value,
+        temporary: inputs[7].value,
         tags : []
 
     }
