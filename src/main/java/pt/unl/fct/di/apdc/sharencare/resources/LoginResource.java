@@ -86,5 +86,54 @@ public class LoginResource {
 		}
 
 	}
+	
+	//op6 - logs in an institution
+	@POST
+	@Path("/institution")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response loginInstitution(LoginInstitutionData data) {
+
+		if(data.emptyParameters()){
+			System.out.println("Please fill in all non-optional fields.");
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.nifLogin);
+		Entity user = datastore.get(userKey);
+
+		if (user != null) {
+			String hashedPWD = user.getString("password");
+			
+			String username = user.getString("username");
+
+			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
+				AuthToken t = new AuthToken(data.nifLogin, user.getString("role"));
+
+				Cookie cookiee = new Cookie("Token", t.tokenID, "/", null);
+				NewCookie cookie = new NewCookie(cookiee,null,-1,null,true,true);
+
+				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
+				Entity token = Entity.newBuilder(tokenKey)
+						.set("tokenId", t.tokenID)
+						.set("username", t.username)
+						.set("role", t.role)
+						.set("creationData", t.creationData)
+						.set("expirationData", t.expirationData)
+						.set("valid", t.valid)
+						.build();
+				
+				LOG.info("Institution " + username + " logged in successfully.");
+				datastore.add(token);
+				return Response.ok(username).cookie(cookie).build();
+			} else {
+				LOG.warning("Wrong password for username: " + username);
+				return Response.status(Status.EXPECTATION_FAILED).build();
+			}
+		} else {
+			LOG.warning("Failed login attempt for username: " + data.nifLogin);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+	}
 
 }

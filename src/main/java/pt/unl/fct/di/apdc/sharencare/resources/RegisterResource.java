@@ -13,7 +13,7 @@ import com.google.cloud.datastore.*;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import pt.unl.fct.di.apdc.sharencare.util.RegisterCompanyData;
+import pt.unl.fct.di.apdc.sharencare.util.RegisterInstitutionData;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterData;
 
 //import pt.unl.fct.di.apdc.APDC56253.util.LoginData;
@@ -97,7 +97,6 @@ public class RegisterResource {
                         .set("username", data.username)
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
-                        .set("confirmation", DigestUtils.sha512Hex(data.password))
         				.set("profileType", "private")
         				.set("landLine", "")
         				.set("mobile", "")
@@ -124,11 +123,11 @@ public class RegisterResource {
     }
     
     @POST
-    @Path("/company")
+    @Path("/institution")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerCompany(RegisterCompanyData data) {
+    public Response registerInstitution(RegisterInstitutionData data) {
 
-        LOG.fine("Attempt to register company: " + data.username);
+        LOG.fine("Attempt to register institution: " + data.username);
 
         if(data.emptyParameters()){
             System.out.println("Please fill in all non-optional fields.");
@@ -171,12 +170,20 @@ public class RegisterResource {
                         .set("username", data.username)
                         .set("email", data.email)
                         .set("password", DigestUtils.sha512Hex(data.password))
-                        .set("confirmation", DigestUtils.sha512Hex(data.password))
+        				.set("landLine", "")
+        				.set("mobile", "")
+        				.set("address", "")
+        				.set("secondAddress", "")
+        				.set("postal", "")
+                        .set("role", "INSTITUTION")
+                        .set("state", "ENABLED")
+        				.set("profilePic", "")
+                        .set("events", "")
                         .build();
 
                 txn.add(user);
                 txn.commit();
-                return Response.ok("Company " + data.username + " registered.").build();
+                return Response.ok("Institution " + data.username + " registered.").build();
             }
         } finally {
             if (txn.isActive()) {

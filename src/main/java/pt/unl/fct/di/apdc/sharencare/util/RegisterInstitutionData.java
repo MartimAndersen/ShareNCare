@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-public class RegisterCompanyData {
+public class RegisterInstitutionData {
 
 	public String username;
 	public String nif;
@@ -10,17 +10,17 @@ public class RegisterCompanyData {
 	public String role;
 	public String state;
 
-	public RegisterCompanyData() {
+	public RegisterInstitutionData() {
 
 	}
 
-	public RegisterCompanyData(String username, String nif, String email, String password, String confirmation) {
+	public RegisterInstitutionData(String username, String nif, String email, String password, String confirmation) {
 		this.username = username;
 		this.nif = nif;
 		this.password = password;
 		this.confirmation = confirmation;
 		this.email = email;
-		this.role = "COMPANY";
+		this.role = "INSTITUTION";
 		this.state = "ENABLED";
 	}
 
