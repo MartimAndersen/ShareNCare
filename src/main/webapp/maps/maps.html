@@ -40,6 +40,10 @@
 
 <h2>Track Information</h2>
 
+<button style="font-size : 15px;  float: right;" onclick="clearMap()">Clear Map</button>
+
+<button style="font-size : 15px;  float: right;" onclick="addMarkers()">Find Institutions</button>
+
 <textarea id="distanceBox" readonly>
 Distance:
 </textarea>
@@ -57,7 +61,8 @@ Distance:
     </p>
 
     <div class="slider">
-        Difficulty of the walk:   <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput" oninput="this.nextElementSibling.value = this.value">
+        Difficulty of the walk: <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput"
+                                       oninput="this.nextElementSibling.value = this.value">
         <output id="sliderOutput">5</output>
     </div>
 

@@ -1,17 +1,19 @@
 document.getElementById("submitButton").style.visibility = "hidden";
 
+var map;
+
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
-        center: {lat:  38.659784, lng:  -9.202765},
-        zoom: 16
+        center: {lat: 38.659784, lng: -9.202765},
+        zoom: 9
     });
     new AutocompleteDirectionsHandler(map);
 }
 
 let dist = 0;
 
-class AutocompleteDirectionsHandler { 
+class AutocompleteDirectionsHandler {
     constructor(map) {
         this.map = map;
         this.originPlaceId = "";
@@ -38,6 +40,11 @@ class AutocompleteDirectionsHandler {
             destinationInput
         );
         this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+
+        // new google.maps.Marker({
+        //     position: new google.maps.LatLng(38.736946, -9.142685),
+        //     map: map
+        // })
     }
 
     setupPlaceChangedListener(autocomplete, mode) {
@@ -100,7 +107,7 @@ function callCreateTrack(data) {
             alert(this.responseText);
         } else if (this.readyState === 4 && this.status === 400) {
             alert("You need to be logged in to execute this operation.");
-        }else if (this.readyState === 4 && this.status === 403) {
+        } else if (this.readyState === 4 && this.status === 403) {
             alert("Please insert a title.");
         } else if (this.readyState === 4 && this.status === 409) {
             alert("The track with the given title already exists.");
@@ -113,11 +120,11 @@ function callCreateTrack(data) {
     xhttp.send(data);
 }
 
-function changeSliderValue(value){
+function changeSliderValue(value) {
     document.getElementById('sliderInput').value = value;
 }
 
-document.getElementById("sliderInput").oninput = function(){
+document.getElementById("sliderInput").oninput = function () {
     document.getElementById("sliderOutput").value = document.getElementById("sliderInput").value;
 }
 
@@ -141,4 +148,42 @@ createTrackForm.onsubmit = () => {
     return false;
 }
 
+let locations = [
+    ['Canil Municipal de Sintra', 38.80103664384434, -9.362070114620005],
+    ['Comunidade Vida e Paz', 38.750773862083626, -9.133415786802798],
+    ['Cáritas Diocesana de Setúbal', 38.750773862083626, -9.133415786802798],
+    ['Comunidade Vida e Paz', 38.52423234014446, -8.8967447733166],
+    ['Casa de Acolhimento Residencial D. Nuno Álvares Pereira', 38.67591762242458, -9.160317675163238]
+];
+
+var markers = [];
+
+function addMarkers() {
+
+    var infowindow = new google.maps.InfoWindow();
+
+    var marker, i;
+
+    for (i = 0; i < locations.length; i++) {
+        marker = new google.maps.Marker({
+            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            map: map
+        });
+
+        markers.push(marker);
+
+        google.maps.event.addListener(marker, 'click', (function (marker, i) {
+            return function () {
+                infowindow.setContent(locations[i][0]);
+                infowindow.open(map, marker);
+            }
+        })(marker, i));
+    }
+}
+
+function clearMap() {
+    for(let m=0; m<markers.length; m++){
+        markers[m].setMap(null);
+    }
+}
 
