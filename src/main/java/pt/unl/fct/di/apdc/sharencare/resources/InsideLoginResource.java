@@ -257,7 +257,7 @@ public class InsideLoginResource {
 
 		}
 
-		return Response.ok(user).build();		
+		return Response.ok(g.toJson(user.getProperties().values())).build();		
 	}
 	
 	@POST	
