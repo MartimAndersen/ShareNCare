@@ -2,40 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Title</title>
+    <link rel="stylesheet" href="../changeAttributes/changeAttributesStyle.css">
 </head>
 
+
+
 <body>
+
+<ul>
+    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html">Home</a></li>
+</ul>
+
+
+<div class="center">
 
 <form id="changeAttributesFormId" action="#" method="post">
     <h1>Update Personal Info</h1>
 
     <p>
-        <label for="newEmail" class="floatLabel"></label>
+        <label for="newEmail" class="floatLabel">Email</label>
         <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
     </p>
     <p>
+
         <label for="newProfileType" class="floatLabel"></label>
         <input id="newProfileType" name="changeAttributesInput" type="text" placeholder="Profile Type (public/private)">
+
     </p>
     <p>
-        <label for="newLandLine" class="floatLabel"></label>
+        <label for="newLandLine" class="floatLabel">Land Line</label>
         <input id="newLandLine" name="changeAttributesInput" type="text" placeholder="Landline">
     </p>
     <p>
-        <label for="newMobile" class="floatLabel"></label>
+        <label for="newMobile" class="floatLabel">Mobile</label>
         <input id="newMobile" name="changeAttributesInput" type="text" placeholder="Mobile">
     </p>
     <p>
-        <label for="newAddress" class="floatLabel"></label>
+        <label for="newAddress" class="floatLabel">Address</label>
         <input id="newAddress" name="changeAttributesInput" type="text" placeholder="Address">
     </p>
     <p>
-        <label for="newSecondAddress" class="floatLabel"></label>
+        <label for="newSecondAddress" class="floatLabel">Second Address</label>
         <input id="newSecondAddress" name="changeAttributesInput" type="text" placeholder="Second Address">
     </p>
     <p>
-        <label for="newPostal" class="floatLabel"></label>
+        <label for="newPostal" class="floatLabel">Postal</label>
         <input id="newPostal" name="changeAttributesInput" type="text" placeholder="Postal">
     </p>
 
@@ -43,10 +58,9 @@
         <input type="submit" value="Update" id="submitChangeAttributes">
     </p>
 </form>
+</div>
 
-<button onclick="goToPageBefore()">Go back</button>
 
-<script src="changeAttributes.js"></script>
 
 </body>
 </html>

@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;	
@@ -53,6 +54,7 @@ public class InsideLoginResource {
 	
 	private final Gson g = new Gson();
 	AuthTokenResource t = new AuthTokenResource();
+	private static final Logger LOG = Logger.getLogger(InsideLoginResource.class.getName());
 
 	// op2
 	@POST
@@ -107,6 +109,8 @@ public class InsideLoginResource {
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeProperty(ProfileData data) {
+		
+		
 		
 		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
@@ -272,6 +276,8 @@ public class InsideLoginResource {
 			System.out.println("Please enter at least one new attribute.");	
 			return Response.status(Status.LENGTH_REQUIRED).build();	
 		}
+		
+		LOG.info("Cheguei");
 		
 		String email = data.newEmail;	
 		String profileType = data.newProfileType;	
