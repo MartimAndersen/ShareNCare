@@ -1,5 +1,5 @@
 function goToPageBefore(){
-    window.location.href = "../../afterLoginPage.html";
+    window.location.href = "../../afterLoginCompanyPage.html";
 }
 
 function callChangeAttributes(data) {

@@ -3,6 +3,7 @@ function backToInitialPage() {
 }
 
 function goToChangePassword() {
+    localStorage.setItem("isUserPage","true");
     window.location.href = "functionalities/changePassword/changePassword.html";
 }
 
@@ -15,6 +16,7 @@ function goToChangeRole() {
 }
 
 function goToCreateTrack() {
+    localStorage.setItem("isUserPage","true");
     window.location.href = "functionalities/createTrack/createTrack.html";
 }
 
@@ -30,6 +32,18 @@ function goToSeeLeaderboard() {
     window.location.href = "functionalities/leaderboard/leaderboard.html";
 }
 
-function goToLogout() {
-    window.location.href = "functionalities/logout/logout.html";
+function logout() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); backToInitialPage(); break;
+                default: alert("You need to be logged in to execute this operation."); break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/loggedIn/logout", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    xhttp.send("");
 }
