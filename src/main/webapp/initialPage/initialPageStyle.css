@@ -20,7 +20,6 @@ body {
 
 /* Control the left side */
 .left {
-    left: 0;
     background-color: rgba(194, 215, 175, 0.95);
     color: rgba(34, 50, 19, 0.95);
     width: 25%;

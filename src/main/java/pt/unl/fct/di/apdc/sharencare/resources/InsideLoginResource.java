@@ -128,7 +128,7 @@ public class InsideLoginResource {
 		String secondAddress = data.secondAddress;
 		String zipCode = data.zipCode;
 		String profileType = data.profileType;
-		String tags = g.toJson(data.tags); 
+		List<Integer> tags = data.tags; 
 		byte[] profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
@@ -204,8 +204,8 @@ public class InsideLoginResource {
 			}
 		}
 		
-		if(data.tags == null)
-			tags = g.toJson(user.getString("tags"));
+		/*if(data.tags.isEmpty())
+			tags = g.toJson(user.getString("tags"));*/
 		
 		//falta saber que identificador utilizar para a profile pic
 		bucket.create(token.getString("username") , profilePic);
@@ -228,7 +228,7 @@ public class InsideLoginResource {
 				.set("address", address)
 				.set("secondAddress", secondAddress)
 				.set("postal", zipCode)
-				.set("tags", tags)
+				.set("tags", g.toJson(tags))
 				.set("events", g.toJson(user.getString("events")))
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
@@ -261,7 +261,7 @@ public class InsideLoginResource {
 
 		}
 
-		return Response.ok(user).build();		
+		return Response.ok(g.toJson(user.getProperties().values())).build();		
 	}
 	
 	@POST	

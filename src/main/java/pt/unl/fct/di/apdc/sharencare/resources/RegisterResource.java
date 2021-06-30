@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.datastore.*;
+import com.google.gson.Gson;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -25,6 +26,7 @@ public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private final Gson gson = new Gson();
 
     public RegisterResource() {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey("superUser");
@@ -46,8 +48,8 @@ public class RegisterResource {
                     .set("role", "SU")
                     .set("state", "ENABLED")
                     .set("profilePic", "")
-                    .set("tags", "")
-                    .set("events", "")
+                    .set("tags", gson.toJson(new ArrayList<Integer>()))
+                    .set("events", gson.toJson(new ArrayList<String>()))
                     .build();
             datastore.add(user);
         } else {}
@@ -106,8 +108,8 @@ public class RegisterResource {
                         .set("role", "USER")
                         .set("state", "ENABLED")
         				.set("profilePic", "")
-                        .set("tags", "")
-                        .set("events", "")
+        		        .set("tags", gson.toJson(new ArrayList<Integer>()))
+                        .set("events", gson.toJson(new ArrayList<String>()))
                         .build();
 
                 txn.add(user);
