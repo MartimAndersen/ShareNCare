@@ -4,15 +4,21 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
+    background-image: url("images/nature.jpg");
+    background-size: cover; /* Resize the background image to cover the entire container */
 }
 
 /* Style the header */
-.header {
-    /*background-color: #f1f1f1;*/
-    /*padding: 30px;*/
+.header1 {
     text-align: center;
     font-size: 30px;
-    font-family:Gilbert;
+    font-family:Gilbert, sans-serif;
+}
+.header2 {
+    text-align: center;
+    font-size: 50px;
+    font-family: 'Brush Script MT', cursive;
+    color: rgba(255, 250, 0, 0.76);
 }
 
 /* Create three equal columns that floats next to each other */
@@ -20,24 +26,22 @@ body {
     float: left;
     width: 33.33%;
     padding: 10px;
-    height: 500px; /* Should be removed. Only for demonstration */
-    background-image: linear-gradient(to right, rgba(194,215,175,0.95) , rgba(183,210,150,0.95));
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(194, 215, 175, 1), rgba(183, 210, 150, 1));
 }
 .column2 {
     float: left;
-    /*border-left-color: #000000;
-    border-right-color: #000000;*/
     width: 33.33%;
     padding: 10px;
-    height: 500px; /* Should be removed. Only for demonstration */
-    background-image: linear-gradient(to right, rgba(183,210,150,0.95) , rgba(163,196,131,0.95) );
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(183, 210, 150, 1), rgba(163, 196, 131, 1));
 }
 .column3 {
     float: left;
     width: 33.33%;
     padding: 10px;
-    height: 500px; /* Should be removed. Only for demonstration */
-    background-image: linear-gradient(to right, rgba(163,196,131,0.95) , rgba(153, 205, 173, 1) );
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(163, 196, 131, 1), rgba(153, 205, 173, 1));
 }
 
 /* Clear floats after the columns */
@@ -47,11 +51,14 @@ body {
     clear: both;
 }
 
+.row{
+    text-align: center;
+}
+
 /* Style the footer */
 .footer {
-    background-color: #f1f1f1;
     padding: 10px;
-    text-align: center;
+    height: 50px;
 }
 
 /*Style the buttons*/
@@ -61,18 +68,21 @@ body {
     border-radius: 12px;
     color: white;
     padding: 7px 14px;
-    text-align: left;
+    text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     transition-duration: 0.2s;
+    width: 300px;
+
 }
 
 .button1:hover {
     background-color: rgba(153, 205, 173, 1);
     color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 .button2 {
@@ -81,18 +91,20 @@ body {
     border-radius: 12px;
     color: white;
     padding: 7px 14px;
-    text-align: left;
+    text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     transition-duration: 0.2s;
+    width: 300px;
 }
 
 .button2:hover {
     background-color: rgba(163,196,131,0.95);
     color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 .button3 {
@@ -101,18 +113,20 @@ body {
     border-radius: 12px;
     color: white;
     padding: 7px 14px;
-    text-align: left;
+    text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     transition-duration: 0.2s;
+    width: 300px;
 }
 
 .button3:hover {
     background-color: rgba(194,215,175,0.95);
     color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 .button4 {
@@ -121,18 +135,21 @@ body {
     border-radius: 12px;
     color: white;
     padding: 7px 14px;
-    text-align: left;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
     cursor: pointer;
     transition-duration: 0.2s;
+    margin-top: 0px;
+    float: right;
+    width: 100px;
+    text-align: center;
 }
 
 .button4:hover {
     background-color: rgba(153, 205, 173, 1);
     color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 /* Responsive layout - makes the three columns stack on top of each other instead of next to each other */

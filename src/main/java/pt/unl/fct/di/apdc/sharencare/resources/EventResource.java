@@ -3,7 +3,9 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -22,6 +24,7 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Transaction;
+import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
@@ -115,9 +118,11 @@ public class EventResource {
 				.build();
 		
 		QueryResults<Entity> eventsQuery = datastore.run(query);
-		List<Entity> events = new ArrayList<>();	
-			while (eventsQuery.hasNext())	
-				events.add(eventsQuery.next());	
+		List<String> events = new ArrayList<>();
+			while (eventsQuery.hasNext())	{
+				String event = g.toJson(eventsQuery.next().getProperties().values());
+				events.add(event);	
+			}
 		
 		
 		return Response.ok(g.toJson(events)).build();

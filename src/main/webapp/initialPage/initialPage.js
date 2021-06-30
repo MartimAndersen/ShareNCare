@@ -184,7 +184,13 @@ function handleLoginCompany() {
 }
 
 function goToAfterLoginPage() {
-    window.location.href = "../afterLogin/afterLogin.html";
+    // window.location.href = "../afterLogin/afterLogin.html";
+    window.location.href = "../afterLogin/afterLoginPage.html";
+}
+
+function goToAfterLoginCompanyPage() {
+    // window.location.href = "../afterLogin/afterLogin.html";
+    window.location.href = "../afterLogin/afterLoginCompanyPage.html";
 }
 
 // function toggleVisibility() {

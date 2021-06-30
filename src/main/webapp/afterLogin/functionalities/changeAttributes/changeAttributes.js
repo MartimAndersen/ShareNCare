@@ -1,3 +1,7 @@
+function goToPageBefore(){
+    window.location.href = "../../afterLoginPage.html";
+}
+
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -19,6 +23,8 @@ function callChangeAttributes(data) {
     xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
+
+    goToPageBefore();
 }
 
 function handleChangeAttributes() {

@@ -23,28 +23,29 @@ import pt.unl.fct.di.apdc.sharencare.util.ProfileInstitutionData;
 @Path("/loggedInInstitution")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class InsideLoginInstitutionResource {
-	
+
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build().getService();
-	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021", Storage.BucketGetOption.fields(Storage.BucketField.values()));
-	
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build()
+			.getService();
+	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
+			Storage.BucketGetOption.fields(Storage.BucketField.values()));
+
 	private final Gson g = new Gson();
 	AuthTokenResource t = new AuthTokenResource();
-	
+
 	@POST
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeAttributes(ProfileInstitutionData data) {
-		
+
 		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		/*if (data.allEmptyParameters()) {
+		if (data.allEmptyParameters()) {
 			System.out.println("Please enter at least one new attribute.");
 			return Response.status(Status.LENGTH_REQUIRED).build();
-		}*/
+		}
 
-		String username = data.username;
 		String email = data.email;
 		String mobile = data.mobile;
 		String landLine = data.landLine;
@@ -66,7 +67,6 @@ public class InsideLoginInstitutionResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
 					.build();
 		}
-		
 
 //		if(!t.validToken(tokenKey))
 //			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId +
@@ -88,16 +88,16 @@ public class InsideLoginInstitutionResource {
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
 
-		  if (data.email.equals(""))
-			  email = user.getString("email"); 
-		  else {
-			  if(!data.validEmail()) { 
-				  System.out.println("Invalid email."); 
-				  return Response.status(Status.PRECONDITION_FAILED).build(); 
-			  } 
-		  }
-		 //TODO
-		if(data.profilePic.length == 0) {
+		if (data.email.equals(""))
+			email = user.getString("email");
+		else {
+			if (!data.validEmail()) {
+				System.out.println("Invalid email.");
+				return Response.status(Status.PRECONDITION_FAILED).build();
+			}
+		}
+		// TODO
+		if (data.profilePic.length == 0) {
 			profilePic = null;
 		}
 
@@ -116,64 +116,60 @@ public class InsideLoginInstitutionResource {
 		if (data.address.equals(""))
 			address = user.getString("address");
 
-		if (data.zipCode.equals("")) 
+		if (data.zipCode.equals("")) {
 			zipCode = user.getString("postal");
-	
-	    else {
-			if (!data.validPostalCode()) {
-				System.out.println("Invalid postal code.");
-				return Response.status(Status.METHOD_NOT_ALLOWED).build();
-			}
+		} else if (!data.validPostalCode()) {
+			System.out.println("Invalid postal code.");
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 		}
-		
-		if (data.website.equals(""))
+
+		if (data.website.equals("")) {
 			website = user.getString("website");
+
+		} else if (!data.validWebsite()) {
+			System.out.println("Invalid website URL");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		if (data.instagram.equals(""))
 			instagram = user.getString("instagram");
+
 		if (data.twitter.equals(""))
 			twitter = user.getString("twitter");
+
 		if (data.facebook.equals(""))
 			facebook = user.getString("facebook");
+
 		if (data.youtube.equals(""))
 			youtube = user.getString("youtube");
-		if (data.fax.equals(""))
+
+		if (data.fax.equals("")) {
 			fax = user.getString("fax");
-		
-		//falta saber que identificador utilizar para a profile pic
-		bucket.create(token.getString("username") , profilePic);
+
+		} else if (!data.validFax()) {
+			System.out.println("Invalid fax number");
+			return Response.status(Status.CONFLICT).build();
+		}
+
+		// falta saber que identificador utilizar para a profile pic
+		bucket.create(token.getString("username"), profilePic);
 		/*
-		if(data.profilePic == null)
-			profilePic = user.getBlob("profilePic");
-	*/
+		 * if(data.profilePic == null) profilePic = user.getBlob("profilePic");
+		 */
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
-		
 
-		user = Entity.newBuilder(userKey)
-				.set("username", token.getString("username"))
-				.set("password", user.getString("password"))
-				.set("confirmation", user.getString("password"))
-				.set("email", email)
-				.set("landLine", landLine)
-				.set("mobile", mobile)
-				.set("address", address)
-				.set("postal", zipCode)
-				.set("website", website)
-				.set("twitter", twitter)
-				.set("instagram", instagram)
-				.set("youtube", youtube)
-				.set("facebook", facebook)
-				.set("fax", fax)
-				.set("members", g.toJson(user.getString("members")))
-				.set("events", g.toJson(user.getString("events")))
-				.set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+				.set("password", user.getString("password")).set("confirmation", user.getString("password"))
+				.set("email", email).set("landLine", landLine).set("mobile", mobile).set("address", address)
+				.set("postal", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
+				.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
+				.set("members", g.toJson(user.getString("members"))).set("events", g.toJson(user.getString("events")))
+				.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 		datastore.update(user);
 
 		return Response.ok("Properties changed").build();
 	}
-	
-
 
 }

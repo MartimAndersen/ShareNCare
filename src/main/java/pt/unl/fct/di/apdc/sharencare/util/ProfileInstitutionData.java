@@ -1,12 +1,12 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.net.URL;
 import java.util.List;
 
 import com.google.gson.Gson;
 
 public class ProfileInstitutionData {
 	
-	public String username;
 	public String email;
 	public String mobile;
 	public String landLine;
@@ -27,10 +27,9 @@ public class ProfileInstitutionData {
 		
 	}
 	
-	public ProfileInstitutionData(String username, String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic, 
+	public ProfileInstitutionData(String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic, 
 			List<String> events, String tokenId, String website, String instagram, String twitter, String facebook, String youtube,
 			String fax, List<String> members) {
-		this.username = username;
 		this.email = email;
 		this.mobile = mobile;
 		this.address = address;
@@ -57,8 +56,7 @@ public class ProfileInstitutionData {
 
 	
 	public boolean validPostalCode() {
-		String[] splitPostal = zipCode.split("-");
-		return (zipCode.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
+		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
 	}
 
 	public boolean validPhone() {
@@ -66,9 +64,29 @@ public class ProfileInstitutionData {
 	}
 	
 	public boolean allEmptyParameters() {
-		return  email.equals("") && profilePic.length == 0 &&
-				landLine.equals("") && mobile.equals("")
-				&& address.equals("") && zipCode.equals("");
+		return  email.equals("") && mobile.equals("") && address.equals("")
+				&& zipCode.equals("") && landLine.equals("") && profilePic.length == 0
+				&& events == null && members == null && website.equals("") && instagram.equals("")
+				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("");
 	}
+	
+	public boolean validFax() {
+		return fax.matches("\"^\\+[0-9]{1,3}\\([0-9]{3}\\)[0-9]{7}$\"");
+	}
+	
+	public boolean validWebsite()
+    {
+        /* Try creating a valid URL */
+        try {
+            new URL(website).toURI();
+            return true;
+        }
+          
+        // If there was an Exception
+        // while creating URL object
+        catch (Exception e) {
+            return false;
+        }
+    }
 
 }

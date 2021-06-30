@@ -6,15 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./afterLoginPageStyle.css">
 </head>
-<body>
+<body class="body">
 
-<div class="header">
-    <h2>Header</h2>
+<div class="footer">
+    <button style="" class="button4" onclick="logout()">Logout</button>
+</div>
+
+<div class="footer">
+    <button class="button4" onclick="goToAboutUs()">About us</button>
+</div>
+
+<div class="header2">
+    <h2>Welcome User</h2>
 </div>
 
 <div class="row">
     <div class="column1" style="background-color:rgba(194,215,175,0.95);">
-        <h2 class="header">About you!</h2>
+        <h2 class="header1">About you!</h2>
         <p>Here you have the option to customize your profile and even update it! The possibilities are endless!</p>
         <p></p>
         <button class="button1" onclick="goToChangeAttributes()">Customize your profile</button>
@@ -24,26 +32,25 @@
         <button class="button1" onclick="goToChangeRole()">Change your role</button>
     </div>
     <div class="column2" style="background-color:rgba(153, 205, 173, 1);">
-        <h2 class="header">Adventure!</h2>
+        <h2 class="header1">Adventure!</h2>
         <p>Create your event, join a new one or even see what events you have participated in. It's your choice!</p>
         <p></p>
-        <button class="button2" onclick="goToCreateEvent()">Create an event</button>
+        <button class="button2" onclick="goToCreateTrack()">Create a track</button>
         <p></p>
         <button class="button2" onclick="goToJoinEvent()">Join an event</button>
         <p></p>
         <button class="button2" onclick="goToSeeEvents()">See past events</button>
     </div>
     <div class="column3" style="background-color:rgba(163,196,131,0.95);">
-        <h2 class="header">Leaderboard</h2>
+        <h2 class="header1">Leaderboard</h2>
         <p>Did you know that you have a rank? Check out how you did amongst our other users and brag to your friends!</p>
         <p></p>
         <button class="button3" onclick="goToSeeLeaderboard()">See leaderboard</button>
     </div>
 </div>
 
-<div class="footer">
-    <button class="button4" onclick="goToLogout()">Logout</button>
-</div>
+<br>
+<button class="button4" onclick="backToInitialPage()">Back to Initial Page</button>
 
 <script src="afterLoginPage.js"></script>
 </body>

@@ -1,3 +1,13 @@
+
+function goToPageBefore(){
+    let isUserPage = localStorage.getItem("isUserPage");
+    if(isUserPage === "true") {
+        window.location.href = "../../afterLoginPage.html";
+    } else{
+        window.location.href = "../../afterLoginCompanyPage.html";
+    }
+}
+
 function callChangePassword(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -18,6 +28,8 @@ function callChangePassword(data) {
     xhttp.open("POST", "/rest/loggedIn/changePassword", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
+
+    goToPageBefore();
 }
 
 function handleChangePassword() {

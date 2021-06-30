@@ -1,3 +1,8 @@
+
+function goToPageBefore(){
+    window.location.href = "../../afterLoginPage.html";
+}
+
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -17,6 +22,7 @@ function callChangeRole(data) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
+    goToPageBefore();
 }
 
 function handleChangeRole() {
