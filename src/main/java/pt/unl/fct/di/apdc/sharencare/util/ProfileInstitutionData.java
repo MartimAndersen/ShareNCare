@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.net.URL;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -55,8 +56,7 @@ public class ProfileInstitutionData {
 
 	
 	public boolean validPostalCode() {
-		String[] splitPostal = zipCode.split("-");
-		return (zipCode.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
+		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
 	}
 
 	public boolean validPhone() {
@@ -69,5 +69,24 @@ public class ProfileInstitutionData {
 				&& events == null && members == null && website.equals("") && instagram.equals("")
 				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("");
 	}
+	
+	public boolean validFax() {
+		return fax.matches("\"^\\+[0-9]{1,3}\\([0-9]{3}\\)[0-9]{7}$\"");
+	}
+	
+	public boolean validWebsite()
+    {
+        /* Try creating a valid URL */
+        try {
+            new URL(website).toURI();
+            return true;
+        }
+          
+        // If there was an Exception
+        // while creating URL object
+        catch (Exception e) {
+            return false;
+        }
+    }
 
 }

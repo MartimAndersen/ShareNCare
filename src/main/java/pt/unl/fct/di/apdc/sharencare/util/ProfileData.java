@@ -53,9 +53,9 @@ public class ProfileData {
 
 	
 	public boolean validPostalCode() {
-		String[] splitPostal = zipCode.split("-");
-		return (zipCode.equals("") || (splitPostal[0].length() == 4 && splitPostal[1].length() == 3));
+		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
 	}
+
 
 //	public boolean validPhone() {
 //		String[] splitMobile = mobile.split(" ");
