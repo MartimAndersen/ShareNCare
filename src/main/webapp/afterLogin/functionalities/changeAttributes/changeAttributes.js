@@ -29,14 +29,21 @@ function callChangeAttributes(data) {
 
 function handleChangeAttributes() {
     let inputs = document.getElementsByName("changeAttributesInput")
+    let radioButton = ""
+    if(document.getElementById('newProfile').checked){
+        radioButton = inputs[1].value
+    }
+    if(document.getElementById('newProfile1').checked){
+       radioButton = inputs[2].value
+    }
     let data = {
-        newEmail: inputs[0].value,
-        newProfileType: inputs[1].value,
-        newLandLine: inputs[2].value,
-        newMobile: inputs[3].value,
-        newAddress: inputs[4].value,
-        newSecondAddress: inputs[5].value,
-        newPostal: inputs[6].value
+        newEmail: inputs[0].value,   
+        newProfileType: radioButton,
+        newLandLine: inputs[3].value,
+        newMobile: inputs[4].value,
+        newAddress: inputs[5].value,
+        newSecondAddress: inputs[6].value,
+        newPostal: inputs[7].value
     }
     callChangeAttributes(JSON.stringify(data));
 }
