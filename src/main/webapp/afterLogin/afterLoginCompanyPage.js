@@ -14,7 +14,7 @@ function goToChangeRole() {
     window.location.href = "functionalities/changeRole/changeRole.html";
 }
 
-function goToCreateTrack() {
+function goToCreateEvent() {
     window.location.href = "functionalities/createTrack/createTrack.html";
 }
 
