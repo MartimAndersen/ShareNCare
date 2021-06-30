@@ -2,16 +2,8 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #0d575e;
+    background-image: url("../afterLogin/images/nature.jpg");
     text-align: center;
-}
-
-.column1 {
-    float: left;
-    width: 33.33%;
-    padding: 10px;
-    height: 500px;
-    background-image: linear-gradient(to right, rgba(194, 215, 175, 1), rgba(183, 210, 150, 1));
 }
 
 /* Split the screen in half */
@@ -23,6 +15,7 @@ body {
     top: 0;
     overflow-x: hidden;
     padding-top: 20px;
+    text-align: center;
 }
 
 /* Control the left side */
@@ -30,6 +23,11 @@ body {
     left: 0;
     background-color: rgba(194, 215, 175, 0.95);
     color: rgba(34, 50, 19, 0.95);
+    width: 25%;
+    height: 80%;
+    position: absolute;
+    top: 10%;
+    left: 15%;
 }
 
 /* Control the right side */
@@ -37,6 +35,10 @@ body {
     right: 0;
     background-color: rgba(163, 196, 131, 0.95);
     color: rgba(34, 50, 19, 0.95);
+    width: 25%;
+    height: 80%;
+    top: 10%;
+    left: 55%;
 }
 
 /* If you want the content centered horizontally and vertically */
