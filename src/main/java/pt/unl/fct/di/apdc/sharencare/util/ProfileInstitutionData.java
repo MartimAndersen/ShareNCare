@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 
 public class ProfileInstitutionData {
 	
-	public String username;
 	public String email;
 	public String mobile;
 	public String landLine;
@@ -27,10 +26,9 @@ public class ProfileInstitutionData {
 		
 	}
 	
-	public ProfileInstitutionData(String username, String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic, 
+	public ProfileInstitutionData(String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic, 
 			List<String> events, String tokenId, String website, String instagram, String twitter, String facebook, String youtube,
 			String fax, List<String> members) {
-		this.username = username;
 		this.email = email;
 		this.mobile = mobile;
 		this.address = address;
@@ -66,9 +64,10 @@ public class ProfileInstitutionData {
 	}
 	
 	public boolean allEmptyParameters() {
-		return  email.equals("") && profilePic.length == 0 &&
-				landLine.equals("") && mobile.equals("")
-				&& address.equals("") && zipCode.equals("");
+		return  email.equals("") && mobile.equals("") && address.equals("")
+				&& zipCode.equals("") && landLine.equals("") && profilePic.length == 0
+				&& events == null && members == null && website.equals("") && instagram.equals("")
+				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("");
 	}
 
 }
