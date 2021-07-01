@@ -69,12 +69,7 @@ function initAutocomplete() {
         map.fitBounds(bounds);
     });
 
-
-
-
 }
-
-
 
 function callCreateEvent(data) {
     let xhttp = new XMLHttpRequest();
@@ -82,9 +77,12 @@ function callCreateEvent(data) {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200: alert(this.responseText); break;
-                case 406: alert("Wrong parameters."); break;
-                case 409: alert("Event already exists"); break;
-                default: alert("Something went wrong"); break;
+                case 401: alert("You need to be logged in to execute this operation."); break;
+                case 411: alert("Please fill in all fields."); break;
+                case 406: alert("Number of participants is incorrect."); break;
+                case 403: alert("Date is not valid."); break;
+                case 409: alert("Event already exists."); break;
+                default: alert("Something went wrong."); break;
             }
         }
     };

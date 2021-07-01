@@ -128,16 +128,12 @@ public class RegisterResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerInstitution(RegisterInstitutionData data) {
 
-        System.out.println("ENTREI O REGISTER");
-
-        LOG.fine("Attempt to register institution: " + data.username);
-
         if(data.emptyParameters()){
             System.out.println("Please fill in all non-optional fields.");
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         if(!data.validNif()) {
-        	System.out.println("Invalid Nif.");//406
+        	System.out.println("Invalid Nif.");
         	return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
         if(!data.validEmail()){
@@ -177,6 +173,8 @@ public class RegisterResource {
         				.set("mobile", "")
         				.set("address", "")
         				.set("postal", "")
+                        .set("role", "INSTITUTION")
+                        .set("state", "ENABLED")
         				.set("website", "")
         				.set("twitter", "")
         				.set("instagram", "")

@@ -269,12 +269,10 @@ public class InsideLoginResource {
 			System.out.println("You need to be logged in to execute this operation.");	
 			return Response.status(Status.UNAUTHORIZED).build();	
 		}	
-		if (data.allEmptyParameters()) {	
-			System.out.println("Please enter at least one new attribute.");	
+		if (data.allEmptyParameters()) {
+			System.out.println("Please enter at least one new attribute.");
 			return Response.status(Status.LENGTH_REQUIRED).build();	
 		}
-		
-		LOG.info("Cheguei");
 		
 		String email = data.newEmail;	
 		String profileType = data.newProfileType;	
@@ -530,8 +528,7 @@ public class InsideLoginResource {
  		if (data.emptyParameters()) {	
  			System.out.println("Please fill in all non-optional fields.");	
  			return Response.status(Response.Status.UNAUTHORIZED).build();	
- 		}	
- 		System.out.println("NAME DO COOKIE: " + cookie.getName());	
+ 		}
  		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());	
  		Entity token = datastore.get(tokenKey);	
  		if (token == null) {	
@@ -570,9 +567,9 @@ public class InsideLoginResource {
  							.set("postal", user.getString("postal"))	
  							.set("role", user.getString("role"))	
  							.set("state", user.getString("state"))	
-// 							.set("profilePic", user.getString("profilePic"))	
-// 							.set("tags", user.getString("tags"))	
-// 							.set("events", user.getString("events"))	
+// 							.set("profilePic", user.getString("profilePic"))
+// 							.set("tags", user.getString("tags"))
+// 							.set("events", user.getString("events"))
  							.build();	
  					datastore.put(user);	
  					return Response.ok("Password was changed").cookie(cookie).build();	
@@ -646,8 +643,8 @@ public class InsideLoginResource {
  		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));	
  		Entity currentUser = datastore.get(currentUserKey);	
  		if (currentUser.getString("state").equals("DISABLED"))	
- 			return Response.status(Status.BAD_REQUEST)	
- 					.entity("User with id: " + currentUser.getString("username") + " is disabled.").build();	
+ 			return Response.status(Status.BAD_REQUEST)
+ 					.entity("User with id: " + currentUser.getString("username") + " is disabled.").build();
  		if (user == null)	
  			return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();	
  		if (!token.getString("role").equals("GA"))	
@@ -662,8 +659,9 @@ public class InsideLoginResource {
  		while (results.hasNext())	
  			datastore.delete(results.next().getKey());	
  		return Response.ok("User was removed").build();	
- 	}	
- 	private boolean checkRole(String userRole, String removerRole) {	
+ 	}
+
+	private boolean checkRole(String userRole, String removerRole) {
  		if (userRole.equals("USER"))	
  			if (removerRole.equals("GBO") || removerRole.equals("GA") || removerRole.equals("SU"))	
  				return true;	

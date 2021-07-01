@@ -107,6 +107,7 @@ public class LoginResource {
 			String username = user.getString("username");
 
 			if(hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
+				System.out.println("ROLE DA INSTITUTION: " + user.getString("role"));
 				AuthToken t = new AuthToken(data.nifLogin, user.getString("role"));
 
 				Cookie cookiee = new Cookie("Token", t.tokenID, "/", null);

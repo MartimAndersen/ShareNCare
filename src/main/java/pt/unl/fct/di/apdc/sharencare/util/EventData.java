@@ -25,18 +25,27 @@ public class EventData {
     	this.name = name;
     	this.description = description;
     	this.minParticipants = minParticipants;
-    	this.maxParticipants = minParticipants;
+    	this.maxParticipants = maxParticipants;
         this.lat = lat;
         this.lon = lon;
         this.temporary = temporary;
         this.date = date;
         this.tags = tags;
-    	
+
     }
+
+	public boolean atLeastOneEmptyParameter() {
+		return name.equals("") || description.equals("") || minParticipants.equals("")
+				|| maxParticipants.equals("") || temporary.equals("") || date.equals("") || lat == null|| lon == null /** || tags.equals("")*/;
+	}
 	
-	public boolean VerifyDate() {
-		String[] parts = date.split("-");
-		return isValidDate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+	public boolean verifyDate() {
+    	if(!date.contains("-")){
+    		return false;
+		} else {
+			String[] parts = date.split("-");
+			return isValidDate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+		}
 	}
 	
 	private boolean isValidDate(int d, int m, int y)

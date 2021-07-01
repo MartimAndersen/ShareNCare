@@ -2,10 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -28,15 +25,12 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Transaction;
-import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
 import com.google.appengine.api.datastore.*;
 
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
-import pt.unl.fct.di.apdc.sharencare.util.ListEventsData;
-import pt.unl.fct.di.apdc.sharencare.util.TokenData;
 
 @Path("/event")
 public class EventResource {
@@ -49,10 +43,18 @@ public class EventResource {
     @POST
     @Path("/registerEvent")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerEvent(EventData data) {
+    public Response registerEvent(@CookieParam("Token") NewCookie cookie, EventData data) {
     	LOG.fine("Attempt to register event: " + data.name);
-    	
-    	System.out.println("estoua chegar");
+
+		if (cookie.getName().equals("")) {
+			System.out.println("You need to be logged in to execute this operation.");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		if (data.atLeastOneEmptyParameter()) {
+			System.out.println("Please fill in all fields.");
+			return Response.status(Status.LENGTH_REQUIRED).build();
+		}
     	
     	
     	if( Integer.parseInt(data.minParticipants) <= 0 || Integer.parseInt(data.maxParticipants) < Integer.parseInt(data.minParticipants)) {
@@ -60,9 +62,9 @@ public class EventResource {
     		return Response.status(Status.NOT_ACCEPTABLE).build();
     	}
     	
-    	if(!data.VerifyDate()) {
+    	if(!data.verifyDate()) {
     		System.out.println("Date is not valid");
-    		return Response.status(Status.NOT_ACCEPTABLE).build();
+    		return Response.status(Status.FORBIDDEN).build();
     	}
 
 
@@ -85,23 +87,19 @@ public class EventResource {
                         .set("date", data.date)
                         .set("tags", g.toJson(data.tags))
                         .build();
-                
-                
 
 
                 txn.add(event);
                 txn.commit();
-                return Response.ok("Track " + data.name + " registered.").build();
+                return Response.ok("Event " + data.name + " registered.").cookie(cookie).build();
             }
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
             }
         }
-
     }
-	
-//TODO	@Produces
+
 	@GET
 	@Path("/getAllEvents/{tokenId}")
 	@Consumes(MediaType.APPLICATION_JSON)
