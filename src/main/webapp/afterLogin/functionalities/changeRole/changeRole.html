@@ -2,19 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
+    <link rel="stylesheet" href="../changeRole/changeRoleStyle.css">
 </head>
 
 <body>
 
+<ul>
+    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html">Home</a></li>
+</ul>
+
+<div class="center">
+
 <form id="changeRoleFormId" action="#" method="post">
     <h1>Change Role</h1>
     <p>
-        <label for="userToBeChanged" class="floatLabel"></label>
+        <label for="userToBeChanged" class="floatLabel">User to be changed</label><br>
         <input id="userToBeChanged" name="changeRoleInput" type="text" placeholder="User to be changed">
     </p>
     <p>
-        <label for="roleToChange" class="floatLabel"></label>
+        <label for="roleToChange" class="floatLabel">New Role</label><br>
         <input id="roleToChange" name="changeRoleInput" type="text" placeholder="New Role">
     </p>
 
@@ -23,7 +33,9 @@
     </p>
 </form>
 
-<button onclick="goToPageBefore()">Go back</button>
+
+
+</div>
 
 <script src="changeRole.js"></script>
 

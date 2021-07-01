@@ -1,7 +1,5 @@
 
-function goToPageBefore(){
-    window.location.href = "../../afterLoginPage.html";
-}
+
 
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();
