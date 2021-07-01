@@ -31,6 +31,8 @@ import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
+import com.google.appengine.api.datastore.*;
+
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.ListEventsData;
@@ -259,7 +261,7 @@ public class EventResource {
 		 * END OF VERIFICATIONS
 		 */
 		
-		Query<Entity> query = Query.newEntityQueryBuilder()
+		/*Query<Entity> query = Query.newEntityQueryBuilder()
 				.setKind("Event")
 				.build();
 		
@@ -268,9 +270,30 @@ public class EventResource {
 		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
 			while (eventsQuery.hasNext()){
 				Entity e = eventsQuery.next();
-				if(userEvents.contains(e.getString("name"))) {
+				if(userEvents.contains(e.getKey().toString())) {
 					String event = g.toJson(eventsQuery.next().getProperties().values());
 					events.add(event);
+				}
+			}*/
+		
+		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("Event");
+
+		DatastoreService data = DatastoreServiceFactory.getDatastoreService();		
+		PreparedQuery pq = data.prepare(query);
+		
+		List<com.google.appengine.api.datastore.Entity> u = pq.asList(FetchOptions.Builder.withDefaults());
+		List<String> events = new ArrayList<>();
+		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
+			for(int i = 0; i < u.size(); i++){
+				com.google.appengine.api.datastore.Entity e;
+				try {
+					e = data.get(u.get(i).getKey());
+					if(userEvents.contains(e.getProperty("name").toString()))
+						events.add(e.toString());
+				//}
+				} catch (EntityNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
 
