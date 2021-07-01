@@ -6,25 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <link rel="stylesheet" href="createEventStyle.css">
 
 </head>
 <body>
-
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
 <button onclick="goBack()">Go back</button>
 
 <br>
 <br>
 <br>
+
+<input
+        id="searchBoxInput"
+        class="controls"
+        type="text"
+        placeholder="Event location"
+/>
+<div id="map"></div>
+
 
 <form id="createEventId" action="#" method="post">
     <h1>Create new event</h1>
@@ -33,32 +34,33 @@
         <label for="name" class="floatLabel"></label>
         <input id="name" name="createEventInput" type="text" placeholder="Name">
     </p>
+
     <p>
         <label for="description" class="floatLabel"></label>
-        <input id="description" name="createEventInput" type="text" placeholder="description">
+        <textarea id="description" name="createEventInput" type="text" style="height:170px; width:750px;"
+                  placeholder="Event Description"></textarea>
     </p>
-    <p>
-        <label for="minParticipants" class="floatLabel"></label>
-        <input id="minParticipants" name="createEventInput" type="text" placeholder="min number os participants">
-    </p>
-    <p>
-        <label for="maxParticipants" class="floatLabel"></label>
-        <input id="maxParticipants" name="createEventInput" type="text" placeholder="max number os participants">
-    </p>
-    <p>
-        <label for="lat" class="floatLabel"></label>
-        <input id="lat" name="createEventInput" type="text" placeholder="latitude of event">
 
-        <label for="lon" class="floatLabel"></label>
-        <input id="lon" name="createEventInput" type="text" placeholder="longitude of event">
+    <p>
+        Number of participants: &nbsp;
+        <label for="minParticipants" class="floatLabel"></label>
+        <input id="minParticipants" name="createEventInput" type="text" placeholder="minimum">
+        &nbsp; - &nbsp;
+        <label for="maxParticipants" class="floatLabel"></label>
+        <input id="maxParticipants" name="createEventInput" type="text" placeholder="maximum">
     </p>
+
     <p>
         <label for="date" class="floatLabel"></label>
         <input id="date" name="createEventInput" type="text" placeholder="date of event">
     </p>
+
     <p>
-        <label for="temporary" class="floatLabel"></label>
-        <input id="temporary" name="createEventInput" type="text" placeholder="temporary or persistent">
+        Event Type<br>
+        <input type="radio" id="temporary" name="createEventInput" value="temporary">
+        <label for="temporary">temporary</label>
+        <input type="radio" id="temporary2" name="createEventInput" value="persistent">
+        <label for="temporary">persistent</label><br>
     </p>
 
     <p>
@@ -66,7 +68,14 @@
     </p>
 </form>
 
-
 <script src="createEvent.js"></script>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback.-->
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCswsWteMRuc4U3LJngGKdSIYbTASbvgCs&callback=initAutocomplete&libraries=places&v=weekly"
+        async
+></script>
+
+
 </body>
 </html>
