@@ -7,6 +7,8 @@ body {
     background-size: cover; /* Resize the background image to cover the entire container */
 }
 
+
+
 /* Split the screen in half */
 .split {
     height: 100%;
