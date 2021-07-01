@@ -110,8 +110,6 @@ public class InsideLoginResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeProperty(ProfileData data) {
 		
-		
-		
 		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
