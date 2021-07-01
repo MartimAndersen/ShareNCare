@@ -4,6 +4,7 @@ body {
     padding: 0;
     background-image: url("../afterLogin/images/nature.jpg");
     text-align: center;
+    background-size: cover; /* Resize the background image to cover the entire container */
 }
 
 /* Split the screen in half */
@@ -20,13 +21,15 @@ body {
 
 /* Control the left side */
 .left {
+    left: 0;
     background-color: rgba(194, 215, 175, 0.95);
     color: rgba(34, 50, 19, 0.95);
     width: 25%;
-    height: 80%;
+    height: 130%;
     position: absolute;
-    top: 10%;
-    left: 15%;
+    top: 25%;
+    left: 17.5%;
+    border-radius: 12px;
 }
 
 /* Control the right side */
@@ -35,22 +38,34 @@ body {
     background-color: rgba(163, 196, 131, 0.95);
     color: rgba(34, 50, 19, 0.95);
     width: 25%;
-    height: 80%;
-    top: 10%;
-    left: 55%;
-}
-
-/* If you want the content centered horizontally and vertically */
-.centered {
+    height: 130%;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    top: 25%;
+    left: 57.5%;
+    border-radius: 12px;
 }
 
-/* Style the image inside the centered container, if needed */
-.centered img {
-    width: 150px;
-    border-radius: 50%;
+input[type=text], select {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 20%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
 }
