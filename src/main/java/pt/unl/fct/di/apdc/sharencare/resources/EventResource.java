@@ -15,6 +15,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -102,6 +103,7 @@ public class EventResource {
 	@GET
 	@Path("/getAllEvents/{tokenId}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllEvents(@PathParam("tokenId") String tokenId) {
 		
 		if (tokenId.equals(""))
@@ -224,10 +226,12 @@ public class EventResource {
 		return Response.ok("Properties changed").build();
 	}
     
-    @POST
-	@Path("/listUserEvents/{tokenId}")
+    @SuppressWarnings({ "unchecked" })
+	@GET
+	@Path("/listUserEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response listUserEvents(@PathParam("tokenId") String tokenId) {
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response listUserEvents(@QueryParam("tokenId") String tokenId) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -254,8 +258,23 @@ public class EventResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		
+		Query<Entity> query = Query.newEntityQueryBuilder()
+				.setKind("Event")
+				.build();
+		
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
+			while (eventsQuery.hasNext()){
+				Entity e = eventsQuery.next();
+				if(userEvents.contains(e.getString("name"))) {
+					String event = g.toJson(eventsQuery.next().getProperties().values());
+					events.add(event);
+				}
+			}
 
-		return Response.ok(g.toJson(currentUser.getString("events"))).build();
+		return Response.ok(g.toJson(userEvents)).build();
 
 	}
 
