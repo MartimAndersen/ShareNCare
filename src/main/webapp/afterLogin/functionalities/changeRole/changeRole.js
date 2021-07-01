@@ -1,6 +1,3 @@
-
-
-
 function callChangeRole(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
