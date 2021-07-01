@@ -244,9 +244,9 @@ public class EventResource {
 			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
 
-		if (!t.validToken(tokenKey))
+		/*if (!t.validToken(tokenKey))
 			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId
-					+ " has expired. Please login again to continue using the application").build();
+					+ " has expired. Please login again to continue using the application").build();*/
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity currentUser = datastore.get(currentUserKey);
@@ -274,7 +274,7 @@ public class EventResource {
 				}
 			}
 
-		return Response.ok(g.toJson(userEvents)).build();
+		return Response.ok(g.toJson(events)).build();
 
 	}
 
