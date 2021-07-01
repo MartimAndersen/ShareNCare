@@ -11,11 +11,61 @@
 </head>
 <body>
 
+<script>
+    function myFunction1() {
+        var x = document.getElementById("passwordLogin");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    function myFunction2() {
+        var x = document.getElementById("password");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    function myFunction3() {
+        var x = document.getElementById("confirmation");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    function myFunction4() {
+        var x = document.getElementById("passwordLoginCompany");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    function myFunction5() {
+        var x = document.getElementById("passwordCompany");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    function myFunction6() {
+        var x = document.getElementById("confirmationCompany");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
 
+<h1 style="text-align: center; font-family: 'Brush Script MT', cursive; font-size: 80px; color: rgba(255, 250, 0, 0.76)">Share&Care</h1>
 
 <div class="split left">
-    <div class="centered">
-
+    <div>
         <form id="loginFormId" action="#" method="post">
             <h1>Login</h1>
             <p>
@@ -24,18 +74,15 @@
             </p>
             <p>
                 <label for="passwordLogin" class="floatLabel"></label>
-                <input id="passwordLogin" name="loginInput" type="password" placeholder="Password">
+                <input id="passwordLogin" name="loginInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
             </p>
-
+            <p>
+                <input type="checkbox" onclick="myFunction1()">Show Password
+            </p>
             <p>
                 <input type="submit" value="Sign In" id="submitLogin">
             </p>
         </form>
-
-<br>
-<br>
-<br>
-
         <form id="regFormId" action="#" method="post">
             <h1>Sign Up</h1>
             <p>
@@ -49,38 +96,29 @@
             </p>
             <p>
                 <label for="password" class="floatLabel"></label>
-                <input id="password" name="regInput" type="password" placeholder="Password">
+                <input id="password" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
                 <!--        <span>Enter a password with 5 or more characters</span>-->
             </p>
             <p>
+                <input type="checkbox" onclick="myFunction2()">Show Password
+            </p>
+            <p>
                 <label for="confirmation" class="floatLabel"></label>
-                <input id="confirmation" name="regInput" type="password" placeholder="Confirm Password">
+                <input id="confirmation" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
+            </p>
+            <p>
+                <input type="checkbox" onclick="myFunction3()">Show Password
             </p>
             <p>
                 <input type="submit" value="Sign Up" id="submitRegister">
             </p>
         </form>
-
-        <br>
-        <br>
-        <br>
-
         <button onclick="goToAfterLoginPage()">More User Functionalities</button>
-
-        <br>
-        <br>
-        <br>
-
     </div>
 </div>
 
-
-
-
-
 <div class="split right">
-    <div class="centered">
-
+    <div>
         <form id="loginCompanyFormId" action="#" method="post">
             <h1>Login an Institution</h1>
             <p>
@@ -89,18 +127,15 @@
             </p>
             <p>
                 <label for="passwordLoginCompany" class="floatLabel"></label>
-                <input id="passwordLoginCompany" name="loginInputCompany" type="password" placeholder="Password">
+                <input id="passwordLoginCompany" name="loginInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
             </p>
-
             <p>
-                <input type="submit" value="Sign In an Institution" id="submitLoginCompany">
+                <input type="checkbox" onclick="myFunction4()">Show Password
+            </p>
+            <p>
+                <input type="submit" value="Sign In an Institution" style="width: 40%; text-align: center" id="submitLoginCompany">
             </p>
         </form>
-
-<br>
-<br>
-<br>
-
         <form id="regCompanyFormId" action="#" method="post">
             <h1>Sign Up an Institution</h1>
             <p>
@@ -111,36 +146,30 @@
                 <label for="idNrCompany" class="floatLabel"></label>
                 <input id="idNrCompany" name="regInputCompany" type="text" placeholder="Identification number">
             </p>
-
             <p>
                 <label for="emailCompany" class="floatLabel"></label>
                 <input id="emailCompany" name="regInputCompany" type="text" placeholder="Email">
             </p>
             <p>
                 <label for="passwordCompany" class="floatLabel"></label>
-                <input id="passwordCompany" name="regInputCompany" type="password" placeholder="Password">
+                <input id="passwordCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
+            </p>
+            <p>
+                <input type="checkbox" onclick="myFunction5()">Show Password
             </p>
             <p>
                 <label for="confirmationCompany" class="floatLabel"></label>
-                <input id="confirmationCompany" name="regInputCompany" type="password" placeholder="Confirm Password">
+                <input id="confirmationCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
             </p>
             <p>
-                <input type="submit" value="Sign Up an Institution" id="submitRegisterCompany">
+                <input type="checkbox" onclick="myFunction6()">Show Password
+            </p>
+            <p>
+                <input type="submit" value="Sign Up an Institution" style="width: 35%;" id="submitRegisterCompany">
             </p>
         </form>
-
-        <br>
-        <br>
-        <br>
-
         <button onclick="goToAfterLoginCompanyPage()">More Company Functionalities</button>
-
-        <br>
-        <br>
-        <br>
-
-
-</div>
+    </div>
 </div>
 
 <!--<button onclick="toggleVisibility()">Toggle Visibility</button>-->
