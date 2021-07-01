@@ -36,7 +36,6 @@ public class RegisterResource {
                     .set("username", "superUser")
                     .set("email", "superUser@gmail.com")
                     .set("password", DigestUtils.sha512Hex("password"))
-                    .set("confirmation", DigestUtils.sha512Hex("password"))
                     .set("profileType", "private")
                     .set("landLine", "")
                     .set("mobile", "")

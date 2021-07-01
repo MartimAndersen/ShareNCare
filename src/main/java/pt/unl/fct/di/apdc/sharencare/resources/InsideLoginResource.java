@@ -113,10 +113,10 @@ public class InsideLoginResource {
 		if (data.tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		if (data.allEmptyParameters()) {
+	/*	if (data.allEmptyParameters()) {
 			System.out.println("Please enter at least one new attribute.");
 			return Response.status(Status.LENGTH_REQUIRED).build();
-		}
+		}*/
 
 		//TODO
 		String email = data.email;
@@ -168,9 +168,9 @@ public class InsideLoginResource {
 			  } 
 		  }
 		 //TODO
-		if(data.profilePic.length == 0) {
+	/*	if(data.profilePic.length == 0) {
 			profilePic = null;
-		}
+		}*/
 		if (data.profileType.equals(""))
 			profileType = user.getString("profileType");
 
