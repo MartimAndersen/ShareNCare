@@ -9,11 +9,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -113,6 +116,34 @@ public class EventResource {
 					.build();
 		}
 		
+		Query<Entity> query = Query.newEntityQueryBuilder()
+				.setKind("Event")
+				.build();
+		
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+			while (eventsQuery.hasNext())	{
+				String event = g.toJson(eventsQuery.next().getProperties().values());
+				events.add(event);	
+			}
+		
+		
+		return Response.ok(g.toJson(events)).build();
+		
+	}
+	
+	@Produces
+	@GET
+	@Path("/getAllEventsWeb")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getAllEventsWeb(@CookieParam("Token") NewCookie cookie) {
+		
+		if (cookie.getName().equals("")) {	
+			System.out.println("You need to be logged in to execute this operation.");	
+			return Response.status(Status.UNAUTHORIZED).build();	
+		}	
+		
+
 		Query<Entity> query = Query.newEntityQueryBuilder()
 				.setKind("Event")
 				.build();
