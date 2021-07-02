@@ -274,7 +274,7 @@ public class EventResource {
 			while (eventsQuery.hasNext()){
 				Entity e = eventsQuery.next();
 				if(userEvents.contains(e.getString("name"))) {
-					String event = g.toJson(eventsQuery.next().getProperties().values());
+					String event = g.toJson(e.getProperties().values());
 					events.add(event);
 				}
 			}
