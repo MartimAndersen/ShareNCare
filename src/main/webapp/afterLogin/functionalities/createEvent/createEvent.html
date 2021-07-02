@@ -57,6 +57,12 @@
     </p>
 
     <p>
+        <label for="hour" class="floatLabel"></label>
+        <input id="hour" name="createEventInput" type="text" style="width: 190px"
+               placeholder="hour of event (hour:minutes)">
+    </p>
+
+    <p>
         Event Type: &nbsp;
         <input type="radio" id="temporary" name="createEventInput" value="temporary">
         <label for="temporary">temporary</label>
@@ -65,7 +71,6 @@
         <label for="temporary">persistent</label><br>
     </p>
 
-    <!--    public String[] TAGS =  {"animals", "environment", "children", "elderly", "supplies", "homeless"};//, sports, summer, holidays, turism};-->
     <p>
         Tags (select at least one): &nbsp;
         <input type="checkbox" id="tag1" name="createEventInput" value="animals"> Animals
