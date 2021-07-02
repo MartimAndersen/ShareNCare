@@ -2,13 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
+    <link rel="stylesheet" href="joinEventStyle.css">
 </head>
 <body>
+
+<ul>
+    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html">Home</a></li>
+</ul>
 
 <button onclick="goToPageBefore()">Go back</button>
 
 <button onclick="callGetEvents()">Events</button>
+
 
 <table id="demo_table">
     <thead>
@@ -19,7 +28,6 @@
         <th>maxPart</th>
         <th>minPart</th>
         <th>temporary</th>
-        <th>hour</th>
     </tr>
     </thead>
     <tbody>
