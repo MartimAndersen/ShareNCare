@@ -75,7 +75,7 @@ public class LoginResource {
 
 				LOG.info("User " + data.usernameLogin + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok(user.getProperties().values()).cookie(cookie).build();
+				return Response.ok(g.toJson(user.getProperties().values())).cookie(cookie).build();
 			} else {
 				LOG.warning("Wrong password for username: " + data.usernameLogin);
 				return Response.status(Status.EXPECTATION_FAILED).build();
@@ -124,7 +124,7 @@ public class LoginResource {
 				
 				LOG.info("Institution " + username + " logged in successfully.");
 				datastore.add(token);
-				return Response.ok(user.getProperties().values()).cookie(cookie).build();
+				return Response.ok(g.toJson(user.getProperties().values())).cookie(cookie).build();
 			} else {
 				LOG.warning("Wrong password for username: " + username);
 				return Response.status(Status.EXPECTATION_FAILED).build();
