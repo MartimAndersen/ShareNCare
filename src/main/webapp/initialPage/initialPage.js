@@ -203,3 +203,15 @@ function goToAfterLoginCompanyPage() {
 //         }
 //     }
 // }
+
+function togglePassword(id1, id2) {
+    let password = document.getElementById(id1);
+    let image = document.getElementById(id2);
+    if (password.type === "password") {
+        password.type = "text";
+        image.setAttribute("class","fas fa-eye");
+    } else {
+        password.type = "password";
+        image.setAttribute("class","fas fa-eye-slash");
+    }
+}

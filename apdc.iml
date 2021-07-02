@@ -83,5 +83,6 @@
     <orderEntry type="library" name="Maven: io.opencensus:opencensus-api:0.28.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud:google-cloud-storage:1.113.14" level="project" />
     <orderEntry type="library" name="Maven: com.google.apis:google-api-services-storage:v1-rev20210127-1.31.0" level="project" />
+    <orderEntry type="library" name="font-awesome" level="application" />
   </component>
 </module>

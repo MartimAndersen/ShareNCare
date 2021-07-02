@@ -11,58 +11,9 @@
 </head>
 <body>
 
-<script>
-    function myFunction1() {
-        var x = document.getElementById("passwordLogin");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-    function myFunction2() {
-        var x = document.getElementById("password");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-    function myFunction3() {
-        var x = document.getElementById("confirmation");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-    function myFunction4() {
-        var x = document.getElementById("passwordLoginCompany");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-    function myFunction5() {
-        var x = document.getElementById("passwordCompany");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-    function myFunction6() {
-        var x = document.getElementById("confirmationCompany");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-</script>
-
 <h1 style="text-align: center; font-family: 'Brush Script MT', cursive; font-size: 80px; color: rgba(255, 250, 0, 0.90)">Share&Care</h1>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
 
 <div class="split left">
     <div>
@@ -75,10 +26,9 @@
             <p>
                 <label for="passwordLogin" class="floatLabel"></label>
                 <input id="passwordLogin" name="loginInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
+                <i onclick="togglePassword('passwordLogin', 'passwordLogin1')" class="fas fa-eye-slash" id="passwordLogin1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
-            <p>
-                <input type="checkbox" onclick="myFunction1()">Show Password
-            </p>
+
             <p>
                 <input type="submit" value="Sign In" id="submitLogin">
             </p>
@@ -97,17 +47,13 @@
             <p>
                 <label for="password" class="floatLabel"></label>
                 <input id="password" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-                <!--        <span>Enter a password with 5 or more characters</span>-->
+                <i onclick="togglePassword('password', 'password1')" class="fas fa-eye-slash" id="password1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
-            <p>
-                <input type="checkbox" onclick="myFunction2()">Show Password
-            </p>
+
             <p>
                 <label for="confirmation" class="floatLabel"></label>
                 <input id="confirmation" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
-            </p>
-            <p>
-                <input type="checkbox" onclick="myFunction3()">Show Password
+                <i onclick="togglePassword('confirmation', 'confirmation1')" class="fas fa-eye-slash" id="confirmation1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
             <p>
                 <input type="submit" value="Sign Up" id="submitRegister">
@@ -128,9 +74,7 @@
             <p>
                 <label for="passwordLoginCompany" class="floatLabel"></label>
                 <input id="passwordLoginCompany" name="loginInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-            </p>
-            <p>
-                <input type="checkbox" onclick="myFunction4()">Show Password
+                <i onclick="togglePassword('passwordLoginCompany', 'passwordLoginCompany1')" class="fas fa-eye-slash" id="passwordLoginCompany1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
             <p>
                 <input type="submit" value="Sign In an Institution" style="width: 40%; text-align: center" id="submitLoginCompany">
@@ -153,16 +97,12 @@
             <p>
                 <label for="passwordCompany" class="floatLabel"></label>
                 <input id="passwordCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-            </p>
-            <p>
-                <input type="checkbox" onclick="myFunction5()">Show Password
+                <i onclick="togglePassword('passwordCompany', 'passwordCompany1')" class="fas fa-eye-slash" id="passwordCompany1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
             <p>
                 <label for="confirmationCompany" class="floatLabel"></label>
                 <input id="confirmationCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
-            </p>
-            <p>
-                <input type="checkbox" onclick="myFunction6()">Show Password
+                <i onclick="togglePassword('confirmationCompany', 'confirmationCompany1')" class="fas fa-eye-slash" id="confirmationCompany1" style="margin-left: -30px; cursor: pointer;"></i>
             </p>
             <p>
                 <input type="submit" value="Sign Up an Institution" style="width: 35%;" id="submitRegisterCompany">
