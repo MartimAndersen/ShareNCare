@@ -1,5 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import com.google.cloud.datastore.Value;
@@ -10,6 +12,7 @@ public class EventData {
     public String name, description;
     public String minParticipants, maxParticipants;
     //public String coordinates;
+    public String hour;
     public String temporary;
     public String date;
     public List<Integer> tags;
@@ -20,7 +23,7 @@ public class EventData {
 
     }
 
-    public EventData(String name, String description, String minParticipants, String maxParticipants,
+    public EventData(String name, String description, String minParticipants, String maxParticipants, String hour,
                      Double lat, Double lon, String temporary, String date, List<Integer> tags) {
 
         this.name = name;
@@ -29,6 +32,7 @@ public class EventData {
         this.maxParticipants = maxParticipants;
         this.lat = lat;
         this.lon = lon;
+        this.hour = hour;
         this.temporary = temporary;
         this.date = date;
         this.tags = tags;
@@ -37,7 +41,16 @@ public class EventData {
 
     public boolean atLeastOneEmptyParameter() {
         return name.equals("") || description.equals("") || minParticipants.equals("")
-                || maxParticipants.equals("") || temporary.equals("") || date.equals("") || lat == null || lon == null || tags.size() == 0;
+                || maxParticipants.equals("") || hour.equals("") || temporary.equals("") || date.equals("") || lat == null || lon == null || tags.size() == 0;
+    }
+    
+    public boolean isHourValid() {
+    	try {
+            LocalTime.parse(hour);
+        } catch (DateTimeParseException | NullPointerException e) {
+            return false;
+        }
+    	return true;
     }
 
     public boolean verifyDate() {

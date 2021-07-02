@@ -66,6 +66,11 @@ public class EventResource {
     		System.out.println("Date is not valid");
     		return Response.status(Status.FORBIDDEN).build();
     	}
+    	
+    	if(!data.isHourValid()) {
+    		System.out.println("Hour is not valid");
+    		return Response.status(Status.EXPECTATION_FAILED).build();
+    	}
 
 
         Transaction txn = datastore.newTransaction();
@@ -82,6 +87,7 @@ public class EventResource {
                         .set("description", data.description)
                         .set("minParticipants", data.minParticipants)
                         .set("maxParticipants", data.maxParticipants)
+                        .set("hour", data.hour)
                         .set("coordinates", coordinates)
                         .set("temporary", data.temporary)
                         .set("date", data.date)
