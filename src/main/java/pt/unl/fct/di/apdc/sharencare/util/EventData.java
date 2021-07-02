@@ -30,9 +30,9 @@ public class EventData {
         this.description = description;
         this.minParticipants = minParticipants;
         this.maxParticipants = maxParticipants;
+        this.hour = hour;
         this.lat = lat;
         this.lon = lon;
-        this.hour = hour;
         this.temporary = temporary;
         this.date = date;
         this.tags = tags;
