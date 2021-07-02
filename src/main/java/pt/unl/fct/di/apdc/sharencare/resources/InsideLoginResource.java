@@ -17,6 +17,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.api.gax.paging.Page;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -264,29 +265,35 @@ public class InsideLoginResource {
 	}
 	
 	@GET
-	@Path("/getUser")
+	@Path("/getPic")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPic(@QueryParam("username") String username, @QueryParam("tokenId") String tokenId) {
+	public Response getPic(@QueryParam("tokenId") String tokenId) {
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
 		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
+			
+		}
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
 
 		if (user == null) {
 			System.out.println("The user with the given token does not exist.");
-			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist")
 					.build();
 		}
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null) {
-			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
-
+		byte[] pic = null;
+		Page<Blob> blobs = bucket.list();
+		for (Blob blob: blobs.getValues()) {
+		    if (token.getString("username").equals(blob.getName())) {
+		        pic =  blob.getContent();
+		    }
 		}
 
-		return Response.ok(g.toJson(user.getProperties().values())).build();
+		return Response.ok(g.toJson(pic)).build();
 	}
 
 	@GET
