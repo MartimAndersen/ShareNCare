@@ -11,28 +11,20 @@
 </head>
 <body>
 
-<img src="../afterLogin/images/logo" height="15%" width="15%">
+<ul>
+    <!--    <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>-->
+    <li><a class="active" href="../welcomePage/welcomePage.html">Back to Welcome Page</a></li>
+    <!--    <img src="../afterLogin/images/logo" height="5%" width="5%">-->
+</ul>
+
+<ul>
+    <img src="../afterLogin/images/logo" height="10%" width="10%">
+</ul>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
 
 <div class="split left">
     <div>
-        <form id="loginFormId" action="#" method="post">
-            <h1>Login</h1>
-            <p>
-                <label for="usernameLogin" class="floatLabel"></label>
-                <input id="usernameLogin" name="loginInput" type="text" placeholder="Username">
-            </p>
-            <p>
-                <label for="passwordLogin" class="floatLabel"></label>
-                <input id="passwordLogin" name="loginInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-                <i onclick="togglePassword('passwordLogin', 'passwordLogin1')" class="fas fa-eye-slash" id="passwordLogin1" style="margin-left: -30px; cursor: pointer;"></i>
-            </p>
-
-            <p>
-                <input type="submit" value="Sign In" id="submitLogin">
-            </p>
-        </form>
         <form id="regFormId" action="#" method="post">
             <h1>Sign Up</h1>
             <p>
@@ -46,73 +38,52 @@
             </p>
             <p>
                 <label for="password" class="floatLabel"></label>
-                <input id="password" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-                <i onclick="togglePassword('password', 'password1')" class="fas fa-eye-slash" id="password1" style="margin-left: -30px; cursor: pointer;"></i>
+                <input id="password" name="regInput" type="password"
+                       style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                       placeholder="Password">
+                <i onclick="togglePassword('password', 'password1')" class="fas fa-eye-slash" id="password1"
+                   style="margin-left: -30px; cursor: pointer;"></i>
             </p>
 
             <p>
                 <label for="confirmation" class="floatLabel"></label>
-                <input id="confirmation" name="regInput" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
-                <i onclick="togglePassword('confirmation', 'confirmation1')" class="fas fa-eye-slash" id="confirmation1" style="margin-left: -30px; cursor: pointer;"></i>
+                <input id="confirmation" name="regInput" type="password"
+                       style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                       placeholder="Confirm Password">
+                <i onclick="togglePassword('confirmation', 'confirmation1')" class="fas fa-eye-slash" id="confirmation1"
+                   style="margin-left: -30px; cursor: pointer;"></i>
             </p>
             <p>
                 <input type="submit" value="Sign Up" id="submitRegister">
             </p>
         </form>
-        <button onclick="goToAfterLoginPage()">More User Functionalities</button>
+
     </div>
 </div>
 
 <div class="split right">
-    <div>
-        <form id="loginCompanyFormId" action="#" method="post">
-            <h1>Login an Institution</h1>
-            <p>
-                <label for="usernameLoginCompany" class="floatLabel"></label>
-                <input id="usernameLoginCompany" name="loginInputCompany" type="text" placeholder="Identification number">
-            </p>
-            <p>
-                <label for="passwordLoginCompany" class="floatLabel"></label>
-                <input id="passwordLoginCompany" name="loginInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-                <i onclick="togglePassword('passwordLoginCompany', 'passwordLoginCompany1')" class="fas fa-eye-slash" id="passwordLoginCompany1" style="margin-left: -30px; cursor: pointer;"></i>
-            </p>
-            <p>
-                <input type="submit" value="Sign In an Institution" style="width: 40%; text-align: center" id="submitLoginCompany">
-            </p>
-        </form>
-        <form id="regCompanyFormId" action="#" method="post">
-            <h1>Sign Up an Institution</h1>
-            <p>
-                <label for="usernameCompany" class="floatLabel"></label>
-                <input id="usernameCompany" name="regInputCompany" type="text" placeholder="Username">
-            </p>
-            <p>
-                <label for="idNrCompany" class="floatLabel"></label>
-                <input id="idNrCompany" name="regInputCompany" type="text" placeholder="Identification number">
-            </p>
-            <p>
-                <label for="emailCompany" class="floatLabel"></label>
-                <input id="emailCompany" name="regInputCompany" type="text" placeholder="Email">
-            </p>
-            <p>
-                <label for="passwordCompany" class="floatLabel"></label>
-                <input id="passwordCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Password">
-                <i onclick="togglePassword('passwordCompany', 'passwordCompany1')" class="fas fa-eye-slash" id="passwordCompany1" style="margin-left: -30px; cursor: pointer;"></i>
-            </p>
-            <p>
-                <label for="confirmationCompany" class="floatLabel"></label>
-                <input id="confirmationCompany" name="regInputCompany" type="password" style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="Confirm Password">
-                <i onclick="togglePassword('confirmationCompany', 'confirmationCompany1')" class="fas fa-eye-slash" id="confirmationCompany1" style="margin-left: -30px; cursor: pointer;"></i>
-            </p>
-            <p>
-                <input type="submit" value="Sign Up an Institution" style="width: 35%;" id="submitRegisterCompany">
-            </p>
-        </form>
-        <button onclick="goToAfterLoginCompanyPage()">More Company Functionalities</button>
-    </div>
-</div>
+    <form id="loginFormId" action="#" method="post">
+        <h1>Login</h1>
+        <p>
+            <label for="usernameLogin" class="floatLabel"></label>
+            <input id="usernameLogin" name="loginInput" type="text" placeholder="Username">
+        </p>
+        <p>
+            <label for="passwordLogin" class="floatLabel"></label>
+            <input id="passwordLogin" name="loginInput" type="password"
+                   style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="Password">
+            <i onclick="togglePassword('passwordLogin', 'passwordLogin1')" class="fas fa-eye-slash" id="passwordLogin1"
+               style="margin-left: -30px; cursor: pointer;"></i>
+        </p>
 
-<!--<button onclick="toggleVisibility()">Toggle Visibility</button>-->
+        <p>
+            <input type="submit" value="Sign In" id="submitLogin">
+        </p>
+    </form>
+    <button onclick="goToAfterLoginPage()">More User Functionalities</button>
+</div>
+</div>
 
 <script src="initialPage.js"></script>
 </body>
