@@ -131,12 +131,19 @@ public class InsideLoginResource {
 		}
 
 		user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
-				.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
-				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-				.set("address", user.getString("adress")).set("secondAddress", user.getString("secondAdress"))
-				.set("postal", user.getString("postal")).set("tags", g.toJson(data.tags))
-				.set("events", g.toJson(user.getString("events"))).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("email", user.getString("email"))
+				.set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine"))
+				.set("mobile", user.getString("mobile"))
+				.set("address", user.getString("adress"))
+				.set("secondAddress", user.getString("secondAdress"))
+				.set("postal", user.getString("postal"))
+				.set("profilePic", "")
+				.set("tags", g.toJson(data.tags))
+				.set("events", g.toJson(user.getString("events")))
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.build();
 
 		datastore.update(user);
 
@@ -252,12 +259,22 @@ public class InsideLoginResource {
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
 
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("email", email).set("profileType", profileType)
-				.set("landLine", landLine).set("mobile", mobile).set("address", address)
-				.set("secondAddress", secondAddress).set("postal", zipCode).set("tags", g.toJson(tags))
-				.set("events", g.toJson(user.getString("events"))).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+		user = Entity.newBuilder(userKey)
+				.set("username", token.getString("username"))
+				.set("password", user.getString("password"))
+				.set("email", email)
+				.set("profileType", profileType)
+				.set("landLine", landLine)
+				.set("mobile", mobile)
+				.set("address", address)
+				.set("secondAddress", secondAddress)
+				.set("postal", zipCode)
+				.set("profilePic", "")
+				.set("tags", g.toJson(tags))
+				.set("events", g.toJson(user.getString("events")))
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.build();
 
 		datastore.update(user);
 
