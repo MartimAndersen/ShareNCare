@@ -1,8 +1,8 @@
-
 var map;
 var searchBoxInput;
 var latitude;
 var longitude;
+
 function initAutocomplete() {
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
@@ -76,13 +76,27 @@ function callCreateEvent(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
-                case 200: alert(this.responseText); break;
-                case 401: alert("You need to be logged in to execute this operation."); break;
-                case 411: alert("Please fill in all fields."); break;
-                case 406: alert("Number of participants is incorrect."); break;
-                case 403: alert("Date is not valid."); break;
-                case 409: alert("Event already exists."); break;
-                default: alert("Something went wrong."); break;
+                case 200:
+                    alert(this.responseText);
+                    break;
+                case 401:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+                case 411:
+                    alert("Please fill in all fields.");
+                    break;
+                case 406:
+                    alert("Number of participants is incorrect.");
+                    break;
+                case 403:
+                    alert("Date is not valid.");
+                    break;
+                case 409:
+                    alert("Event already exists.");
+                    break;
+                default:
+                    alert("Something went wrong.");
+                    break;
             }
         }
     };
@@ -91,17 +105,33 @@ function callCreateEvent(data) {
     xhttp.send(data);
 }
 
+function fillTagsList(inputs) {
+    let tagsList = [];
+    let currTagId = "";
+    let counter = 1;
+    for (let t = 7; t <= 12; t++) {
+        currTagId = "tag" + counter;
+        if (document.getElementById(currTagId).checked) {
+            // tagsList.push(inputs[t].value);
+            tagsList.push(counter);
+        }
+        counter++;
+    }
+    return tagsList;
+}
 
 function handleCreateEvent() {
     let inputs = document.getElementsByName("createEventInput");
 
     let radioButtonResult = ""
-    if(document.getElementById('temporary').checked){
+    if (document.getElementById('temporary').checked) {
         radioButtonResult = inputs[5].value
     }
-    if(document.getElementById('temporary2').checked){
+    if (document.getElementById('temporary2').checked) {
         radioButtonResult = inputs[6].value
     }
+
+
 
     let data = {
         name: inputs[0].value,
@@ -112,12 +142,11 @@ function handleCreateEvent() {
         lon: longitude,
         date: inputs[4].value,
         temporary: radioButtonResult,
-        tags : []
+        tags: fillTagsList(inputs)
 
     }
     callCreateEvent(JSON.stringify(data));
 }
-
 
 
 let createEventForm = document.getElementById("createEventId");

@@ -44,27 +44,44 @@
     <p>
         Number of participants: &nbsp;
         <label for="minParticipants" class="floatLabel"></label>
-        <input id="minParticipants" name="createEventInput" type="text" placeholder="minimum">
+        <input id="minParticipants" name="createEventInput" type="text" style="width: 58px" placeholder="minimum">
         &nbsp; - &nbsp;
         <label for="maxParticipants" class="floatLabel"></label>
-        <input id="maxParticipants" name="createEventInput" type="text" placeholder="maximum">
+        <input id="maxParticipants" name="createEventInput" type="text" style="width: 58px" placeholder="maximum">
     </p>
 
     <p>
         <label for="date" class="floatLabel"></label>
-        <input id="date" name="createEventInput" type="text" placeholder="date of event">
+        <input id="date" name="createEventInput" type="text" style="width: 190px"
+               placeholder="date of event (day-month-year)">
     </p>
 
     <p>
-        Event Type<br>
+        Event Type: &nbsp;
         <input type="radio" id="temporary" name="createEventInput" value="temporary">
         <label for="temporary">temporary</label>
+        &nbsp;&nbsp;
         <input type="radio" id="temporary2" name="createEventInput" value="persistent">
         <label for="temporary">persistent</label><br>
     </p>
 
+    <!--    public String[] TAGS =  {"animals", "environment", "children", "elderly", "supplies", "homeless"};//, sports, summer, holidays, turism};-->
     <p>
-        <input type="submit" value="create" id="submitCreatedEvent">
+        Tags (select at least one): &nbsp;
+        <input type="checkbox" id="tag1" name="createEventInput" value="animals"> Animals
+        &nbsp;&nbsp;
+        <input type="checkbox" id="tag2" name="createEventInput" value="environment"> Environment
+        &nbsp;&nbsp;
+        <input type="checkbox" id="tag3" name="createEventInput" value="children"> Children
+        &nbsp;&nbsp;
+        <input type="checkbox" id="tag4" name="createEventInput" value="elderly"> Elderly
+        &nbsp;&nbsp;
+        <input type="checkbox" id="tag5" name="createEventInput" value="supplies"> Supplies
+        &nbsp;&nbsp;
+        <input type="checkbox" id="tag6" name="createEventInput" value="homeless"> Homeless
+
+    <p>
+        <input type="submit" value="Create" id="submitCreatedEvent">
     </p>
 </form>
 
