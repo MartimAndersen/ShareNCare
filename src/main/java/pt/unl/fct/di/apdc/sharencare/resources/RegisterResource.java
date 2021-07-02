@@ -54,7 +54,8 @@ public class RegisterResource {
         } else {}
 
     }
-
+    
+    
     @POST
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
