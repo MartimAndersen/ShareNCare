@@ -16,8 +16,10 @@ function populate_table(jsonResponse) {
       var obj = []
              obj= JSON.parse(jsonResponse[i]);
         let row = table.insertRow(-1);
-		let cell = row.insertCell(0);
-		let text = document.createTextNode((obj[7].value));
+        let cell = row.insertCell(0);
+        let text = document.createTextNode((obj[8].value));
+		cell = row.insertCell(0);
+		text = document.createTextNode((obj[7].value));
         cell.appendChild(text);
 		cell = row.insertCell(0);
 		text = document.createTextNode((obj[4].value));
