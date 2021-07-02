@@ -8,13 +8,12 @@
 </head>
 <body>
 
-<div class="footer">
-    <button class="button4" onclick="logout()">Logout</button>
-</div>
-
-<div class="footer">
-    <button class="button4" onclick="goToAboutUs()">About us</button>
-</div>
+<ul>
+    <li><a class="active" onclick="logout()">Logout</a></li>
+    <li><a class="active" onclick="goToAboutUs()">About Us</a></li>
+    <li><a class="active" href="../initialPage/initialPage.html">Back to Initial Page</a></li>
+    <img src="../afterLogin/images/logo" height="5%" width="5%">
+</ul>
 
 <div class="header2">
     <h2>Welcome Company</h2>
@@ -43,9 +42,6 @@
         <button class="button3" onclick="goToCreateEvent()">Insert button here</button>
     </div>
 </div>
-
-<br>
-<button class="button4" onclick="backToInitialPage()">Back to Initial Page</button>
 
 <script src="afterLoginCompanyPage.js"></script>
 </body>
