@@ -296,31 +296,6 @@ public class InsideLoginResource {
 		return Response.ok(g.toJson(pic)).build();
 	}
 
-	@GET
-	@Path("/getUser")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@QueryParam("username") String username, @QueryParam("tokenId") String tokenId) {
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-		Entity user = datastore.get(userKey);
-
-		if (user == null) {
-			System.out.println("The user with the given token does not exist.");
-			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
-					.build();
-		}
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null) {
-			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
-
-		}
-
-		return Response.ok(g.toJson(user.getProperties().values())).build();
-	}
-
 	@POST
 	@Path("/changeAttributesWeb")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -731,26 +706,6 @@ public class InsideLoginResource {
 		return false;
 	}
 
-	private boolean validateData(ChangePropertyData data) {
-		String[] email = data.newEmail.split("\\.");
-		String[] landLine = data.newLandLine.split(" ");
-		String[] mobile = data.newMobile.split(" ");
-		String[] postal = data.newPostal.split("-");
-		int emailSize = email.length - 1;
-		if (data.newEmail.contains("@") && (email[emailSize].length() == 2 || email[emailSize].length() == 3))
-			if (data.newProfileType.equals("") || data.newProfileType.equalsIgnoreCase("public")
-					|| data.newProfileType.equalsIgnoreCase("private"))
-				if (data.newLandLine.equals("")
-						|| (landLine[0].subSequence(0, 1).equals("+") && landLine[1].length() == 9))
-					if (data.newPostal.equals("") || (postal[0].length() == 4 && postal[1].length() == 3))
-						if (data.newMobile.equals("") || (mobile[0].subSequence(0, 1).equals("+")
-								&& (mobile[1].substring(0, 2).equals("91") || mobile[1].substring(0, 2).equals("93")
-										|| mobile[1].substring(0, 2).equals("96"))
-								&& mobile[1].length() == 9))
-							return true;
-		return false;
-	}
-
 	private boolean checkRoleChange(String userToBeChangedRole, String nextRole, String masterRole) {
 		boolean isValid = false;
 		if (userToBeChangedRole.equals("USER")) {
@@ -761,10 +716,6 @@ public class InsideLoginResource {
 			}
 		}
 		return isValid;
-	}
-
-	private String convertToString(List<Integer> t) {
-		return g.toJson(t);
 	}
 
 }
