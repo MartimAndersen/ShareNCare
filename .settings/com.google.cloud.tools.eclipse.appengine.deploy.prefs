@@ -5,4 +5,8 @@ project.bucket=
 project.id=capable-sphinx-312419
 project.previousVersion.stop=true
 project.promote=true
+<<<<<<< HEAD
 project.version=31
+=======
+project.version=32
+>>>>>>> main

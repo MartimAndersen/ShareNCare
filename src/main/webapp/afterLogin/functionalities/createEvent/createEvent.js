@@ -86,13 +86,16 @@ function callCreateEvent(data) {
                     alert("Please fill in all fields.");
                     break;
                 case 406:
-                    alert("Number of participants is incorrect.");
+                    alert("Number of participants is invalid.");
                     break;
                 case 403:
-                    alert("Date is not valid.");
+                    alert("Invalid date format.");
                     break;
                 case 409:
                     alert("Event already exists.");
+                    break;
+                case 417:
+                    alert("Invalid hour format.");
                     break;
                 default:
                     alert("Something went wrong.");
@@ -109,7 +112,7 @@ function fillTagsList(inputs) {
     let tagsList = [];
     let currTagId = "";
     let counter = 1;
-    for (let t = 7; t <= 12; t++) {
+    for (let t = 8; t <= 13; t++) {
         currTagId = "tag" + counter;
         if (document.getElementById(currTagId).checked) {
             // tagsList.push(inputs[t].value);
@@ -141,6 +144,7 @@ function handleCreateEvent() {
         lat: latitude,
         lon: longitude,
         date: inputs[4].value,
+        hour: inputs[5].value,
         temporary: radioButtonResult,
         tags: fillTagsList(inputs)
 

@@ -27,7 +27,6 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
-import com.google.appengine.api.datastore.*;
 
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
@@ -107,10 +106,10 @@ public class EventResource {
     }
 
 	@GET
-	@Path("/getAllEvents/{tokenId}")
+	@Path("/getAllEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllEvents(@PathParam("tokenId") String tokenId) {
+	public Response getAllEvents(@QueryParam("tokenId") String tokenId) {
 		
 		if (tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
