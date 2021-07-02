@@ -24,6 +24,7 @@
     <tr>
         <th>name</th>
         <th>date</th>
+        <th>hour</th>
         <th>description</th>
         <th>maxPart</th>
         <th>minPart</th>
@@ -34,6 +35,20 @@
     </tbody>
 </table>
 
+
+
+<form id="joinEventFormId" action="#" method="post">
+    <h1>Join Event</h1>
+    <p>
+        <label for="eventId" class="floatLabel">Name of Event</label><br>
+        <input id="eventId" name="joinEventInput" type="text" placeholder="Name of Event">
+    </p>
+
+
+    <p>
+        <input type="submit" value="Join" id="submitJoinEvent">
+    </p>
+</form>
 <script src="joinEvent.js"></script>
 
 </body>

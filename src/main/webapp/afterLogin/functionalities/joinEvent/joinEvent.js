@@ -17,22 +17,25 @@ function populate_table(jsonResponse) {
              obj= JSON.parse(jsonResponse[i]);
         let row = table.insertRow(-1);
 		let cell = row.insertCell(0);
-		let text = document.createTextNode((obj[7].value));
+		let text = document.createTextNode((obj[8].value));
         cell.appendChild(text);
 		cell = row.insertCell(0);
-		text = document.createTextNode((obj[4].value));
+		text = document.createTextNode((obj[5].value));
         cell.appendChild(text);
 		cell = row.insertCell(0)
-		text = document.createTextNode((obj[3].value));
+		text = document.createTextNode((obj[4].value));
+        cell.appendChild(text);
+        cell = row.insertCell(0)
+         text = document.createTextNode((obj[3].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
          text = document.createTextNode((obj[2].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
-         text = document.createTextNode((obj[1].value));
+        text = document.createTextNode((obj[1].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
-        text = document.createTextNode((obj[5].value));
+        text = document.createTextNode((obj[6].value));
         cell.appendChild(text);
    }
 }
@@ -54,14 +57,37 @@ xhttp.open("GET", "/rest/event/getAllEventsWeb", true);
 xhttp.send();
 
 
-/*
-let names = []
-jsonResponse.forEach(jsonResponse, (result) => {
-    names.push(result.name)
-})
-console.log(names);
-*/
+}
 
+function callJoinEvents(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); break;
+                case 401: alert("You need to be logged in to execute this operation."); break;
+                case 404: alert("Token does not exist."); break;
+                case 403: alert("The user with the given token does not exist."); break;
+                case 406: alert("The user with the given token is disabled."); break;
+                default: alert("Wrong parameters."); break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/event/addEventWeb", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
 
+function handleJoinEvents() {
+    let inputs = document.getElementsByName("joinEventInput")
+    let data = {
+        eventId: inputs[0].value
+    }
+    callJoinEvents(JSON.stringify(data));
+}
 
+let joinEventForm= document.getElementById("joinEventFormId");
+joinEventForm.onsubmit = () => {
+    handleJoinEvents();
+    return false;
 }
