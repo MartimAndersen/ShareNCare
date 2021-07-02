@@ -259,7 +259,7 @@ public class EventResource {
 		 * END OF VERIFICATIONS
 		 */
 		
-		/*Query<Entity> query = Query.newEntityQueryBuilder()
+		Query<Entity> query = Query.newEntityQueryBuilder()
 				.setKind("Event")
 				.build();
 		
@@ -268,13 +268,13 @@ public class EventResource {
 		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
 			while (eventsQuery.hasNext()){
 				Entity e = eventsQuery.next();
-				if(userEvents.contains(e.getKey().toString())) {
+				if(userEvents.contains(e.getString("name"))) {
 					String event = g.toJson(eventsQuery.next().getProperties().values());
 					events.add(event);
 				}
-			}*/
+			}
 		
-		com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("Event");
+		/*com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("Event");
 
 		DatastoreService data = DatastoreServiceFactory.getDatastoreService();		
 		PreparedQuery pq = data.prepare(query);
@@ -293,7 +293,7 @@ public class EventResource {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}
+			}*/
 
 		return Response.ok(g.toJson(events)).build();
 
