@@ -236,65 +236,69 @@ public class EventResource {
 	@POST
 	@Path("/addEventWeb")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addEventWeb(@CookieParam("Token") NewCookie cookie,AddEventDataWeb data) {
-		
+	public Response addEventWeb(@CookieParam("Token") NewCookie cookie,EventData data) {
+
+		LOG.fine("Attempt to register event: " + data.name);
+
 		if (cookie.getName().equals("")) {
 			System.out.println("You need to be logged in to execute this operation.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
-		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-		Entity token = datastore.get(tokenKey);
 
-		if (token == null) {
-			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+		if (data.atLeastOneEmptyParameter()) {
+			System.out.println("Please fill in all fields.");
+			return Response.status(Status.LENGTH_REQUIRED).build();
 		}
 
 
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity user = datastore.get(userKey);
-		if (user == null) {
-			System.out.println("The user with the given token does not exist.");
-			return Response.status(Status.FORBIDDEN)
-					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		if( Integer.parseInt(data.minParticipants) <= 0 || Integer.parseInt(data.maxParticipants) < Integer.parseInt(data.minParticipants)) {
+			System.out.println("Number of participants is incorrect");
+			return Response.status(Status.NOT_ACCEPTABLE).build();
 		}
-		if (user.getString("state").equals("DISABLED")) {
-			System.out.println("The user with the given token is disabled.");
-			return Response.status(Status.NOT_ACCEPTABLE)
-					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+
+		if(!data.verifyDate()) {
+			System.out.println("Date is not valid");
+			return Response.status(Status.FORBIDDEN).build();
 		}
-		
-		List<String> events = new ArrayList<String>();
-		String e = user.getString("events");
-		
-		
-		if(!e.equals(""))
-			events = new ArrayList<String>(Arrays.asList(g.fromJson(e, String[].class)));
-			
-		events.add(data.eventId);
-		
-		user = Entity.newBuilder(userKey)
-				.set("username", token.getString("username"))
-				.set("password", user.getString("password"))
-				.set("confirmation", user.getString("password"))
-				.set("email", user.getString("email"))
-				.set("profileType", user.getString("profileType"))
-				.set("landLine", user.getString("landLine"))
-				.set("mobile", user.getString("mobile"))
-				.set("address", user.getString("address"))
-				.set("secondAddress", user.getString("secondAddress"))
-				.set("postal", user.getString("postal"))
-				.set("tags",user.getString("tags"))
-				//.set("profilePic", profilePic)
-				.set("role", user.getString("role"))
-				.set("state", user.getString("state"))
-				.set("events", g.toJson(events))
-				.build();
 
-		datastore.update(user);
+		if(!data.isHourValid()) {
+			System.out.println("Hour is not valid");
+			return Response.status(Status.EXPECTATION_FAILED).build();
+		}
 
-		return Response.ok("Properties changed").build();
+
+		Transaction txn = datastore.newTransaction();
+		try {
+			Key mapKey = datastore.newKeyFactory().setKind("Event").newKey(data.name);
+			Entity event = txn.get(mapKey);
+			if (event != null) {
+				txn.rollback();
+				return Response.status(Status.CONFLICT).entity("The event with the given title already exists.").build();
+			} else {
+				String coordinates = data.lat + " " + data.lon;
+				event = Entity.newBuilder(mapKey)
+						.set("name", data.name)
+						.set("description", data.description)
+						.set("minParticipants", data.minParticipants)
+						.set("maxParticipants", data.maxParticipants)
+						.set("hour", data.hour)
+						.set("coordinates", coordinates)
+						.set("temporary", data.temporary)
+						.set("initial_date", data.initial_date)
+						.set("ending_date", data.ending_date)
+						.set("tags", g.toJson(data.tags))
+						.build();
+
+
+				txn.add(event);
+				txn.commit();
+				return Response.ok("Event " + data.name + " registered.").cookie(cookie).build();
+			}
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
 	}
     
     @SuppressWarnings({ "unchecked" })

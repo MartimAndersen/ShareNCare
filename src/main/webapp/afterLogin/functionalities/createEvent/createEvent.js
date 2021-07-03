@@ -108,7 +108,7 @@ function callCreateEvent(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/event/registerEvent", true);
+    xhttp.open("POST", "/rest/event/addEventWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
@@ -138,8 +138,6 @@ function handleCreateEvent() {
     if (document.getElementById('temporary2').checked) {
         radioButtonResult = inputs[6].value
     }
-
-
 
     let data = {
         name: inputs[0].value,
