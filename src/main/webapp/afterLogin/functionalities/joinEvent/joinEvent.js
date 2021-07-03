@@ -23,10 +23,10 @@ function populate_table(jsonResponse) {
 		text = document.createTextNode((obj[5].value));
         cell.appendChild(text);
 		cell = row.insertCell(0)
-		text = document.createTextNode((obj[4].value));
+		text = document.createTextNode((obj[3].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
-         text = document.createTextNode((obj[3].value));
+         text = document.createTextNode((obj[4].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
          text = document.createTextNode((obj[2].value));
