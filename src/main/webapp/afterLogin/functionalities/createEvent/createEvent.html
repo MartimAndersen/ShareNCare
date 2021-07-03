@@ -12,23 +12,20 @@
 </head>
 <body>
 
-<button onclick="goBack()">Go back</button>
+<ul>
+    <li><a class="active" onclick="logout()" style="cursor: pointer">Logout</a></li>
+    <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>
+    <li><a class="active" href="../../../initialPageCompany/initialPageCompany.html">Back to Initial Page</a></li>
+    <li><a class="active" href="../../../welcomePage/welcomePage.html">Back to Welcome Page</a></li>
+    <img src="../../../afterLogin/images/logo" height="5%" width="5%">
+</ul>
 
-<br>
-<br>
-<br>
+<input id="searchBoxInput" class="controls" type="text" style="width: 25%" placeholder="Event location"/>
+<div id="map" class="split right"></div>
 
-<input
-        id="searchBoxInput"
-        class="controls"
-        type="text"
-        placeholder="Event location"
-/>
-<div id="map"></div>
-
-
+<div class="split left">
 <form id="createEventId" action="#" method="post">
-    <h1>Create new event</h1>
+    <h1 style="text-align: center">Create new event</h1>
 
     <p>
         <label for="name" class="floatLabel"></label>
@@ -37,58 +34,61 @@
 
     <p>
         <label for="description" class="floatLabel"></label>
-        <textarea id="description" name="createEventInput" type="text" style="height:170px; width:750px;"
-                  placeholder="Event Description"></textarea>
+        <textarea id="description" name="createEventInput" placeholder="Event Description"></textarea>
     </p>
 
-    <p>
-        Number of participants: &nbsp;
-        <label for="minParticipants" class="floatLabel"></label>
-        <input id="minParticipants" name="createEventInput" type="text" style="width: 58px" placeholder="minimum">
-        &nbsp; - &nbsp;
-        <label for="maxParticipants" class="floatLabel"></label>
-        <input id="maxParticipants" name="createEventInput" type="text" style="width: 58px" placeholder="maximum">
+    <p>Number of participants:
+        <p>&nbsp;
+            <label for="minParticipants" class="floatLabel"></label>
+            <input id="minParticipants" name="createEventInput" style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="minimum">
+            &nbsp; - &nbsp;
+            <label for="maxParticipants" class="floatLabel"></label>
+            <input id="maxParticipants" name="createEventInput" style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="maximum">
+        </p>
     </p>
 
     <p>
         <label for="date" class="floatLabel"></label>
-        <input id="date" name="createEventInput" type="text" style="width: 190px"
-               placeholder="date of event (day-month-year)">
+        <input id="date" name="createEventInput" type="text" placeholder="Date of event (day-month-year)">
     </p>
 
     <p>
         <label for="hour" class="floatLabel"></label>
-        <input id="hour" name="createEventInput" type="text" style="width: 190px"
-               placeholder="hour of event (hour:minutes)">
+        <input id="hour" name="createEventInput" type="text" placeholder="Hour of event (hour:minutes)">
     </p>
 
     <p>
-        Event Type: &nbsp;
-        <input type="radio" id="temporary" name="createEventInput" value="temporary">
-        <label for="temporary">temporary</label>
-        &nbsp;&nbsp;
-        <input type="radio" id="temporary2" name="createEventInput" value="persistent">
-        <label for="temporary">persistent</label><br>
+        Event Type:
+        <p>&nbsp;
+            <input type="radio" id="temporary" name="createEventInput" value="temporary">
+            <label for="temporary">temporary</label>
+            &nbsp;&nbsp;
+            <input type="radio" id="temporary2" name="createEventInput" value="persistent">
+            <label for="temporary">persistent</label><br>
+        </p>
     </p>
 
     <p>
-        Tags (select at least one): &nbsp;
-        <input type="checkbox" id="tag1" name="createEventInput" value="animals"> Animals
-        &nbsp;&nbsp;
-        <input type="checkbox" id="tag2" name="createEventInput" value="environment"> Environment
-        &nbsp;&nbsp;
-        <input type="checkbox" id="tag3" name="createEventInput" value="children"> Children
-        &nbsp;&nbsp;
-        <input type="checkbox" id="tag4" name="createEventInput" value="elderly"> Elderly
-        &nbsp;&nbsp;
-        <input type="checkbox" id="tag5" name="createEventInput" value="supplies"> Supplies
-        &nbsp;&nbsp;
-        <input type="checkbox" id="tag6" name="createEventInput" value="homeless"> Homeless
+        Tags (select at least one):
+        <p>&nbsp;
+            <input type="checkbox" id="tag1" name="createEventInput" value="animals"> Animals
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag2" name="createEventInput" value="environment"> Environment
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag3" name="createEventInput" value="children"> Children
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag4" name="createEventInput" value="elderly"> Elderly
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag5" name="createEventInput" value="supplies"> Supplies
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag6" name="createEventInput" value="homeless"> Homeless
+        </p>
 
-    <p>
         <input type="submit" value="Create" id="submitCreatedEvent">
     </p>
 </form>
+
+</div>
 
 <script src="createEvent.js"></script>
 

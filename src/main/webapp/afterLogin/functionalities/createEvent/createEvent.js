@@ -3,6 +3,11 @@ var searchBoxInput;
 var latitude;
 var longitude;
 
+function goToAboutUs() {
+    localStorage.setItem("isCompanyPage","false");
+    window.location.href = "../../functionalities/aboutUs/aboutUs.html";
+}
+
 function initAutocomplete() {
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
