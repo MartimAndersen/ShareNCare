@@ -90,7 +90,8 @@ public class EventResource {
                         .set("hour", data.hour)
                         .set("coordinates", coordinates)
                         .set("temporary", data.temporary)
-                        .set("date", data.date)
+                        .set("initial_date", data.initial_date)
+                        .set("ending_date", data.ending_date)
                         .set("tags", g.toJson(data.tags))
                         .build();
 

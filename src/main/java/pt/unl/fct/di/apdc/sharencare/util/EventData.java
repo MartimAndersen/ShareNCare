@@ -14,7 +14,8 @@ public class EventData {
     //public String coordinates;
     public String hour;
     public String temporary;
-    public String date;
+    public String initial_date;
+    public String ending_date;
     public List<Integer> tags;
     public Double lat, lon;
 
@@ -24,7 +25,7 @@ public class EventData {
     }
 
     public EventData(String name, String description, String minParticipants, String maxParticipants, String hour,
-                     Double lat, Double lon, String temporary, String date, List<Integer> tags) {
+                     Double lat, Double lon, String temporary, String initial_date, String ending_date, List<Integer> tags) {
 
         this.name = name;
         this.description = description;
@@ -34,14 +35,16 @@ public class EventData {
         this.lat = lat;
         this.lon = lon;
         this.temporary = temporary;
-        this.date = date;
+        this.initial_date = initial_date;
+        this.ending_date = ending_date;
         this.tags = tags;
 
     }
 
     public boolean atLeastOneEmptyParameter() {
         return name.equals("") || description.equals("") || minParticipants.equals("")
-                || maxParticipants.equals("") || hour.equals("") || temporary.equals("") || date.equals("") || lat == null || lon == null || tags.size() == 0;
+                || maxParticipants.equals("") || hour.equals("") || temporary.equals("") || initial_date.equals("") ||
+                ending_date.equals("") ||lat == null || lon == null || tags.size() == 0;
     }
     
     public boolean isHourValid() {
@@ -54,12 +57,15 @@ public class EventData {
     }
 
     public boolean verifyDate() {
-        if (!date.contains("-")) {
+        if (!initial_date.contains("-") && !ending_date.contains("-")) {
             return false;
         } else {
-            String[] parts = date.split("-");
-            return isValidDate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            String[] parts1 = initial_date.split("-");
+            String[] parts2 = ending_date.split("-");
+            return isValidDate(Integer.parseInt(parts1[0]), Integer.parseInt(parts1[1]), Integer.parseInt(parts1[2]))
+            		&& isValidDate(Integer.parseInt(parts2[0]), Integer.parseInt(parts2[1]), Integer.parseInt(parts2[2]));
         }
+        
     }
 
     private boolean isValidDate(int d, int m, int y) {
