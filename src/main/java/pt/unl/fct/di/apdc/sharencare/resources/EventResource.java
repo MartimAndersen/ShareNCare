@@ -89,7 +89,7 @@ public class EventResource {
                         .set("maxParticipants", data.maxParticipants)
                         .set("hour", data.time)
                         .set("coordinates", coordinates)
-                        .set("temporary", data.temporary)
+                        .set("temporary", data.durability)
                         .set("initial_date", data.initialDate)
                         .set("ending_date", data.endingDate)
                         .set("tags", g.toJson(data.tags))
@@ -283,9 +283,9 @@ public class EventResource {
 						.set("maxParticipants", data.maxParticipants)
 						.set("hour", data.time)
 						.set("coordinates", coordinates)
-						.set("temporary", data.temporary)
-						.set("initial_date", data.initialDate)
-						.set("ending_date", data.endingDate)
+						.set("durability", data.durability)
+						.set("initialDate", data.initialDate)
+						.set("endingDate", data.endingDate)
 						.set("tags", g.toJson(data.tags))
 						.build();
 

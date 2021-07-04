@@ -12,7 +12,7 @@ public class EventData {
     public String name, description;
     public String minParticipants, maxParticipants;
     public String time;
-    public String temporary;
+    public String durability;
     public String initialDate;
     public String endingDate;
     public List<Integer> tags;
@@ -33,7 +33,7 @@ public class EventData {
         this.time = time;
         this.lat = lat;
         this.lon = lon;
-        this.temporary = temporary;
+        this.durability = durability;
         this.initialDate = initialDate;
         this.endingDate = endingDate;
         this.tags = tags;
@@ -42,7 +42,7 @@ public class EventData {
 
     public boolean atLeastOneEmptyParameter() {
         return name.equals("") || description.equals("") || minParticipants.equals("")
-                || maxParticipants.equals("") || time.equals("") || temporary.equals("") || initialDate.equals("") ||
+                || maxParticipants.equals("") || time.equals("") || durability.equals("") || initialDate.equals("") ||
                 endingDate.equals("") ||lat == null || lon == null || tags.size() == 0;
     }
     
