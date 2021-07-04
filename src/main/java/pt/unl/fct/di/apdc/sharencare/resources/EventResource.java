@@ -106,6 +106,77 @@ public class EventResource {
             }
         }
     }
+    
+    @POST
+    @Path("/registerEventAndroid")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response registerEventAndroid(@QueryParam("tokenId") String tokenId, EventData data) {
+    	LOG.fine("Attempt to register event: " + data.name);
+
+    	Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+		
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
+			
+		}
+
+		if (data.atLeastOneEmptyParameter()) {
+			System.out.println("Please fill in all fields.");
+			return Response.status(Status.LENGTH_REQUIRED).build();
+		}
+    	
+    	
+    	if( Integer.parseInt(data.minParticipants) <= 0 || Integer.parseInt(data.maxParticipants) < Integer.parseInt(data.minParticipants)) {
+    		System.out.println("Number of participants is incorrect");
+    		return Response.status(Status.NOT_ACCEPTABLE).build();
+    	}
+    	
+    	if(!data.verifyDate()) {
+    		System.out.println("Date is not valid");
+    		return Response.status(Status.FORBIDDEN).build();
+    	}
+    	
+    	if(!data.isHourValid()) {
+    		System.out.println("Hour is not valid");
+    		return Response.status(Status.EXPECTATION_FAILED).build();
+    	}
+
+
+        Transaction txn = datastore.newTransaction();
+        try {
+            Key mapKey = datastore.newKeyFactory().setKind("Event").newKey(data.name);
+            Entity event = txn.get(mapKey);
+            if (event != null) {
+                txn.rollback();
+                return Response.status(Status.CONFLICT).entity("The event with the given title already exists.").build();
+            } else {
+            	String coordinates = data.lat + " " + data.lon;
+                event = Entity.newBuilder(mapKey)
+                		.set("name", data.name)
+                        .set("description", data.description)
+                        .set("minParticipants", data.minParticipants)
+                        .set("maxParticipants", data.maxParticipants)
+                        .set("hour", data.time)
+                        .set("coordinates", coordinates)
+                        .set("temporary", data.durability)
+                        .set("initial_date", data.initialDate)
+                        .set("ending_date", data.endingDate)
+                        .set("tags", g.toJson(data.tags))
+                        .build();
+
+
+                txn.add(event);
+                txn.commit();
+                return Response.ok("Event " + data.name + " registered.").build();
+            }
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
 
 	@GET
 	@Path("/getAllEvents")
