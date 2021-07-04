@@ -444,5 +444,22 @@ public class EventResource {
 		return Response.ok(g.toJson(events)).build();
 
 	}
+    
+    @GET
+	@Path("/getEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response getEvent(@QueryParam("eventId") String eventId) {
+    	Key eventKey = datastore.newKeyFactory().setKind("User").newKey(eventId);
+		Entity event = datastore.get(eventKey);
+		
+		if(event == null)
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist")
+					.build();
+
+
+		return Response.ok(g.toJson(event.getProperties().values())).build();
+
+    }
 
 }
