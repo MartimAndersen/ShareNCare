@@ -31,12 +31,17 @@ function handleChangeAttributes() {
     let inputs = document.getElementsByName("changeAttributesInput")
     let data = {
         newEmail: inputs[0].value,
-        newProfileType: inputs[1].value,
-        newLandLine: inputs[2].value,
-        newMobile: inputs[3].value,
-        newAddress: inputs[4].value,
-        newSecondAddress: inputs[5].value,
-        newPostal: inputs[6].value
+        newLandLine: inputs[1].value,
+        newMobile: inputs[2].value,
+        newAddress: inputs[3].value,
+        newSecondAddress: inputs[4].value,
+        newPostal: inputs[5].value,
+        fax: inputs[6].value,
+        website: inputs[7].value,
+        instagram: inputs[8].value,
+        twitter: inputs[9].value,
+        facebook: inputs[10].value,
+        youtube: inputs[11].value
     }
     callChangeAttributes(JSON.stringify(data));
 }

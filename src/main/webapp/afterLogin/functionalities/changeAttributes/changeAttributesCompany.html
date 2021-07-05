@@ -2,12 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
+    <link rel="stylesheet" href="../changeAttributes/changeAttributesStyle.css">
 </head>
+
+
 
 <body>
 
-<button onclick="goToPageBefore()">Go back</button>
+<ul>
+    <img src="../../images/logo" height="5%" width="5%">
+    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
+</ul>
+
+<div class="center">
+
+    <form id="changeAttributesFormId" action="#" method="post">
+        <h1>Update Personal Info</h1>
+
+        <p>
+            <label for="newEmail" class="floatLabel">Email</label>
+            <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
+        </p>
+        <p>
+            <label for="newLandLine" class="floatLabel">Land Line</label>
+            <input id="newLandLine" name="changeAttributesInput" type="text" placeholder="Landline">
+        </p>
+        <p>
+            <label for="newMobile" class="floatLabel">Mobile</label>
+            <input id="newMobile" name="changeAttributesInput" type="text" placeholder="Mobile">
+        </p>
+        <p>
+            <label for="newAddress" class="floatLabel">Address</label>
+            <input id="newAddress" name="changeAttributesInput" type="text" placeholder="Address">
+        </p>
+        <p>
+            <label for="newSecondAddress" class="floatLabel">Second Address</label>
+            <input id="newSecondAddress" name="changeAttributesInput" type="text" placeholder="Second Address">
+        </p>
+        <p>
+            <label for="newPostal" class="floatLabel">Postal</label>
+            <input id="newPostal" name="changeAttributesInput" type="text" placeholder="Postal">
+        </p>
+        <p>
+            <label for="fax" class="floatLabel">Postal</label>
+            <input id="fax" name="changeAttributesInput" type="text" placeholder="Fax">
+        </p>
+        <p>
+            <label for="website" class="floatLabel">Postal</label>
+            <input id="website" name="changeAttributesInput" type="text" placeholder="Website">
+        </p>
+        <p>
+            <label for="instagram" class="floatLabel">Postal</label>
+            <input id="instagram" name="changeAttributesInput" type="text" placeholder="Instagram">
+        </p>
+        <p>
+            <label for="twitter" class="floatLabel">Postal</label>
+            <input id="twitter" name="changeAttributesInput" type="text" placeholder="Twitter">
+        </p>
+        <p>
+            <label for="facebook" class="floatLabel">Postal</label>
+            <input id="facebook" name="changeAttributesInput" type="text" placeholder="Facebook">
+        </p>
+        <p>
+            <label for="youtube" class="floatLabel">Postal</label>
+            <input id="youtube" name="changeAttributesInput" type="text" placeholder="Youtube">
+        </p>
+        <p>
+            <input type="submit" value="Update" id="submitChangeAttributes">
+        </p>
+    </form>
+</div>
 
 <script src="changeAttributesCompany.js"></script>
 
