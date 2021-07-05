@@ -18,6 +18,9 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -38,6 +41,7 @@ public class EventResource {
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Gson g = new Gson();
+	final ObjectMapper objectMapper = new ObjectMapper();
 	AuthTokenResource t = new AuthTokenResource();
     
     @POST
@@ -274,13 +278,17 @@ public class EventResource {
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
 		
-		List<String> events = new ArrayList<String>();
 		String e = user.getString("events");
 		
-		if(!e.equals(""))
-			events = g.fromJson(e, List.class);
-			
-		events.add(data.eventId);
+		try {
+			String[] events = objectMapper.readValue(e, String[].class);
+	
+		String[] newEvents = new String[events.length+1];
+		
+		for(int i = 0; i < events.length; i++)
+			newEvents[i] = events[i];
+		
+		newEvents[events.length] = data.eventId;
 		
 		user = Entity.newBuilder(userKey)
 				.set("username", token.getString("username"))
@@ -300,7 +308,15 @@ public class EventResource {
 				.build();
 
 		datastore.update(user);
-
+		
+		} catch (JsonMappingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		return Response.ok("Properties changed").build();
 	}
 	
@@ -473,10 +489,16 @@ public class EventResource {
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity currentUser = datastore.get(currentUserKey);
+		
+		if (currentUser == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
 
-		if (currentUser.getString("state").equals("DISABLED"))
+	/*	if (currentUser.getString("state").equals("DISABLED"))
 			return Response.status(Status.BAD_REQUEST)
-					.entity("User with id: " + currentUser.getString("username") + " is disabled.").build();
+					.entity("User with id: " + currentUser.getString("username") + " is disabled.").build();*/
 
 		/*
 		 * END OF VERIFICATIONS
@@ -488,7 +510,11 @@ public class EventResource {
 		
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 		List<String> events = new ArrayList<>();
-		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
+		
+	    ObjectMapper mapper = new ObjectMapper();
+		List<String> userEvents;
+		try {
+			userEvents = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
 			while (eventsQuery.hasNext()){
 				Entity e = eventsQuery.next();
 				if(userEvents.contains(e.getString("name"))) {
@@ -496,7 +522,10 @@ public class EventResource {
 					events.add(event);
 				}
 			}
-		
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		/*com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("Event");
 
 		DatastoreService data = DatastoreServiceFactory.getDatastoreService();		
