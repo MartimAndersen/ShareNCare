@@ -240,6 +240,7 @@ public class EventResource {
 		
 	}
 		
+	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/addEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -277,26 +278,25 @@ public class EventResource {
 		String e = user.getString("events");
 		
 		if(!e.equals(""))
-			events = Arrays.asList(g.fromJson(e, String[].class));
+			events = g.fromJson(e, List.class);
 			
 		events.add(data.eventId);
 		
 		user = Entity.newBuilder(userKey)
 				.set("username", token.getString("username"))
 				.set("password", user.getString("password"))
-				.set("confirmation", user.getString("password"))
 				.set("email", user.getString("email"))
-				.set("publicProfile", user.getBoolean("publicProfile"))
+				.set("profileType", user.getString("profileType"))
 				.set("landLine", user.getString("landLine"))
 				.set("mobile", user.getString("mobile"))
 				.set("address", user.getString("address"))
 				.set("secondAddress", user.getString("secondAddress"))
 				.set("postal", user.getString("postal"))
+				.set("profilePic", user.getString("profilePic"))
 				.set("tags",user.getString("tags"))
-				//.set("profilePic", profilePic)
+				.set("events", g.toJson(events))
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state"))
-				.set("events", g.toJson(events))
 				.build();
 
 		datastore.update(user);
@@ -450,7 +450,7 @@ public class EventResource {
 	@Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
 	public Response getEvent(@QueryParam("eventId") String eventId) {
-    	Key eventKey = datastore.newKeyFactory().setKind("User").newKey(eventId);
+    	Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 		Entity event = datastore.get(eventKey);
 		
 		if(event == null)

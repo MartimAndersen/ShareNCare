@@ -56,11 +56,11 @@ public class EventData {
     }
 
     public boolean verifyDate() {
-        if (!initialDate.contains("-") && !endingDate.contains("-")) {
+        if (!initialDate.contains("/") && !endingDate.contains("/")) {
             return false;
         } else {
-            String[] parts1 = initialDate.split("-");
-            String[] parts2 = endingDate.split("-");
+            String[] parts1 = initialDate.split("/");
+            String[] parts2 = endingDate.split("/");
             return isValidDate(Integer.parseInt(parts1[0]), Integer.parseInt(parts1[1]), Integer.parseInt(parts1[2]))
             		&& isValidDate(Integer.parseInt(parts2[0]), Integer.parseInt(parts2[1]), Integer.parseInt(parts2[2]));
         }
