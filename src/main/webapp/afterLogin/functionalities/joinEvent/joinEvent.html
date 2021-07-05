@@ -7,16 +7,13 @@
     <title>Share&Care</title>
     <link rel="stylesheet" href="joinEventStyle.css">
 </head>
-<body>
+<body onload="callGetEvents()">
 
 <ul>
     <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
     <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
 </ul>
 
-<button onclick="goToPageBefore()">Go back</button>
-
-<button onclick="callGetEvents()">Events</button>
 
 
 <table id="demo_table">
@@ -36,8 +33,11 @@
     </tbody>
 </table>
 
+<br>
+<br>
+<br>
 
-
+<div>
 <form id="joinEventFormId" action="#" method="post">
     <h1>Join Event</h1>
     <p>
@@ -50,6 +50,7 @@
         <input type="submit" value="Join" id="submitJoinEvent">
     </p>
 </form>
+</div>
 <script src="joinEvent.js"></script>
 
 
