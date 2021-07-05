@@ -1,3 +1,6 @@
+function backToInitialPage() {
+    window.location.href = "../welcomePage/welcomePage.html";
+}
 
 function goToAboutUs() {
     localStorage.setItem("isUserPage","true");

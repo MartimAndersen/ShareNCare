@@ -1,5 +1,5 @@
 function backToInitialPage() {
-    window.location.href = "../initialPage/initialPage.html";
+    window.location.href = "../welcomePage/welcomePage.html";
 }
 
 function goToAboutUs() {
