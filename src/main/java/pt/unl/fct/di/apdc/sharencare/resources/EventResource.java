@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 
 
 import pt.unl.fct.di.apdc.sharencare.util.AddEventData;
-import pt.unl.fct.di.apdc.sharencare.util.AddEventDataWeb;
+import pt.unl.fct.di.apdc.sharencare.util.JoinEvent;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 
 @Path("/event")
@@ -303,6 +303,83 @@ public class EventResource {
 
 		return Response.ok("Properties changed").build();
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@POST
+	@Path("/joinEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response joinEvent(@CookieParam("Token") NewCookie cookie,JoinEvent data) {
+		
+		LOG.fine("Attempt to join event.");
+		
+		if (cookie.getName().equals("")) {
+			System.out.println("You need to be logged in to execute this operation.");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		if (data.atLeastOneEmptyParameter()) {
+			System.out.println("Please fill in all fields.");
+			return Response.status(Status.LENGTH_REQUIRED).build();
+		}
+
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The user with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		}
+		
+		List<String> events = new ArrayList<String>();
+		String e = user.getString("events");
+		
+		if(!e.equals(""))
+			events = g.fromJson(e, List.class);
+			
+		events.add(data.eventId);
+		
+		user = Entity.newBuilder(userKey)
+				.set("username", token.getString("username"))
+				.set("password", user.getString("password"))
+				.set("email", user.getString("email"))
+				.set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine"))
+				.set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address"))
+				.set("secondAddress", user.getString("secondAddress"))
+				.set("postal", user.getString("postal"))
+				.set("profilePic", user.getString("profilePic"))
+				.set("tags",user.getString("tags"))
+				.set("events", g.toJson(events))
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.build();
+
+		datastore.update(user);
+
+		return Response.ok("Properties changed").build();
+	}
+	
+	
 	
 	@POST
 	@Path("/addEventWeb")

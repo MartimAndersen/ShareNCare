@@ -10,6 +10,7 @@ function myFunction(jsonResponse) {
         console.log(obj);
     }
 }
+
 function populate_table(jsonResponse) {
    let table = document.getElementById('demo_table');
    for(var i = 0; i < jsonResponse.length; i++) {
@@ -17,13 +18,13 @@ function populate_table(jsonResponse) {
              obj= JSON.parse(jsonResponse[i]);
         let row = table.insertRow(-1);
 		let cell = row.insertCell(0);
-		let text = document.createTextNode((obj[8].value));
+		let text = document.createTextNode((obj[9].value));
         cell.appendChild(text);
 		cell = row.insertCell(0);
 		text = document.createTextNode((obj[5].value));
         cell.appendChild(text);
 		cell = row.insertCell(0)
-		text = document.createTextNode((obj[4].value));
+		text = document.createTextNode((obj[6].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
          text = document.createTextNode((obj[2].value));
@@ -32,10 +33,13 @@ function populate_table(jsonResponse) {
          text = document.createTextNode((obj[3].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
+        text = document.createTextNode((obj[4].value));
+        cell.appendChild(text);
+        cell = row.insertCell(0)
         text = document.createTextNode((obj[1].value));
         cell.appendChild(text);
         cell = row.insertCell(0)
-        text = document.createTextNode((obj[6].value));
+        text = document.createTextNode((obj[7].value));
         cell.appendChild(text);
    }
 }
@@ -50,6 +54,7 @@ let xhttp = new XMLHttpRequest();
           // console.log(xhttp.responseText);
           jsonResponse = JSON.parse(xhttp.responseText);
          populate_table(jsonResponse)
+
     }
 
 };
@@ -65,6 +70,7 @@ function callJoinEvents(data) {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200: alert(this.responseText); break;
+                case 411: alert("You need to give a name of a event."); break;
                 case 401: alert("You need to be logged in to execute this operation."); break;
                 case 404: alert("Token does not exist."); break;
                 case 403: alert("The user with the given token does not exist."); break;
@@ -73,7 +79,7 @@ function callJoinEvents(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/event/addEventWeb", true);
+    xhttp.open("POST", "/rest/event/joinEvent", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
