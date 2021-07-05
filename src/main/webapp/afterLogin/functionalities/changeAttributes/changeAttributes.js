@@ -6,8 +6,9 @@ function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
+            let a = this.responseText;
             switch (this.status) {
-                case 200: alert(this.responseText); break;
+                case 200: alert("Properties changed."); goToPageBefore(); break;
                 case 411: alert("Please enter at least one new attribute."); break;
                 case 401: alert("You need to be logged in to execute this operation."); break;
                 case 404: alert("Token does not exist."); break;
@@ -23,8 +24,6 @@ function callChangeAttributes(data) {
     xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
-
-    goToPageBefore();
 }
 
 function handleChangeAttributes() {

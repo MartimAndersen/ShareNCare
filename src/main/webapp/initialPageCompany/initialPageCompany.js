@@ -40,8 +40,6 @@ function callLoginCompany(data) {
     xhttp.send(data);
 }
 
-
-
 let regFormCompany = document.getElementById("regCompanyFormId");
 regFormCompany.onsubmit = () => {
     handleRegisterCompany();
