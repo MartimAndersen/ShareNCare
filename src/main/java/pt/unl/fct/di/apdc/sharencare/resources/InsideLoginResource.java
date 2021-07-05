@@ -570,31 +570,6 @@ public class InsideLoginResource {
 		return Response.ok(user + " is now logged out.").cookie(cookieAux).build();
 	}
 
-//    // op7
-//    @POST
-//    @Path("/logout")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response logout(TokenData data, @CookieParam("token") NewCookie cookie) {
-//
-//        NewCookie cookieAux = new NewCookie(cookie.getName(), null);
-//
-//        if (data.tokenId.equals("")) {
-//            return Response.status(Status.UNAUTHORIZED).build();
-//        }
-//
-//        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
-//        Entity token = datastore.get(tokenKey);
-//
-//        if (token == null) {
-//            return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist").build();
-//        }
-//
-//        String user = token.getString("username");
-//
-//        datastore.delete(tokenKey);
-//        return Response.ok(user + " has logged out").cookie(cookieAux).build();
-//    }
-
 	// op8.1d
 	@POST
 	@Path("/changePassword")
@@ -642,6 +617,75 @@ public class InsideLoginResource {
 // 							.set("profilePic", user.getString("profilePic"))
 // 							.set("tags", user.getString("tags"))
 // 							.set("events", user.getString("events"))
+							.build();
+					datastore.put(user);
+					return Response.ok("Password was changed").cookie(cookie).build();
+				} else {
+					return Response.status(Status.EXPECTATION_FAILED).entity("Passwords don't match.").build();
+				}
+			} else {
+				System.out.println("Invalid password. Please enter 5 or more characters.");
+				return Response.status(Response.Status.LENGTH_REQUIRED).build();
+			}
+		} else {
+			return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
+		}
+	}
+
+	// op8.1d
+	@POST
+	@Path("/changePasswordCompany")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response changePasswordCompany(@CookieParam("Token") NewCookie cookie, ChangePasswordData data) {
+		if (data.emptyParameters()) {
+			System.out.println("Please fill in all non-optional fields.");
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+		}
+// 		if(!t.validToken(tokenKey))
+// 			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenIdChangePassword +
+// 					" has expired.Please login again to continue using the application")
+// 					.build();
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();
+		}
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The user with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		}
+		String hashedPWD = user.getString("password");
+		if (hashedPWD.equals(DigestUtils.sha512Hex(data.oldPassword))) {
+			if (data.validPasswordLength()) {
+				if (data.newPassword.equals(data.confirmation)) {
+					user = Entity.newBuilder(userKey)
+							.set("nif", user.getString("nif"))
+							.set("username", user.getString("username"))
+							.set("email", user.getString("email"))
+							.set("password", DigestUtils.sha512Hex(data.newPassword))
+							.set("landLine", user.getString("landLine"))
+							.set("mobile", user.getString("mobile"))
+							.set("address", user.getString("address"))
+							.set("postal", user.getString("postal"))
+							.set("role", user.getString("role"))
+							.set("state", user.getString("state"))
+							.set("website", user.getString("website"))
+							.set("twitter", user.getString("twitter"))
+							.set("instagram", user.getString("instagram"))
+							.set("youtube", user.getString("youtube"))
+							.set("facebook", user.getString("facebook"))
+							.set("fax", user.getString("fax"))
+							.set("members", user.getString("members"))
+							.set("events", user.getString("events"))
 							.build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();

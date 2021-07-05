@@ -1,5 +1,10 @@
+var isUserPage = localStorage.getItem("isUserPage");
 function goToPageBefore(){
-    window.location.href = "../../afterLoginPage.html";
+    if(isUserPage === "true") {
+        window.location.href = "../../afterLoginPage.html";
+    } else{
+        window.location.href = "../../afterLoginCompanyPage.html";
+    }
 }
 
 function callChangePassword(data) {
@@ -19,7 +24,11 @@ function callChangePassword(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/changePassword", true);
+    if(isUserPage === "true") {
+        xhttp.open("POST", "/rest/loggedIn/changePassword", true);
+    } else{
+        xhttp.open("POST", "/rest/loggedIn/changePasswordCompany", true);
+    }
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
