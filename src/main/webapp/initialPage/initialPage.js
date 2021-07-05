@@ -42,6 +42,7 @@ function callLogin(data) {
                 case 401: alert("Please fill in all non-optional fields."); break;
                 case 404: alert("User does not exist."); break;
                 case 417: alert("Incorrect password."); break;
+                case 403: alert("You cannot login as an institution here."); break;
                 default: alert("Wrong parameters."); break;
             }
         }
