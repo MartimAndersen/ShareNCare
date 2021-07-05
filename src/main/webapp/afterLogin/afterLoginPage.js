@@ -52,3 +52,7 @@ function logout() {
 
     xhttp.send("");
 }
+
+window.onload = function() {
+    document.getElementById("header2Id").innerHTML = "Welcome " + localStorage.getItem('currUser');
+}
