@@ -4,8 +4,12 @@ var latitude;
 var longitude;
 
 function goToAboutUs() {
-    localStorage.setItem("isCompanyPage","false");
+    localStorage.setItem("isUserPage","false");
     window.location.href = "../../functionalities/aboutUs/aboutUs.html";
+}
+
+function goBack() {
+    window.location.href = "../../afterLoginCompanyPage.html";
 }
 
 function initAutocomplete() {
@@ -160,8 +164,4 @@ let createEventForm = document.getElementById("createEventId");
 createEventForm.onsubmit = () => {
     handleCreateEvent();
     return false;
-}
-
-function goBack() {
-    window.location.href = "../../afterLoginCompanyPage.html";
 }

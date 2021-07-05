@@ -187,3 +187,12 @@ function clearMap() {
     }
 }
 
+function goToAboutUs() {
+    localStorage.setItem("isUserPage","true");
+    window.location.href = "../../functionalities/aboutUs/aboutUs.html";
+}
+
+function goBack() {
+    window.location.href = "../../afterLoginPage.html";
+}
+
