@@ -1,6 +1,4 @@
-function goToPageBefore(){
-    window.location.href = "../../afterLoginCompanyPage.html";
-}
+
 
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
@@ -20,28 +18,32 @@ function callChangeAttributes(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
+    xhttp.open("POST", "/rest/loggedInInstitution/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
-    goToPageBefore();
+
 }
 
 function handleChangeAttributes() {
     let inputs = document.getElementsByName("changeAttributesInput")
     let data = {
-        newEmail: inputs[0].value,
-        newLandLine: inputs[1].value,
-        newMobile: inputs[2].value,
-        newAddress: inputs[3].value,
-        newSecondAddress: inputs[4].value,
-        newPostal: inputs[5].value,
-        fax: inputs[6].value,
-        website: inputs[7].value,
-        instagram: inputs[8].value,
-        twitter: inputs[9].value,
-        facebook: inputs[10].value,
-        youtube: inputs[11].value
+        email: inputs[0].value,
+        landLine: inputs[1].value,
+        mobile: inputs[2].value,
+        address: inputs[3].value,
+        zipCode: inputs[4].value,
+        fax: inputs[5].value,
+        website: inputs[6].value,
+        instagram: inputs[7].value,
+        twitter: inputs[8].value,
+        facebook: inputs[9].value,
+        youtube: inputs[10].value,
+        profilePic: [],
+        members: [],
+        tokenId: "",
+        events: []
+
     }
     callChangeAttributes(JSON.stringify(data));
 }

@@ -1,6 +1,4 @@
-function goToPageBefore(){
-    window.location.href = "../../afterLoginPage.html";
-}
+
 
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
@@ -40,7 +38,7 @@ function handleChangeAttributes() {
         newProfileType: radioButton,
         newLandLine: inputs[3].value,
         newMobile: inputs[4].value,
-        newAddress: inputs[5].value,
+        newAddress: inputs[5].value ,
         newSecondAddress: inputs[6].value,
         newPostal: inputs[7].value
     }
