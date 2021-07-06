@@ -174,6 +174,7 @@ public class RegisterResource {
         				.set("mobile", "")
         				.set("address", "")
         				.set("postal", "")
+        				.set("profilePic", "")
                         .set("role", "INSTITUTION")
                         .set("state", "ENABLED")
         				.set("website", "")
@@ -182,8 +183,7 @@ public class RegisterResource {
         				.set("youtube", "")
         				.set("facebook", "")
         				.set("fax", "")
-        				.set("members", "")
-        				.set("events", "")
+        				.set("events", gson.toJson(new ArrayList<String>()))
                         .build();
 
                 txn.add(user);
