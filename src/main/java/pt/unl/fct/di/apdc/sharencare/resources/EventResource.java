@@ -612,8 +612,32 @@ public class EventResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
 
-		Query<Entity> query = Query.newEntityQueryBuilder()
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> userEvents = new ArrayList<String>();
+		
+		try {
+			userEvents = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
+			while (eventsQuery.hasNext()) {
+				Entity e = eventsQuery.next();
+				if (userEvents.contains(e.getString("name"))) {
+					String event = g.toJson(e.getProperties().values());
+					events.add(event);
+				}
+			}
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return Response.ok(g.toJson(events)).build();
+
+		/*Query<Entity> query = Query.newEntityQueryBuilder()
 				.setKind("Event")
 				.build();
 
@@ -639,7 +663,7 @@ public class EventResource {
 			e1.printStackTrace();
 		}
 
-		return Response.ok(g.toJson(events)).build();
+		return Response.ok(g.toJson(events)).build();*/
 
 	}
 
