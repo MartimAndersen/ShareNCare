@@ -18,7 +18,6 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
-    background: #eee;
     margin: 10px auto;
     position: relative;
     text-align:center;
@@ -35,6 +34,9 @@ body {
 /* Add some shadows to create a card effect */
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 20px;
+    background-color: rgba(144, 238, 144, 0.80);
 }
 
 /* Some left and right padding inside the container */
@@ -51,4 +53,28 @@ body {
 
 .title {
     color: grey;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /*background-color: #333;*/
+}
+
+li {
+    float: right;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #111;
 }
