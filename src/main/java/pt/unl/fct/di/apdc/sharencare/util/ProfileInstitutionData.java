@@ -21,7 +21,6 @@ public class ProfileInstitutionData {
 	public String facebook;
 	public String youtube;
 	public String fax;
-	public List<String> members;
 
 	public ProfileInstitutionData() {
 		
@@ -29,7 +28,7 @@ public class ProfileInstitutionData {
 	
 	public ProfileInstitutionData(String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic, 
 			List<String> events, String tokenId, String website, String instagram, String twitter, String facebook, String youtube,
-			String fax, List<String> members) {
+			String fax) {
 		this.email = email;
 		this.mobile = mobile;
 		this.address = address;
@@ -43,7 +42,6 @@ public class ProfileInstitutionData {
 		this.facebook = facebook;
 		this.youtube = youtube;
 		this.fax = fax;
-		this.members = members;
 		this.tokenId = tokenId;
 	}
 	
@@ -66,7 +64,7 @@ public class ProfileInstitutionData {
 	public boolean allEmptyParameters() {
 		return  email.equals("") && mobile.equals("") && address.equals("")
 				&& zipCode.equals("") && landLine.equals("") && profilePic.length == 0
-				&& events == null && members == null && website.equals("") && instagram.equals("")
+				&& events == null && website.equals("") && instagram.equals("")
 				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("");
 	}
 	
