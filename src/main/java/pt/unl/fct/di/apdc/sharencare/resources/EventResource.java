@@ -534,6 +534,74 @@ public class EventResource {
 		return Response.ok(g.toJson(events)).build();
 
 	}
+
+	@GET
+	@Path("/listUserEventsWeb")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listUserEventsWeb(@CookieParam("Token") NewCookie cookie) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (cookie.getName().equals("")) {
+			System.out.println("You need to be logged in to execute this operation.");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		/*if (!t.validToken(tokenKey))
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId
+					+ " has expired. Please login again to continue using the application").build();*/
+
+		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity currentUser = datastore.get(currentUserKey);
+
+		if (currentUser == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+
+	/*	if (currentUser.getString("state").equals("DISABLED"))
+			return Response.status(Status.BAD_REQUEST)
+					.entity("User with id: " + currentUser.getString("username") + " is disabled.").build();*/
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		Query<Entity> query = Query.newEntityQueryBuilder()
+				.setKind("Event")
+				.build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> userEventsUnprocessed = new ArrayList<String>();
+		List<String> userEvents = new ArrayList<String>();
+		Type type = new TypeToken<String>() {}.getType();
+		try {
+			userEventsUnprocessed = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
+			userEventsUnprocessed.forEach(x -> userEvents.add(g.fromJson(x, type)));
+			while (eventsQuery.hasNext()){
+				Entity e = eventsQuery.next();
+				if(userEvents.contains(e.getString("name"))) {
+					String event = g.toJson(e.getProperties().values());
+					events.add(event);
+				}
+			}
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return Response.ok(g.toJson(events)).build();
+
+	}
     
     @GET
 	@Path("/getEvent")
