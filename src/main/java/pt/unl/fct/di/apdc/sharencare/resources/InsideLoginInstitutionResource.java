@@ -310,7 +310,7 @@ public Response changeAttributesWeb(@CookieParam("Token") NewCookie cookie, Prof
 
 	datastore.update(user);
 
-	return Response.ok("Properties changed").build();
+	return Response.ok("Properties changed").cookie(cookie).build();
 }
 
 }

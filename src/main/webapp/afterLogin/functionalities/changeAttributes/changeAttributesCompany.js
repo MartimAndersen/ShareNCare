@@ -40,7 +40,7 @@ function handleChangeAttributes() {
         facebook: inputs[9].value,
         youtube: inputs[10].value,
         profilePic: [],
-        members: [],
+        // members: [],
         tokenId: "",
         events: []
 
