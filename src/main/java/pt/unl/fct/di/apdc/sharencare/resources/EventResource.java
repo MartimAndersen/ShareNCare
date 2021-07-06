@@ -470,8 +470,8 @@ public class EventResource {
 				String coordinates = data.lat + " " + data.lon;
 				event = Entity.newBuilder(mapKey).set("name", data.name).set("description", data.description)
 						.set("minParticipants", data.minParticipants).set("maxParticipants", data.maxParticipants)
-						.set("hour", data.time).set("coordinates", coordinates).set("durability", data.durability)
-						.set("initialDate", data.initialDate).set("endingDate", data.endingDate)
+						.set("hour", data.time).set("coordinates", coordinates).set("temporary", data.durability)
+						.set("initial_date", data.initialDate).set("ending_date", data.endingDate)
 						.set("tags", g.toJson(data.tags)).build();
 
 				txn.add(event);

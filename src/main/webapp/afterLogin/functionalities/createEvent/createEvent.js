@@ -120,14 +120,12 @@ function callCreateEvent(data) {
 function fillTagsList(inputs) {
     let tagsList = [];
     let currTagId = "";
-    let counter = 1;
-    for (let t = 8; t <= 13; t++) {
+    for (let counter = 1; counter <= 6; counter++) {
         currTagId = "tag" + counter;
         if (document.getElementById(currTagId).checked) {
             // tagsList.push(inputs[t].value);
             tagsList.push(counter);
         }
-        counter++;
     }
     return tagsList;
 }
@@ -137,10 +135,16 @@ function handleCreateEvent() {
 
     let radioButtonResult = ""
     if (document.getElementById('temporary').checked) {
-        radioButtonResult = inputs[5].value
+        radioButtonResult = inputs[7].value
     }
     if (document.getElementById('temporary2').checked) {
-        radioButtonResult = inputs[6].value
+        radioButtonResult = inputs[8].value
+    }
+    if (document.getElementById('temporary3').checked) {
+        radioButtonResult = inputs[9].value
+    }
+    if (document.getElementById('temporary4').checked) {
+        radioButtonResult = inputs[10].value
     }
 
     let data = {
@@ -150,9 +154,10 @@ function handleCreateEvent() {
         maxParticipants: inputs[3].value,
         lat: latitude,
         lon: longitude,
-        date: inputs[4].value,
-        hour: inputs[5].value,
-        temporary: radioButtonResult,
+        initialDate: inputs[4].value,
+        endingDate: inputs[5].value,
+        time: inputs[6].value,
+        durability: radioButtonResult,
         tags: fillTagsList(inputs)
 
     }

@@ -22,52 +22,68 @@
 <div id="map" class="split right"></div>
 
 <div class="split left">
-<form id="createEventId" action="#" method="post">
-    <h1 style="text-align: center">Create new event</h1>
+    <form id="createEventId" action="#" method="post">
+        <h1 style="text-align: center">Create new event</h1>
 
-    <p>
-        <label for="name" class="floatLabel"></label>
-        <input id="name" name="createEventInput" type="text" placeholder="Name">
-    </p>
+        <p>
+            <label for="name" class="floatLabel"></label>
+            <input id="name" name="createEventInput" type="text" placeholder="Name">
+        </p>
 
-    <p>
-        <label for="description" class="floatLabel"></label>
-        <textarea id="description" name="createEventInput" placeholder="Event Description"></textarea>
-    </p>
+        <p>
+            <label for="description" class="floatLabel"></label>
+            <textarea id="description" name="createEventInput" placeholder="Event Description"></textarea>
+        </p>
 
-    <p>Number of participants:
-        <p>&nbsp;
+        <p>&nbsp;Number of participants:
+            &nbsp;
             <label for="minParticipants" class="floatLabel"></label>
-            <input id="minParticipants" name="createEventInput" style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="minimum">
+            <input id="minParticipants" name="createEventInput"
+                   style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="minimum">
             &nbsp; - &nbsp;
             <label for="maxParticipants" class="floatLabel"></label>
-            <input id="maxParticipants" name="createEventInput" style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;" placeholder="maximum">
+            <input id="maxParticipants" name="createEventInput"
+                   style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="maximum">
         </p>
-    </p>
+        </p>
 
-    <p>
-        <label for="date" class="floatLabel"></label>
-        <input id="date" name="createEventInput" type="text" placeholder="Date of event (day/month/year)">
-    </p>
+        <p>
+            <label for="date1" class="floatLabel"></label>
+            <input id="date1" name="createEventInput" type="text" placeholder="Initial date of event (day/month/year)"
+                   style="width: 35%">
 
-    <p>
-        <label for="hour" class="floatLabel"></label>
-        <input id="hour" name="createEventInput" type="text" placeholder="Hour of event (hour:minutes)">
-    </p>
+            <label for="date2" class="floatLabel"></label>
+            <input id="date2" name="createEventInput" type="text" placeholder="Ending date of event (day/month/year)"
+                   style="width: 35%">
+        </p>
 
-    <p>
-        Event Type:
+        <p>
+            <label for="hour" class="floatLabel"></label>
+            <input id="hour" name="createEventInput" type="text" placeholder="Hour of event (hour:minutes)"
+                   style="width: 28%">
+        </p>
+
         <p>&nbsp;
+            Event Type:
+            &nbsp;
             <input type="radio" id="temporary" name="createEventInput" value="temporary">
-            <label for="temporary">temporary</label>
+            <label for="temporary">One day</label>
             &nbsp;&nbsp;
-            <input type="radio" id="temporary2" name="createEventInput" value="persistent">
-            <label for="temporary">persistent</label><br>
-        </p>
-    </p>
+            <input type="radio" id="temporary2" name="createEventInput" value="weekly">
+            <label for="temporary">Weekly</label><br>
 
-    <p>
-        Tags (select at least one):
+            <input type="radio" id="temporary3" name="createEventInput" value="monthly">
+            <label for="temporary">Monthly</label>
+            &nbsp;&nbsp;
+            <input type="radio" id="temporary4" name="createEventInput" value="annual">
+            <label for="temporary">Annual</label><br>
+        </p>
+        </p>
+
+        <p>
+            Tags (select at least one):
         <p>&nbsp;
             <input type="checkbox" id="tag1" name="createEventInput" value="animals"> Animals
             &nbsp;&nbsp;
@@ -83,8 +99,8 @@
         </p>
 
         <input type="submit" value="Create" id="submitCreatedEvent">
-    </p>
-</form>
+        </p>
+    </form>
 
 </div>
 
