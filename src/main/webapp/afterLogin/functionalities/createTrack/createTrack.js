@@ -150,9 +150,8 @@ createTrackForm.onsubmit = () => {
 
 let locations = [
     ['Canil Municipal de Sintra', 38.80103664384434, -9.362070114620005],
+    ['Cáritas Diocesana de Setúbal', 38.52423234014446, -8.8967447733166],
     ['Comunidade Vida e Paz', 38.750773862083626, -9.133415786802798],
-    ['Cáritas Diocesana de Setúbal', 38.750773862083626, -9.133415786802798],
-    ['Comunidade Vida e Paz', 38.52423234014446, -8.8967447733166],
     ['Casa de Acolhimento Residencial D. Nuno Álvares Pereira', 38.67591762242458, -9.160317675163238]
 ];
 
