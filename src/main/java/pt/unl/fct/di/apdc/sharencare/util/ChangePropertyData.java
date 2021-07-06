@@ -9,13 +9,13 @@ public class ChangePropertyData {
 	public String newAddress;
 	public String newSecondAddress;
 	public String newPostal;
-	public byte[] profilePic;
+//	public byte[] profilePic;
 
 	public ChangePropertyData() {
 		
 	}
 	
-	public ChangePropertyData(String newEmail, String newProfileType, String newLandLine, String newMobile, String newAddress, String newSecondAddress, String newPostal, byte[] profilePic) {
+	public ChangePropertyData(String newEmail, String newProfileType, String newLandLine, String newMobile, String newAddress, String newSecondAddress, String newPostal/**, byte[] profilePic*/) {
 		this.newEmail = newEmail;
 		this.newProfileType = newProfileType;
 		this.newLandLine = newLandLine;
@@ -23,7 +23,7 @@ public class ChangePropertyData {
 		this.newAddress = newAddress;
 		this.newSecondAddress = newSecondAddress;
 		this.newPostal = newPostal;
-		this.profilePic = profilePic;
+//		this.profilePic = profilePic;
 	}
 
 

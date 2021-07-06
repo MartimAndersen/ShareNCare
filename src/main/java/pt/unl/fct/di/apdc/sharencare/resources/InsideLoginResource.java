@@ -358,7 +358,7 @@ public class InsideLoginResource {
 		String address = data.newAddress;
 		String secondAddress = data.newSecondAddress;
 		String postal = data.newPostal;
-		byte[] profilePic = data.profilePic;
+//		byte[] profilePic = data.profilePic;
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -420,7 +420,7 @@ public class InsideLoginResource {
 				return Response.status(Status.CONFLICT).build();
 			}
 		}
-		bucket.create(token.getString("username"), profilePic);
+//		bucket.create(token.getString("username"), profilePic);
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("email", email).set("profileType", profileType)
 				.set("landLine", landLine).set("mobile", mobile).set("address", address)
