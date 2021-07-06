@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -244,7 +246,6 @@ public class EventResource {
 		
 	}
 		
-	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/addEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -290,6 +291,7 @@ public class EventResource {
 		
 		newEvents[events.length] = data.eventId;
 		
+		
 		user = Entity.newBuilder(userKey)
 				.set("username", token.getString("username"))
 				.set("password", user.getString("password"))
@@ -302,7 +304,7 @@ public class EventResource {
 				.set("postal", user.getString("postal"))
 				.set("profilePic", user.getString("profilePic"))
 				.set("tags",user.getString("tags"))
-				.set("events", g.toJson(events))
+				.set("events", g.toJson(newEvents))
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.build();
@@ -465,7 +467,6 @@ public class EventResource {
 		}
 	}
     
-    @SuppressWarnings({ "unchecked" })
 	@GET
 	@Path("/listUserEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -512,9 +513,12 @@ public class EventResource {
 		List<String> events = new ArrayList<>();
 		
 	    ObjectMapper mapper = new ObjectMapper();
-		List<String> userEvents;
+		List<String> userEventsUnprocessed = new ArrayList<String>();
+		List<String> userEvents = new ArrayList<String>();
+		Type type = new TypeToken<String>() {}.getType();
 		try {
-			userEvents = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
+			userEventsUnprocessed = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
+			userEventsUnprocessed.forEach(x -> userEvents.add(g.fromJson(x, type)));
 			while (eventsQuery.hasNext()){
 				Entity e = eventsQuery.next();
 				if(userEvents.contains(e.getString("name"))) {
@@ -526,26 +530,6 @@ public class EventResource {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		/*com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query("Event");
-
-		DatastoreService data = DatastoreServiceFactory.getDatastoreService();		
-		PreparedQuery pq = data.prepare(query);
-		
-		List<com.google.appengine.api.datastore.Entity> u = pq.asList(FetchOptions.Builder.withDefaults());
-		List<String> events = new ArrayList<>();
-		List<String> userEvents = g.fromJson(currentUser.getString("events"), List.class);
-			for(int i = 0; i < u.size(); i++){
-				com.google.appengine.api.datastore.Entity e;
-				try {
-					e = data.get(u.get(i).getKey());
-					if(userEvents.contains(e.getProperty("name").toString()))
-						events.add(e.toString());
-				//}
-				} catch (EntityNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}*/
 
 		return Response.ok(g.toJson(events)).build();
 
