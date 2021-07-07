@@ -305,7 +305,8 @@ public Response changeAttributesWeb(@CookieParam("Token") NewCookie cookie, Prof
 			.set("email", email).set("landLine", landLine).set("mobile", mobile).set("address", address)
 			.set("postal", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
 			.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
-			.set("members", g.toJson(user.getString("members"))).set("events", g.toJson(user.getString("events")))
+//			.set("members", g.toJson(user.getString("members")))
+			.set("events", g.toJson(user.getString("events")))
 			.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 	datastore.update(user);
