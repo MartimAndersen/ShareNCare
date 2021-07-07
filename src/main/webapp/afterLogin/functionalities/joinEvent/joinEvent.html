@@ -2,20 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
-    <link rel="stylesheet" href="joinEventStyle.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" type="text/css" href="joinEventStyle.css"/>
 </head>
+
 <body onload="callGetEvents()">
 
 <ul>
-    <img src="../../images/logo" height="5%" width="5%">
-    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
-    <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
+    <li><a class="active" href="../aboutUs/aboutUs.html" style="cursor: pointer">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html" style="cursor: pointer">Go Back</a></li>
+    <img src="../../../afterLogin/images/logo" height="5%" width="5%" alt="Preview">
 </ul>
 
 
+<div id="map" style="border-radius: 20px"></div>
+
+<br>
+<br>
 
 <table id="demo_table">
     <thead>
@@ -38,21 +42,29 @@
 <br>
 <br>
 
-<div>
-<form id="joinEventFormId" action="#" method="post">
-    <h1 style="color: white">Join Event</h1>
-    <p>
-        <label for="eventId" class="floatLabel">Name of Event</label><br>
-        <input id="eventId" name="joinEventInput" type="text" placeholder="Name of Event">
-    </p>
+<div id="divJoinEvent">
+    <form id="joinEventFormId" action="#" method="post">
+        <h1 style="color: white">Join Event</h1>
+        <p>
+            <label for="eventId" class="floatLabel">Name of Event</label><br>
+            <input id="eventId" name="joinEventInput" type="text" placeholder="Name of Event">
+        </p>
 
 
-    <p>
-        <input type="submit" value="Join" id="submitJoinEvent">
-    </p>
-</form>
+        <p>
+            <input type="submit" value="Join" id="submitJoinEvent">
+        </p>
+    </form>
+
 </div>
+
 <script src="joinEvent.js"></script>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback.-->
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCswsWteMRuc4U3LJngGKdSIYbTASbvgCs&callback=initMap&libraries=places&v=weekly"
+        async
+></script>
 
 
 </body>

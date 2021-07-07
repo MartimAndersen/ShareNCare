@@ -217,7 +217,7 @@ public class EventResource {
 			events.add(event);
 		}
 
-		return Response.ok(g.toJson(events)).build();
+		return Response.ok(g.toJson(events)).cookie(cookie).build();
 
 	}
 
@@ -422,7 +422,7 @@ public class EventResource {
 
 		datastore.update(user);
 
-		return Response.ok("Properties changed").build();
+		return Response.ok("Joined successfully.").cookie(cookie).build();
 	}
 
 	@POST
