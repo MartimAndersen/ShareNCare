@@ -622,11 +622,6 @@ public class InsideLoginResource {
  							.set("profilePic", user.getString("profilePic"))
  							.set("tags", user.getString("tags"))
  							.set("events", user.getString("events"))
-
-
-							.set("username", token.getString("username"))
-							.set("password", user.getString("password"))
-
 							.build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();
