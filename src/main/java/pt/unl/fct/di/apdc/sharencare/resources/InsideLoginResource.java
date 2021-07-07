@@ -425,7 +425,11 @@ public class InsideLoginResource {
 				.set("password", user.getString("password")).set("email", email).set("profileType", profileType)
 				.set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("postal", postal).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("state", user.getString("state"))
+				.set("profilePic", user.getString("profilePic"))
+				.set("tags", user.getString("tags"))
+				.set("events", user.getString("events"))
+				.build();
 		datastore.update(user);
 		return Response.ok("Properties changed.").cookie(cookie).build();
 	}
@@ -609,16 +613,20 @@ public class InsideLoginResource {
 				if (data.newPassword.equals(data.confirmation)) {
 					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 							.set("password", DigestUtils.sha512Hex(data.newPassword))
-							.set("confirmation", DigestUtils.sha512Hex(data.newPassword))
 							.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
 							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
 							.set("address", user.getString("address"))
 							.set("secondAddress", user.getString("secondAddress"))
 							.set("postal", user.getString("postal")).set("role", user.getString("role"))
 							.set("state", user.getString("state"))
-// 							.set("profilePic", user.getString("profilePic"))
-// 							.set("tags", user.getString("tags"))
-// 							.set("events", user.getString("events"))
+ 							.set("profilePic", user.getString("profilePic"))
+ 							.set("tags", user.getString("tags"))
+ 							.set("events", user.getString("events"))
+
+
+							.set("username", token.getString("username"))
+							.set("password", user.getString("password"))
+
 							.build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();

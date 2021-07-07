@@ -1,3 +1,6 @@
+function goToPageBefore(){
+    window.location.href = "../../afterLoginPage.html";
+}
 
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
@@ -7,7 +10,6 @@ function callChangeAttributes(data) {
             switch (this.status) {
                 case 200:
                     alert("Properties changed.");
-                    goToPageBefore();
                     break;
                 case 411:
                     alert("Please enter at least one new attribute.");
