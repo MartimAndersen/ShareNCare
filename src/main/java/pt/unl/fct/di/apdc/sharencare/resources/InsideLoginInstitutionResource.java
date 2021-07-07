@@ -313,7 +313,7 @@ public Response changeAttributesWeb(@CookieParam("Token") NewCookie cookie, Prof
 //		return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
 
 	user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-			.set("password", user.getString("password")).set("confirmation", user.getString("password"))
+			.set("password", user.getString("password")).set("nif", user.getString("nif")).set("profilePic", user.getString("profilePic"))
 			.set("email", email).set("landLine", landLine).set("mobile", mobile).set("address", address)
 			.set("postal", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
 			.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
