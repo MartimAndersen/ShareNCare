@@ -140,7 +140,7 @@ public class InsideLoginResource {
 				.set("postal", user.getString("postal"))
 				.set("profilePic", "")
 				.set("tags", g.toJson(data.tags))
-				.set("events", g.toJson(user.getString("events")))
+				.set("events", user.getString("events"))
 				.set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.build();
