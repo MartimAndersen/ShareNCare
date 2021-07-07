@@ -99,9 +99,9 @@ public class InsideLoginInstitutionResource {
 			}
 		}
 		// TODO
-		if (data.profilePic.length == 0) {
+		/*if (data.profilePic.length == 0) {
 			profilePic = null;
-		}
+		}*/
 
 		if (data.landLine.equals(""))
 			landLine = user.getString("landLine");
