@@ -5,26 +5,25 @@ import java.util.List;
 public class EventData {
     public String name, description;
     public String minParticipants, maxParticipants;
-    public String temporary;
-    public String date;
-    public String hour;
+    public String time;
+    public String durability;
+    public String initialDate;
+    public String endingDate;
     public List<Integer> tags;
     public Double lat, lon;
 
-    public EventData(String name, String description,String minParticipants,String maxParticipants, String hour,
-                     Double lat, Double lon, String temporary, String date, List<Integer> tags) {
-
+    public EventData(String name, String description, String minParticipants, String maxParticipants, String time, String durability, String initialDate, String endingDate, List<Integer> tags, Double lat, Double lon) {
         this.name = name;
         this.description = description;
         this.minParticipants = minParticipants;
         this.maxParticipants = maxParticipants;
+        this.time = time;
+        this.durability = durability;
+        this.initialDate = initialDate;
+        this.endingDate = endingDate;
+        this.tags = tags;
         this.lat = lat;
         this.lon = lon;
-        this.date = hour;
-        this.temporary = temporary;
-        this.date = date;
-        this.tags = tags;
-
     }
 
     public String getName() {
@@ -59,20 +58,36 @@ public class EventData {
         this.maxParticipants = maxParticipants;
     }
 
-    public String getTemporary() {
-        return temporary;
+    public String getTime() {
+        return time;
     }
 
-    public void setTemporary(String temporary) {
-        this.temporary = temporary;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    public String getDate() {
-        return date;
+    public String getDurability() {
+        return durability;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDurability(String durability) {
+        this.durability = durability;
+    }
+
+    public String getInitialDate() {
+        return initialDate;
+    }
+
+    public void setInitialDate(String initialDate) {
+        this.initialDate = initialDate;
+    }
+
+    public String getEndingDate() {
+        return endingDate;
+    }
+
+    public void setEndingDate(String endingDate) {
+        this.endingDate = endingDate;
     }
 
     public List<Integer> getTags() {
@@ -97,13 +112,5 @@ public class EventData {
 
     public void setLon(Double lon) {
         this.lon = lon;
-    }
-
-    public String getHour() {
-        return hour;
-    }
-
-    public void setHour(String hour) {
-        this.hour = hour;
     }
 }

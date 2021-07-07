@@ -4,8 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.register.Repository;
-import pt.unl.fct.di.example.sharencare.login.LoginActivity;
+import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

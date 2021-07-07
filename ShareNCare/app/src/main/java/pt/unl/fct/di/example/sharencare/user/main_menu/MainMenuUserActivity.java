@@ -22,7 +22,7 @@ import java.lang.ref.WeakReference;
 
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.databinding.ActivityMainMenuBinding;
-import pt.unl.fct.di.example.sharencare.login.LoginActivity;
+import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
 
 public class MainMenuUserActivity extends AppCompatActivity {
 

@@ -1,66 +1,223 @@
 package pt.unl.fct.di.example.sharencare.institution.main_menu.ui.events;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Geocoder;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
+import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.institution.login.InstitutionInfo;
+import pt.unl.fct.di.example.sharencare.institution.main_menu.ui.new_event.EventData;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EventsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class EventsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private EventsViewModel mViewModel;
+    private SharedPreferences sharedpreferences;
+    private Repository eventsRepository;
+    private Gson gson = new Gson();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ListView listView;
+    private TextView text;
+    private String[] names, dates, hours, locations;
 
-    public EventsFragment() {
-        // Required empty public constructor
-    }
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BlankFragment2.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static EventsFragment newInstance(String param1, String param2) {
-        EventsFragment fragment = new EventsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        return inflater.inflate(R.layout.fragment_events, container, false);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(EventsViewModel.class);
+        // TODO: Use the ViewModel
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        sharedpreferences = getActivity().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
+        eventsRepository = eventsRepository.getInstance();
+
+        listView = getView().findViewById(R.id.fragment_events_list_view);
+        text = getView().findViewById(R.id.fragment_events_text);
+        listView.setEmptyView(text);
+        getUserEvents();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView nameText = view.findViewById(R.id.row_name_label);
+                String name = nameText.getText().toString();
+
+                Intent i = new Intent(getActivity(), EventsInfoActivity.class);
+                i.putExtra("name_event", name);
+                i.putExtra("type", "info");
+                startActivity(i);
+            }
+        });
+
+    }
+
+    class MyAdapter extends ArrayAdapter<String>{
+        Context context;
+        String[] names;
+        String[] dates;
+        String[] hours;
+        String[] locations;
+
+        MyAdapter(Context context, String[] names, String[] dates, String[] hours, String[] locations){
+            super(context, R.layout.row, R.id.row_name_label, names);
+            this.context = context;
+            this.names = names;
+            this.dates = dates;
+            this.hours = hours;
+            this.locations = locations;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View row = layoutInflater.inflate(R.layout.row, parent, false);
+
+            TextView name = row.findViewById(R.id.row_name_label);
+            TextView date = row.findViewById(R.id.row_date_label);
+            TextView hour = row.findViewById(R.id.row_hour_label);
+            TextView location = row.findViewById(R.id.row_location_label);
+
+            name.setText(names[position]);
+            date.setText(dates[position]);
+            hour.setText(hours[position]);
+            location.setText(locations[position]);
+
+            return row;
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_events_institution, container, false);
+    public void getUserEvents(){
+        String institutionInfo = sharedpreferences.getString("USER", null);
+        InstitutionInfo ins = gson.fromJson(institutionInfo, InstitutionInfo.class);
+
+        eventsRepository.getEventsService().getUserEvents(ins.getTokenId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                if(r.isSuccessful()) {
+                    try {
+                        List<EventData> events = new ArrayList<>();
+                        JSONArray array = new JSONArray(r.body().string());
+                        for (int i = 0; i < array.length(); i++) {
+                            List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
+                            List<String> event = new ArrayList<>();
+
+                            for (int j = 0; j < list.size(); j++) {
+                                event.add(list.get(j).get("value").toString());
+                            }
+
+                            EventData e = new EventData(
+                                    event.get(7),
+                                    event.get(1),
+                                    event.get(6),
+                                    event.get(5),
+                                    event.get(3),
+                                    event.get(9),
+                                    event.get(4),
+                                    event.get(2),
+                                    getTags(event.get(8)),
+                                    getLatLon(event.get(0)).first,
+                                    getLatLon(event.get(0)).second
+                            );
+
+                            events.add(e);
+                        }
+
+                        SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                        String json = gson.toJson(events);
+                        prefsEditor.putString("EVENTS", json);
+                        prefsEditor.apply();
+
+                        Geocoder geocoder;
+                        geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+                        names = new String[events.size()];
+                        dates = new String[events.size()];
+                        hours = new String[events.size()];
+                        locations = new String[events.size()];
+
+                        for(int i = 0; i < events.size(); i++){
+                            names[i] = events.get(i).getName();
+                            dates[i] = events.get(i).getInitialDate();
+                            hours[i] = events.get(i).getTime();
+                            try {
+                                locations[i] = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0).getLocality();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        MyAdapter myAdapter = new MyAdapter(getContext(), names, dates, hours, locations);
+                        listView.setAdapter(myAdapter);
+
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    Toast.makeText(getActivity(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    private Pair<Double, Double> getLatLon(String coordinates){
+        String[] c = coordinates.split(" ");
+        Pair<Double, Double> latLon = new Pair<Double, Double>(new Double(c[0]), new Double(c[1]));
+        return latLon;
+    }
+
+    private List<Integer> getTags(String tags){
+        return gson.fromJson(tags, List.class);
+    }
+
 }

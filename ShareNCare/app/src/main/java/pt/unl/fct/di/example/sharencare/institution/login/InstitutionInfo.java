@@ -19,10 +19,9 @@ public class InstitutionInfo {
     public String facebook;
     public String youtube;
     public String fax;
-    public List<String> members;
     public String tokenId;
 
-    public InstitutionInfo(String username, String nif, String email, String mobile, String landLine, String address, String zipCode, List<String> events, byte[] profilePic, String website, String instagram, String twitter, String facebook, String youtube, String fax, List<String> members, String tokenId) {
+    public InstitutionInfo(String username, String nif, String email, String mobile, String landLine, String address, String zipCode, List<String> events, byte[] profilePic, String website, String instagram, String twitter, String facebook, String youtube, String fax, String tokenId) {
         this.username = username;
         this.nif = nif;
         this.email = email;
@@ -39,7 +38,6 @@ public class InstitutionInfo {
         this.facebook = facebook;
         this.youtube = youtube;
         this.fax = fax;
-        this.members = members;
         this.tokenId = tokenId;
     }
 
@@ -171,11 +169,4 @@ public class InstitutionInfo {
         this.fax = fax;
     }
 
-    public List<String> getMembers() {
-        return members;
-    }
-
-    public void setMembers(List<String> members) {
-        this.members = members;
-    }
 }

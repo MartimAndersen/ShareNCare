@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,9 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
         registerRepository = registerRepository.getInstance();
 
         send.setOnClickListener(v -> {
+            String name = username.getText().toString();
             findViewById(R.id.loading_register).setVisibility(View.VISIBLE);
             RegisterUser u = new RegisterUser(
-                    username.getText().toString(),
+                    name,
                     password.getText().toString(),
                     confirmation.getText().toString(),
                     email.getText().toString()
@@ -49,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
                             findViewById(R.id.email_invalid).setVisibility(View.GONE);
                             email.setBackgroundResource(R.drawable.rounded_corner);
                             findViewById(R.id.username_invalid).setVisibility(View.GONE);
-                            email.setBackgroundResource(R.drawable.rounded_corner);
+                            username.setBackgroundResource(R.drawable.rounded_corner);
                             findViewById(R.id.password_invalid).setVisibility(View.GONE);
                             password.setBackgroundResource(R.drawable.rounded_corner);
                             findViewById(R.id.confirmation_invalid).setVisibility(View.GONE);
@@ -58,8 +59,8 @@ public class RegisterActivity extends AppCompatActivity {
                             if(r.isSuccessful()){
                                 Toast.makeText(getApplicationContext(), "User Registered", Toast.LENGTH_SHORT).show();
                                 Intent tagActivity = new Intent(RegisterActivity.this, TagsActivity.class);
-                                tagActivity.putExtra("name_key", username.getText().toString());
-                                startActivity(new Intent(RegisterActivity.this, TagsActivity.class));
+                                tagActivity.putExtra("name_user", name);
+                                startActivity(tagActivity);
                             }
                            else{
                                if(r.code() == 403){

@@ -1,6 +1,7 @@
 package pt.unl.fct.di.example.sharencare.user.main_menu.ui.events;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,6 +16,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -38,7 +40,8 @@ import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,10 +56,8 @@ public class EventsFragment extends Fragment {
     private Gson gson = new Gson();
 
     private ListView listView;
+    private TextView text;
     private String[] names, dates, hours, locations;
-
-
-    private String tokenId = "1c2eb946-0341-4283-8f85-67edea05de85";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,7 +79,22 @@ public class EventsFragment extends Fragment {
         eventsRepository = eventsRepository.getInstance();
 
         listView = getView().findViewById(R.id.fragment_events_list_view);
+        text = getView().findViewById(R.id.fragment_events_text);
+        listView.setEmptyView(text);
         getUserEvents();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView nameText = view.findViewById(R.id.row_name_label);
+                String name = nameText.getText().toString();
+
+                Intent i = new Intent(getActivity(), EventsInfoActivity.class);
+                i.putExtra("name_event", name);
+                i.putExtra("type", "info");
+                startActivity(i);
+            }
+        });
 
     }
 
@@ -120,7 +136,10 @@ public class EventsFragment extends Fragment {
     }
 
     public void getUserEvents(){
-        eventsRepository.getEventsService().getUserEvents(tokenId).enqueue(new Callback<ResponseBody>() {
+        String userInfo = sharedpreferences.getString("USER", null);
+        UserInfo user = gson.fromJson(userInfo, UserInfo.class);
+
+        eventsRepository.getEventsService().getUserEvents(user.getTokenId()).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful()) {
@@ -129,23 +148,24 @@ public class EventsFragment extends Fragment {
                         JSONArray array = new JSONArray(r.body().string());
                         for (int i = 0; i < array.length(); i++) {
                             List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
-                            List<String> event = new ArrayList<>(8);
+                            List<String> event = new ArrayList<>();
 
-                            for (int j = 0; j < 9; j++) {
+                            for (int j = 0; j < list.size(); j++) {
                                 event.add(list.get(j).get("value").toString());
                             }
 
                             EventData e = new EventData(
-                                    event.get(6),
-                                    event.get(2),
-                                    event.get(5),
-                                    event.get(4),
-                                    event.get(3),
-                                    getLatLon(event.get(0)).first,
-                                    getLatLon(event.get(0)).second,
-                                    event.get(8),
+                                    event.get(7),
                                     event.get(1),
-                                    getTags(event.get(7))
+                                    event.get(6),
+                                    event.get(5),
+                                    event.get(3),
+                                    event.get(9),
+                                    event.get(4),
+                                    event.get(2),
+                                    getTags(event.get(8)),
+                                    getLatLon(event.get(0)).first,
+                                    getLatLon(event.get(0)).second
                             );
 
                             events.add(e);
@@ -166,8 +186,8 @@ public class EventsFragment extends Fragment {
 
                         for(int i = 0; i < events.size(); i++){
                             names[i] = events.get(i).getName();
-                            dates[i] = events.get(i).getDate();
-                            hours[i] = events.get(i).getHour();
+                            dates[i] = events.get(i).getInitialDate();
+                            hours[i] = events.get(i).getTime();
                             try {
                                 locations[i] = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0).getLocality();
                             } catch (IOException e) {

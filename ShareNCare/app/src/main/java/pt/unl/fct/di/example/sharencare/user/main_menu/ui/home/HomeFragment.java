@@ -5,6 +5,7 @@ import android.accessibilityservice.FingerprintGestureController;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -49,8 +51,10 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
 import pt.unl.fct.di.example.sharencare.databinding.FragmentHomeBinding;
+import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import pt.unl.fct.di.example.sharencare.user.main_menu.ui.events.EventData;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,19 +69,15 @@ public class HomeFragment extends Fragment{
     private Double lat;
     private Double lon;
     private String title;
+    private SharedPreferences sharedpreferences;
     Gson gson;
 
-    private String tokenId = "1c2eb946-0341-4283-8f85-67edea05de85";
 
     private Repository eventsRepository;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
-
         return view;
     }
 
@@ -85,8 +85,6 @@ public class HomeFragment extends Fragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-       // mViewModel = new ViewModelProvider(this).get(EventsViewModel.class);
-        // TODO: Use the ViewModel
     }
 
     @Override
@@ -102,8 +100,14 @@ public class HomeFragment extends Fragment{
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
+
+        sharedpreferences = getActivity().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
+
+        String userInfo = sharedpreferences.getString("USER", null);
+        UserInfo user = gson.fromJson(userInfo, UserInfo.class);
+
         eventsRepository.getEventsService()
-                .getAllEvents(tokenId)
+                .getAllEvents(user.getTokenId())
                 .enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
@@ -114,21 +118,22 @@ public class HomeFragment extends Fragment{
                             List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
                             List<String> event = new ArrayList<>(8);
 
-                            for (int j = 0; j < 9; j++) {
+                            for (int j = 0; j < 10; j++) {
                                 event.add(list.get(j).get("value").toString());
                             }
 
                             EventData e = new EventData(
-                                    event.get(6),
-                                    event.get(2),
-                                    event.get(5),
-                                    event.get(4),
-                                    event.get(3),
-                                    getLatLon(event.get(0)).first,
-                                    getLatLon(event.get(0)).second,
-                                    event.get(8),
+                                    event.get(7),
                                     event.get(1),
-                                    getTags(event.get(7))
+                                    event.get(6),
+                                    event.get(5),
+                                    event.get(3),
+                                    event.get(9),
+                                    event.get(4),
+                                    event.get(2),
+                                    getTags(event.get(8)),
+                                    getLatLon(event.get(0)).first,
+                                    getLatLon(event.get(0)).second
                             );
 
                             showEvents(e);
@@ -230,6 +235,17 @@ public class HomeFragment extends Fragment{
     private void showEvents(EventData event){
         LatLng loc = new LatLng(event.getLat(), event.getLon());
         map.addMarker(new MarkerOptions().position(loc).title(event.getName()));
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull @NotNull Marker marker) {
+                String markerTitle = marker.getTitle();
+                Intent i = new Intent(getContext(), EventsInfoActivity.class);
+                i.putExtra("name_event", markerTitle);
+                i.putExtra("type", "add");
+                startActivity(i);
+                return false;
+            }
+        });
     }
 
     private Pair<Double, Double> getLatLon(String coordinates){

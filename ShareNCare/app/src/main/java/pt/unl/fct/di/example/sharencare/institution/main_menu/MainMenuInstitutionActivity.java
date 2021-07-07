@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.ref.WeakReference;
 
 import pt.unl.fct.di.example.sharencare.R;
+import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
 import pt.unl.fct.di.example.sharencare.databinding.ActivityMainMenuInstitutionBinding;
-import pt.unl.fct.di.example.sharencare.login.LoginActivity;
 
 public class MainMenuInstitutionActivity extends AppCompatActivity {
 

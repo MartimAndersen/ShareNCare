@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,9 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +28,8 @@ import android.widget.Toast;
 
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,11 +38,11 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
+import pt.unl.fct.di.example.sharencare.common.register.Repository;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import pt.unl.fct.di.example.sharencare.user.main_menu.MainMenuUserActivity;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.register.Repository;
-import pt.unl.fct.di.example.sharencare.login.LoginActivity;
+import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -71,7 +65,7 @@ public class ProfileFragment extends Fragment {
 
     private EditText editedEmail, editedMobile, editedLandline, editedAddress, editedSecondAddress, editedZipCode;
 
-    private CircleImageView profilePic;
+    private CircleImageView profilePic, editedProfilePic;
 
     private ImageButton changeAttributes;
     private boolean changing;
@@ -108,6 +102,7 @@ public class ProfileFragment extends Fragment {
         changing = false;
 
         profilePic = getView().findViewById(R.id.profile_image);
+        editedProfilePic = getView().findViewById(R.id.profile_image_edit);
 
         username = getView().findViewById(R.id.username);
         email = getView().findViewById(R.id.email);
@@ -132,7 +127,7 @@ public class ProfileFragment extends Fragment {
 
         setAttributes();
 
-        profilePic.setOnClickListener(new View.OnClickListener() {
+        editedProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent gallery = new Intent();
@@ -165,6 +160,9 @@ public class ProfileFragment extends Fragment {
 
                 zipCode.setVisibility(View.INVISIBLE);
                 editedZipCode.setVisibility(View.VISIBLE);
+
+                profilePic.setVisibility(View.INVISIBLE);
+                editedProfilePic.setVisibility(View.VISIBLE);
             }
         });
 
@@ -195,7 +193,7 @@ public class ProfileFragment extends Fragment {
                     newSecondAddress,
                     tags.getCheckedChipIds(),
                     image,
-                    new ArrayList<String>(),
+                    null,
                     user.getTokenId()
             );
 
@@ -256,6 +254,10 @@ public class ProfileFragment extends Fragment {
                         editedZipCode.setVisibility(View.INVISIBLE);
                         zipCode.setVisibility(View.VISIBLE);
 
+
+                        editedProfilePic.setVisibility(View.INVISIBLE);
+                        profilePic.setVisibility(View.VISIBLE);
+
                         if(user.getProfileType().equals("private") && publicProfile.isChecked())
                             user.setProfileType("public");
 
@@ -306,6 +308,7 @@ public class ProfileFragment extends Fragment {
             try{
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
+                editedProfilePic.setImageBitmap(bitmap);
                 profilePic.setImageBitmap(bitmap);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
                 image = out.toByteArray();
@@ -340,15 +343,42 @@ public class ProfileFragment extends Fragment {
             editedZipCode.setText(user.getZipCode());
         }
 
-        for(int i = 0; i < user.tags.size(); i++)
+        List<Integer> t = user.getTags();
+
+        for(int i = 1; i <= user.getTags().size(); i++)
             tags.check(i);
         if(user.profileType.equals("public"))
             publicProfile.setChecked(true);
 
+        getProfilePic(user.getTokenId());
+
     }
 
-    private byte[] getProfilePic(String profilePic){
-        return gson.fromJson(profilePic, byte[].class);
+    private void getProfilePic(String tokenId){
+        profileRepository.getProfileService().getProfilePic(tokenId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                if(r.isSuccessful()){
+                    try {
+                        byte[] byteArray = gson.fromJson(r.body().string(), byte[].class);
+                        if(byteArray != null) {
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                            profilePic.setImageBitmap(bitmap);
+                            editedProfilePic.setImageBitmap(bitmap);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else{
+                    Toast.makeText(getContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT);
+            }
+        });
     }
 
 }
