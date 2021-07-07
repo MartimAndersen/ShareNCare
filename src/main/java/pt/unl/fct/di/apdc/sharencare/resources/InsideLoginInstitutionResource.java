@@ -161,13 +161,25 @@ public class InsideLoginInstitutionResource {
 //		if (!validateData(data))
 //			return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
 
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("confirmation", user.getString("password"))
-				.set("email", email).set("landLine", landLine).set("mobile", mobile).set("address", address)
-				.set("postal", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
-				.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
-				.set("members", g.toJson(user.getString("members"))).set("events", g.toJson(user.getString("events")))
-				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+		user = Entity.newBuilder(userKey)
+				.set("username", user.getString("username"))
+				.set("nif", token.getString("username"))
+				.set("password", user.getString("password"))
+				.set("email", email)
+				.set("profilePic", "")
+				.set("landLine", landLine)
+				.set("mobile", mobile)
+				.set("address", address)
+				.set("postal", zipCode)
+				.set("website", website)
+				.set("twitter", twitter)
+				.set("instagram", instagram)
+				.set("youtube", youtube)
+				.set("facebook", facebook)
+				.set("fax", fax)
+				.set("events", user.getString("events"))
+				.set("role", user.getString("role"))
+				.set("state", user.getString("state")).build();
 
 		datastore.update(user);
 
