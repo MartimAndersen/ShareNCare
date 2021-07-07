@@ -1,70 +1,21 @@
-let map;
-
-function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        mapTypeControl: true,
-        center: {lat: 38.659784, lng: -9.202765},
-        zoom: 9
-    });
-}
-
-var locations = [];
-
-function fillLocationsArray(obj) {
-    let locationAux = [];
-    locationAux.push(obj[7].value);
-    locationAux.push(obj[0].value.split(" ")[0]);
-    locationAux.push(obj[0].value.split(" ")[1]);
-    locations.push(locationAux);
-}
-
-var markers = [];
-
-function addMarkers() {
-
-    var infowindow = new google.maps.InfoWindow();
-
-    var marker, i;
-
-    for (i = 0; i < locations.length; i++) {
-        marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-            map: map
-        });
-
-        markers.push(marker);
-
-        google.maps.event.addListener(marker, 'click', (function (marker, i) {
-            return function () {
-                infowindow.setContent(locations[i][0]);
-                infowindow.open(map, marker);
-            }
-        })(marker, i));
-    }
-}
-
 function goToPageBefore(){
     window.location.href = "../../afterLoginPage.html";
 }
 
-// function myFunction(jsonResponse) {
-//     for(var i = 0; i < jsonResponse.length; i++) {
-//         var obj = []
-//         obj= JSON.parse(jsonResponse[i]);
-//
-//         console.log(obj);
-//     }
-// }
+function myFunction(jsonResponse) {
+    for(var i = 0; i < jsonResponse.length; i++) {
+        var obj = []
+        obj= JSON.parse(jsonResponse[i]);
+
+        console.log(obj);
+    }
+}
 
 function populate_table(jsonResponse) {
     let table = document.getElementById('demo_table');
     for(var i = 0; i < jsonResponse.length; i++) {
-        let obj = [];
-
-        obj = JSON.parse(jsonResponse[i]);
-
-        fillLocationsArray(obj);
-
+        var obj = []
+        obj= JSON.parse(jsonResponse[i]);
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
         let text = document.createTextNode((obj[9].value));
@@ -91,7 +42,6 @@ function populate_table(jsonResponse) {
         text = document.createTextNode((obj[7].value));
         cell.appendChild(text);
     }
-    addMarkers();
 }
 
 function callSeeEvents(){

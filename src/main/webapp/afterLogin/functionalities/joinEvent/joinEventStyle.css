@@ -1,17 +1,19 @@
 #map {
     height: 50%;
-    width: 100%;
+    width: 98%;
     color: #000000;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 html, body {
     background-image: url("../../images/nature.jpg");
     background-size: cover; /* Resize the background image to cover the entire container */
     height: 100%;
-    margin: 10px;
+    margin: 0px;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
-    color: white;
+    color: #000000;
 }
 
 ul {
@@ -61,6 +63,8 @@ li a:hover {
 table {
     border-collapse: collapse;
     width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 th, td {
@@ -109,4 +113,6 @@ input[type=submit]:hover {
     border-radius: 5px;
     padding: 20px;
     background-color: rgba(144, 238, 144, 0.80);
+    margin-left: auto;
+    margin-right: auto;
 }
