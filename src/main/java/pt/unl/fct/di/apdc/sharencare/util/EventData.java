@@ -9,23 +9,23 @@ import com.google.cloud.datastore.Value;
 
 public class EventData {
 
-    public String name, description;
-    public String minParticipants, maxParticipants;
-    public String time;
     public String durability;
-    public String initialDate;
     public String endingDate;
-    public List<Integer> tags;
+    public String initialDate;
+    public String institutionName;
     public Double lat, lon;
-
+    public List<String> members;
+    public String minParticipants, maxParticipants;
+    public String name, description;
+    public int points;
+    public List<Integer> tags;
+    public String time;
 
     public EventData() {
 
     }
 
-    public EventData(String name, String description, String minParticipants, String maxParticipants, String time,
-                     Double lat, Double lon, String durability, String initialDate, String endingDate, List<Integer> tags) {
-
+    public EventData(String durability, String endingDate, String initialDate, String institutionName,  Double lat, Double lon, List<String> members, String minParticipants, String maxParticipants, String name, String description, int points, List<Integer> tags, String time){   	
         this.name = name;
         this.description = description;
         this.minParticipants = minParticipants;
@@ -37,13 +37,15 @@ public class EventData {
         this.initialDate = initialDate;
         this.endingDate = endingDate;
         this.tags = tags;
-
+        this.institutionName = institutionName;
+        this.members = members;
+        this.points = points;
     }
 
     public boolean atLeastOneEmptyParameter() {
         return name.equals("") || description.equals("") || minParticipants.equals("")
                 || maxParticipants.equals("") || time.equals("") || durability.equals("") || initialDate.equals("") ||
-                endingDate.equals("") ||lat == null || lon == null || tags.size() == 0;
+                endingDate.equals("") ||lat == null || lon == null || tags.size() == 0 || institutionName.equals("");
     }
     
     public boolean isHourValid() {
@@ -55,16 +57,14 @@ public class EventData {
     	return true;
     }
 
-    public boolean verifyDate() {
-        if (!initialDate.contains("/") && !endingDate.contains("/")) {
-            return false;
-        } else {
-            String[] parts1 = initialDate.split("/");
-            String[] parts2 = endingDate.split("/");
-            return isValidDate(Integer.parseInt(parts1[0]), Integer.parseInt(parts1[1]), Integer.parseInt(parts1[2]))
-            		&& isValidDate(Integer.parseInt(parts2[0]), Integer.parseInt(parts2[1]), Integer.parseInt(parts2[2]));
-        }
-        
+    private boolean isLeap(int year) {
+        // Return true if year
+        // is a multiple pf 4 and
+        // not multiple of 100.
+        // OR year is multiple of 400.
+        return (((year % 4 == 0) &&
+                (year % 100 != 0)) ||
+                (year % 400 == 0));
     }
 
     private boolean isValidDate(int d, int m, int y) {
@@ -94,13 +94,15 @@ public class EventData {
         return true;
     }
 
-    private boolean isLeap(int year) {
-        // Return true if year
-        // is a multiple pf 4 and
-        // not multiple of 100.
-        // OR year is multiple of 400.
-        return (((year % 4 == 0) &&
-                (year % 100 != 0)) ||
-                (year % 400 == 0));
+    public boolean verifyDate() {
+        if (!initialDate.contains("/") && !endingDate.contains("/")) {
+            return false;
+        } else {
+            String[] parts1 = initialDate.split("/");
+            String[] parts2 = endingDate.split("/");
+            return isValidDate(Integer.parseInt(parts1[0]), Integer.parseInt(parts1[1]), Integer.parseInt(parts1[2]))
+            		&& isValidDate(Integer.parseInt(parts2[0]), Integer.parseInt(parts2[1]), Integer.parseInt(parts2[2]));
+        }
+        
     }
 }

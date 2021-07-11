@@ -4,16 +4,14 @@ public class ChangeStateData {
 
 	public String userToChange;
 	public String state;
-	public String tokenId;
 	
 	public ChangeStateData() {
 		
 	}
 	
-	public ChangeStateData(String userToChange, String state, String tokenId) {
+	public ChangeStateData(String userToChange, String state) {
 		this.userToChange = userToChange;
 		this.state = state;
-		this.tokenId = tokenId;
 	}
 	
 	

@@ -2,7 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.util;
 
 public class TrackData {
 
-    public String title, description, origin, destination, distance, difficulty;
+    public String description, destination, difficulty, distance, origin, title;
 
 
 
@@ -10,7 +10,7 @@ public class TrackData {
 
     }
 
-    public TrackData(String title, String description, String origin, String destination, String distance, String difficulty){
+    public TrackData(String description, String destination, String difficulty,  String distance, String origin, String title){
         this.title = title;
         this.description = description;
         this.origin = origin;

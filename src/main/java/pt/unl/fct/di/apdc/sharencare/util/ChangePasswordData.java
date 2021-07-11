@@ -23,6 +23,10 @@ public class ChangePasswordData {
     public boolean validPasswordLength() {
 		return (newPassword.length()>=5);
     }
+    
+    public boolean cantBeSamePassword() {
+    	return oldPassword.equals(newPassword)
+;    }
 
 	public String getOldPassword() {
 		return oldPassword;

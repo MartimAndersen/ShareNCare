@@ -1,48 +1,46 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.google.cloud.datastore.Blob;
+import com.google.cloud.datastore.Entity;
 import com.google.gson.Gson;
 
 public class ProfileData {
 
-	public String[] TAGS =  {"animals", "environment", "children", "elderly", "supplies", "homeless"};//, sports, summer, holidays, turism};
-	
-	public String email;
-	public String mobile;
-	public String landLine;
 	public String address;
-	public String secondAddress;
-	public String zipCode;
-	public String profileType;
-	public String tokenId;
-	public List<Integer> tags;
+	public String bio;
+	public String email;
 	public List<String> events;
+	public String landLine;
+	public String mobile;
 	public byte[] profilePic;
+	public String profileType;
+	public String secondAddress;
+	public List<Integer> tags;
+	public String tokenId;
+	public String zipCode;
 	
-	private Gson gson;
-	
+	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports, summer, holidays, turism};
+	private final Gson g = new Gson();
+
 	public ProfileData() {
-		
+
 	}
-	
-	public ProfileData(String email, String mobile, String landLine, String address, String postal, String profileType, String secondAddress, List<Integer> tags, byte[] profilePic, 
-			List<String> events, String tokenId) {
-		gson = new Gson();
-		
+
+	public ProfileData(String address, String bio, String email, List<String> events, String landLine, String mobile,
+			byte[] profilePic, String profileType, String secondAddress, List<Integer> tags, String tokenId, String zipCode) {
 		this.email = email;
 		this.mobile = mobile;
+		this.profilePic = profilePic;
 		this.address = address;
-		this.zipCode = postal;
+		this.zipCode = zipCode;
 		this.profileType = profileType;
 		this.secondAddress = secondAddress;
 		this.landLine = landLine;
 		this.tags = tags;
-		this.profilePic = profilePic;
 		this.events = events;
 		this.tokenId = tokenId;
+		this.bio = bio;
 	}
 	
 	public boolean validEmail() {
@@ -51,29 +49,32 @@ public class ProfileData {
 		return (email.contains("@") && (splitEmail[emailSize].length() == 2 || splitEmail[emailSize].length() == 3));
 	}
 
-	
-	public boolean validPostalCode() {
-		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
+	public boolean validPhones() {
+		return mobile.length() <= 15 || landLine.length() <= 15;
 	}
-
-
-//	public boolean validPhone() {
-//		String[] splitMobile = mobile.split(" ");
-//		return (mobile.equals("")
-//				|| (splitMobile[0].subSequence(0, 1).equals("+") && (splitMobile[1].substring(0, 2).equals("91")
-//				|| splitMobile[1].substring(0, 2).equals("93") || splitMobile[1].substring(0, 2).equals("96"))
-//				&& splitMobile[1].length() == 9));
-//	}
+	
 	public boolean validPhone() {
 		return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14);
 	}
-	
-	public boolean allEmptyParameters() {
-		return  email.equals("") && profilePic.length == 0 && tags == null &&
-				landLine.equals("") && mobile.equals("") && profileType.equals("")
-				&& address.equals("") && secondAddress.equals("") && zipCode.equals("");
+
+	public boolean validZipCode() {
+		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
 	}
 
+	public boolean validProfileType() {
+		return profileType.equals("Public") || profileType.equals("Private");
+	}
+	
+	public boolean noChange(Entity user) {
+		return user.getString("address").equals(address) &&
+				user.getString("bio").equals(bio) &&
+				user.getString("email").equals(email) &&
+				user.getString("landLine").equals(landLine) &&
+				user.getString("mobile").equals(mobile) &&
+				user.getString("profileType").equals(profileType) &&
+				user.getString("secondAddress").equals(secondAddress) &&
+				user.getString("tags").equals(g.toJson(tags));
+	}
 
 
 }
