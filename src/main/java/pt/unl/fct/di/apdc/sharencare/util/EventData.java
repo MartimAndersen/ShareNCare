@@ -12,14 +12,17 @@ import com.google.cloud.datastore.Value;
 
 public class EventData {
 
+    public String description;
     public String durability;
     public String endingDate;
     public String initialDate;
     public String institutionName;
-    public Double lat, lon;
+    public Double lat;
+    public Double lon;
+    public String maxParticipants;
     public List<String> members;
-    public String minParticipants, maxParticipants;
-    public String name, description;
+    public String minParticipants;
+    public String name;
     public int points;
     public List<Integer> tags;
     public String time;
@@ -28,7 +31,7 @@ public class EventData {
 
     }
 
-    public EventData(String durability, String endingDate, String initialDate, String institutionName,  Double lat, Double lon, List<String> members, String minParticipants, String maxParticipants, String name, String description, int points, List<Integer> tags, String time){   	
+    public EventData(String description, String durability, String endingDate, String initialDate, String institutionName,  Double lat, Double lon, String maxParticipants, List<String> members, String minParticipants, String name, int points, List<Integer> tags, String time){   	
         this.name = name;
         this.description = description;
         this.minParticipants = minParticipants;
@@ -51,11 +54,6 @@ public class EventData {
                 endingDate.equals("") ||lat == null || lon == null || tags.size() == 0 || institutionName.equals("");
     }
     
-    public boolean validParticipants() {
-		return Integer.parseInt(minParticipants) > 0
-				&& Integer.parseInt(maxParticipants) >= Integer.parseInt(minParticipants);
-    }
-    
     public boolean isHourValid() {
     	try {
             LocalTime.parse(time);
@@ -64,7 +62,7 @@ public class EventData {
         }
     	return true;
     }
-
+    
     private boolean isLeap(int year) {
         // Return true if year
         // is a multiple pf 4 and
@@ -100,6 +98,11 @@ public class EventData {
             return (d <= 30);
 
         return true;
+    }
+
+    public boolean validParticipants() {
+		return Integer.parseInt(minParticipants) > 0
+				&& Integer.parseInt(maxParticipants) >= Integer.parseInt(minParticipants);
     }
 
     public boolean verifyDate() {

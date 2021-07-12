@@ -18,7 +18,6 @@ public class ProfileInstitutionData {
 	public String landLine;
 	public String mobile;
 	public byte[] profilePic;
-	public String tokenId;
 	public String twitter;
 	public String website;
 	public String youtube;
@@ -28,7 +27,7 @@ public class ProfileInstitutionData {
 		
 	}
 	
-	public ProfileInstitutionData(String address, String bio, String email, List<String> events, String facebook, String fax, String instagram, String landLine, String mobile, byte[] profilePic, String tokenId, String twitter, String website, String youtube, String zipCode) {
+	public ProfileInstitutionData(String address, String bio, String email, List<String> events, String facebook, String fax, String instagram, String landLine, String mobile, byte[] profilePic, String twitter, String website, String youtube, String zipCode) {
 		this.email = email;
 		this.mobile = mobile;
 		this.profilePic = profilePic;
@@ -42,7 +41,6 @@ public class ProfileInstitutionData {
 		this.facebook = facebook;
 		this.youtube = youtube;
 		this.fax = fax;
-		this.tokenId = tokenId;
 		this.bio = bio;
 	}
 	
