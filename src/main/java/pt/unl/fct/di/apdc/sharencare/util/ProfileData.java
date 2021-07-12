@@ -62,7 +62,7 @@ public class ProfileData {
 	}
 
 	public boolean validProfileType() {
-		return profileType.equals("Public") || profileType.equals("Private");
+		return profileType.equals("public") || profileType.equals("private");
 	}
 	
 	public boolean noChange(Entity user) {
@@ -73,7 +73,8 @@ public class ProfileData {
 				user.getString("mobile").equals(mobile) &&
 				user.getString("profileType").equals(profileType) &&
 				user.getString("secondAddress").equals(secondAddress) &&
-				user.getString("tags").equals(g.toJson(tags));
+				user.getString("tags").equals(g.toJson(tags)) &&
+				user.getString("zipCode").equals(zipCode);
 	}
 
 

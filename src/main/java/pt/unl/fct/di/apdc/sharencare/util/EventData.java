@@ -4,6 +4,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import com.google.cloud.datastore.Value;
 
 
@@ -46,6 +49,11 @@ public class EventData {
         return name.equals("") || description.equals("") || minParticipants.equals("")
                 || maxParticipants.equals("") || time.equals("") || durability.equals("") || initialDate.equals("") ||
                 endingDate.equals("") ||lat == null || lon == null || tags.size() == 0 || institutionName.equals("");
+    }
+    
+    public boolean validParticipants() {
+		return Integer.parseInt(minParticipants) > 0
+				&& Integer.parseInt(maxParticipants) >= Integer.parseInt(minParticipants);
     }
     
     public boolean isHourValid() {

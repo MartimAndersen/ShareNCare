@@ -25,24 +25,29 @@ import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 @Path("/map")
 public class MapResource {
 
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
 
-	// op1 - registers a track
 	@POST
 	@Path("/registerTrack")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerTrack(@CookieParam("Token") NewCookie cookie, TrackData data) {
+		
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
 
-		if (data.title.equals("")) {
-			System.out.println("Please insert a title.");
+		if (data.title.equals("")) 
 			return Response.status(Status.FORBIDDEN).build();
-		} else if (cookie.getName().equals("")) {
-			System.out.println("You need to be logged in to execute this operation.");
+		
+		if (cookie.getName().equals(""))
 			return Response.status(Status.BAD_REQUEST).build();
-		}
+		
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
 
 		Transaction txn = datastore.newTransaction();
 
@@ -68,21 +73,13 @@ public class MapResource {
 				txn.rollback();
 			}
 		}
-
 	}
 
-	// op2 - registers a marker
 	@POST
-	@Path("registerMarker")
+	@Path("/registerMarker")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerMarker(MarkerData data) {
-		LOG.fine("Attempt to register marker: " + data.coordinates);
-
-		/*
-		 * if (!validateData(data)) return
-		 * Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
-		 */
-
+		
 		Transaction txn = datastore.newTransaction();
 
 		try {
@@ -105,18 +102,24 @@ public class MapResource {
 				txn.rollback();
 			}
 		}
-
 	}
 
 	@POST
 	@Path("/comment")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerComment(@CookieParam("Token") NewCookie cookie, CommentData data) {
+		
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
 
-		if (cookie.getName().equals("")) {
-			System.out.println("You need to be logged in to execute this operation.");
+		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-		}
+		
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
 
 		Transaction txn = datastore.newTransaction();
 
@@ -144,6 +147,7 @@ public class MapResource {
 
 			txn.add(track);
 			txn.commit();
+			
 			return Response.ok("Comment from " + data.username + " registered.").cookie(cookie).build();
 
 		} finally {

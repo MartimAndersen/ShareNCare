@@ -23,12 +23,11 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.sharencare.filters.Secured;
 import pt.unl.fct.di.apdc.sharencare.util.ChangePasswordData;
-import pt.unl.fct.di.apdc.sharencare.util.ChangePropertyData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangeRoleData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangeStateData;
 import pt.unl.fct.di.apdc.sharencare.util.ListRolesData;
-import pt.unl.fct.di.apdc.sharencare.util.LogoutUserData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileDataTags;
 import pt.unl.fct.di.apdc.sharencare.util.RemoveUserData;
@@ -48,12 +47,11 @@ public class InsideLoginResource {
 			Storage.BucketGetOption.fields(Storage.BucketField.values()));
 
 	private final Gson g = new Gson();
-	AuthTokenResource t = new AuthTokenResource();
 
 	@POST
 	@Path("/removeUser")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response removeUser(RemoveUserData data) {
+	public Response removeUser(@QueryParam("tokenId") String tokenId, RemoveUserData data) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -62,16 +60,12 @@ public class InsideLoginResource {
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.userToDelete);
 		Entity user = datastore.get(userKey);
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
-
-		if (!t.validToken(tokenKey))
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId
-					+ " has expired. Please login again to continue using the application").build();
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity currentUser = datastore.get(currentUserKey);
@@ -112,18 +106,19 @@ public class InsideLoginResource {
 		}
 
 		user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
-				.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
-				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
-				.set("zipCode", user.getString("zipCode")).set("tags", g.toJson(data.tags))
-				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("email", user.getString("email")).set("bio", user.getString("bio"))
+				.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
+				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
+				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
+				.set("tags", g.toJson(data.tags)).set("events", user.getString("events"))
+				.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 		datastore.update(user);
 
 		return Response.ok("Tags changed").build();
 	}
 
+	@Secured
 	@POST
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -166,6 +161,7 @@ public class InsideLoginResource {
 		String zipCode = data.zipCode;
 		String profileType = data.profileType;
 		String tags = g.toJson(data.tags);
+		String bio = data.bio;
 		byte[] profilePic = data.profilePic;
 
 		if (data.noChange(user) && getProfilePic(user.getString("username")) == profilePic)
@@ -180,11 +176,14 @@ public class InsideLoginResource {
 		if (!data.validZipCode())
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 
+		if (!data.validProfileType())
+			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+
 		bucket.create(user.getString("username"), profilePic);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("email", email).set("profileType", profileType)
-				.set("landLine", landLine).set("mobile", mobile).set("address", address)
+				.set("password", user.getString("password")).set("bio", bio).set("email", email)
+				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
 				.set("events", user.getString("events")).set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
@@ -275,9 +274,6 @@ public class InsideLoginResource {
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		if (data.tokenId.equals(""))
-			return Response.status(Status.UNAUTHORIZED).build();
-
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
@@ -308,6 +304,7 @@ public class InsideLoginResource {
 		String zipCode = data.zipCode;
 		String profileType = data.profileType;
 		String tags = g.toJson(data.tags);
+		String bio = data.bio;
 		byte[] profilePic = data.profilePic;
 
 		if (data.noChange(user) && getProfilePic(user.getString("username")) == profilePic)
@@ -322,11 +319,14 @@ public class InsideLoginResource {
 		if (!data.validZipCode())
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 
+		if (!data.validProfileType())
+			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+
 		bucket.create(user.getString("username"), profilePic);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("email", email).set("profileType", profileType)
-				.set("landLine", landLine).set("mobile", mobile).set("address", address)
+				.set("password", user.getString("password")).set("email", email).set("bio", bio)
+				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
 				.set("events", user.getString("events")).set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
@@ -339,7 +339,7 @@ public class InsideLoginResource {
 	@Path("/changeRole")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeRole(@CookieParam("Token") NewCookie cookie, ChangeRoleData data) {
-		
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
@@ -379,7 +379,7 @@ public class InsideLoginResource {
 		userToBeChanged = Entity.newBuilder(userToChangeKey).set("username", data.userToBeChanged)
 				.set("password", userToBeChanged.getString("password"))
 				.set("confirmation", userToBeChanged.getString("password"))
-				.set("email", userToBeChanged.getString("email"))
+				.set("email", userToBeChanged.getString("email")).set("bio", userToBeChanged.getString("bio"))
 				.set("profileType", userToBeChanged.getString("profileType"))
 				.set("landLine", userToBeChanged.getString("landLine"))
 				.set("mobile", userToBeChanged.getString("mobile")).set("address", userToBeChanged.getString("address"))
@@ -408,8 +408,7 @@ public class InsideLoginResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id doesn't exist")
-					.build();
+			return Response.status(Status.BAD_REQUEST).entity("Token with id doesn't exist").build();
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity currentUser = datastore.get(currentUserKey);
@@ -424,7 +423,7 @@ public class InsideLoginResource {
 		if (!(data.state.equals("ENABLED") || data.state.equals("DISABLED")))
 			return Response.status(Status.FORBIDDEN)
 					.entity("The option " + data.state + " for STATE of user does not exist").build();
-		
+
 		/*
 		 * END OF VERIFICATIONS
 		 */
@@ -433,11 +432,10 @@ public class InsideLoginResource {
 			return Response.status(Status.FORBIDDEN)
 					.entity("You do not have permissions to change " + data.userToChange + " state").build();
 
-
 		userToChange = Entity.newBuilder(userToChangeKey).set("username", data.userToChange)
 				.set("password", userToChange.getString("password"))
 				.set("confirmation", userToChange.getString("password")).set("email", userToChange.getString("email"))
-				.set("profileType", userToChange.getString("profileType"))
+				.set("bio", userToChange.getString("bio")).set("profileType", userToChange.getString("profileType"))
 				.set("landLine", userToChange.getString("landLine")).set("mobile", userToChange.getString("mobile"))
 				.set("address", userToChange.getString("address"))
 				.set("secondAddress", userToChange.getString("secondAddress"))
@@ -455,15 +453,15 @@ public class InsideLoginResource {
 	public Response logout(@CookieParam("Token") NewCookie cookie) {
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
-		
+
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token doesn't exist").build();
-		
+
 		String user = token.getString("username");
 		datastore.delete(tokenKey);
 		Cookie cookiee = new Cookie("Token", null, "/", null);
 		NewCookie cookieAux = new NewCookie(cookiee, null, -1, null, true, true);
-		
+
 		return Response.ok(user + " is now logged out.").cookie(cookieAux).build();
 	}
 
@@ -471,7 +469,7 @@ public class InsideLoginResource {
 	@Path("/changePassword")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changePassword(@CookieParam("Token") NewCookie cookie, ChangePasswordData data) {
-		
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
@@ -481,32 +479,33 @@ public class InsideLoginResource {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
-		
+
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
-		
+
 		if (user == null)
 			return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();
 
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-		
+
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		
+
 		String hashedPWD = user.getString("password");
 		if (hashedPWD.equals(DigestUtils.sha512Hex(data.oldPassword))) {
 			if (data.validPasswordLength()) {
 				if (data.newPassword.equals(data.confirmation)) {
 					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 							.set("password", DigestUtils.sha512Hex(data.newPassword))
-							.set("email", user.getString("email")).set("profileType", user.getString("profileType"))
+							.set("email", user.getString("email")).set("bio", user.getString("bio"))
+							.set("profileType", user.getString("profileType"))
 							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
 							.set("address", user.getString("address"))
 							.set("secondAddress", user.getString("secondAddress"))
@@ -515,47 +514,47 @@ public class InsideLoginResource {
 							.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();
-					
-				} 
+
+				}
 				return Response.status(Status.EXPECTATION_FAILED).entity("Passwords don't match.").build();
-			} 
+			}
 			return Response.status(Response.Status.LENGTH_REQUIRED).build();
-		} 
+		}
 		return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
 	}
 
 	@POST
 	@Path("/listRole")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response listUsersWithRole(ListRolesData data) {
-		
+	public Response listUsersWithRole(@QueryParam("tokenId") String tokenId, ListRolesData data) {
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
 		Entity token = datastore.get(tokenKey);
-		
+
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
-		
+
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
-		
+
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST).entity("User doesn't exist").build();
-		
+
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.BAD_REQUEST)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-		
+
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		
+
 		String userRole = token.getString("role");
-		
+
 		if (userRole.equals("GBO") || userRole.equals("GA")) {
 			Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
 					.setFilter(PropertyFilter.eq("role", data.role)).build();
@@ -564,8 +563,8 @@ public class InsideLoginResource {
 			while (results.hasNext())
 				r.add(results.next().getKey().getName());
 			return Response.ok(g.toJson(r)).build();
-		} 
-		
+		}
+
 		return Response.status(Status.FORBIDDEN).entity("You do not have permissions").build();
 	}
 

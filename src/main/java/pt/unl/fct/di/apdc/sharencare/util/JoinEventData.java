@@ -1,13 +1,13 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-public class JoinEvent {
+public class JoinEventData {
 
 	public String eventId;
 	
-	public JoinEvent() { 
+	public JoinEventData() { 
 	}
 	
-	public JoinEvent( String eventId) {
+	public JoinEventData( String eventId) {
 
 		this.eventId = eventId;
 	}

@@ -17,14 +17,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterInstitutionData;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterData;
 
-//import pt.unl.fct.di.apdc.APDC56253.util.LoginData;
-//import pt.unl.fct.di.apdc.APDC56253.util.RegisterData;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Gson gson = new Gson();
 
@@ -41,14 +38,13 @@ public class RegisterResource {
                     .set("mobile", "")
                     .set("address", "")
                     .set("secondAddress", "")
-                    .set("postal", "")
-                    .set("tags", "")
+                    .set("zipCode", "")
                     .set("events", "")
-                    .set("role", "SU")
-                    .set("state", "ENABLED")
-                    .set("profilePic", "")
+                    .set("bio", "")
                     .set("tags", gson.toJson(new ArrayList<Integer>()))
                     .set("events", gson.toJson(new ArrayList<String>()))
+                    .set("role", "SU")
+                    .set("state", "ENABLED")
                     .build();
             datastore.add(user);
         } else {}
@@ -61,29 +57,17 @@ public class RegisterResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerUser(RegisterData data) {
 
-        LOG.fine("Attempt to register user: " + data.username);
-
-        if(data.emptyParameters()){
-            System.out.println("Please fill in all non-optional fields.");
+        if(data.emptyParameters())
             return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-        if(!data.validEmail()){
-            System.out.println("Invalid email.");
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-        if(!data.validPasswordLenght()){
-            System.out.println("Invalid password. Please enter 5 or more characters.");
-            return Response.status(Response.Status.LENGTH_REQUIRED).build();
-        }
-        if(!data.validPasswordConfirmation()){
-            System.out.println("The passwords are not the same.");
-            return Response.status(Response.Status.EXPECTATION_FAILED).build();
-        }
 
-//        if (!data.validData()){
-//            System.out.println("data inserida invalida " + data.username);
-//            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
-//        }
+        if(!data.validEmail())
+            return Response.status(Response.Status.FORBIDDEN).build();
+
+        if(!data.validPasswordLenght())
+            return Response.status(Response.Status.LENGTH_REQUIRED).build();
+
+        if(!data.validPasswordConfirmation())
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
 
         Transaction txn = datastore.newTransaction();
         
@@ -104,12 +88,12 @@ public class RegisterResource {
         				.set("mobile", "")
         				.set("address", "")
         				.set("secondAddress", "")
-        				.set("postal", "")
-                        .set("role", "USER")
-                        .set("state", "ENABLED")
-        				.set("profilePic", "")
+        				.set("zipCode", "")
+        				.set("bio", "")
         		        .set("tags", gson.toJson(new ArrayList<Integer>()))
                         .set("events", gson.toJson(new ArrayList<String>()))
+                        .set("role", "USER")
+                        .set("state", "ENABLED")
                         .build();
 
                 txn.add(user);
@@ -121,7 +105,6 @@ public class RegisterResource {
                 txn.rollback();
             }
         }
-
     }
     
     @POST
@@ -129,31 +112,20 @@ public class RegisterResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerInstitution(RegisterInstitutionData data) {
 
-        if(data.emptyParameters()){
-            System.out.println("Please fill in all non-optional fields.");
+        if(data.emptyParameters())
             return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-        if(!data.validNif()) {
-        	System.out.println("Invalid Nif.");
-        	return Response.status(Response.Status.NOT_ACCEPTABLE).build();
-        }
-        if(!data.validEmail()){
-            System.out.println("Invalid email.");
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-        if(!data.validPasswordLenght()){
-            System.out.println("Invalid password. Please enter 5 or more characters.");
-            return Response.status(Response.Status.LENGTH_REQUIRED).build();
-        }
-        if(!data.validPasswordConfirmation()){
-            System.out.println("The passwords are not the same.");
-            return Response.status(Response.Status.EXPECTATION_FAILED).build();
-        }
 
-//        if (!data.validData()){
-//            System.out.println("data inserida invalida " + data.username);
-//            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
-//        }
+        if(!data.validNif())
+        	return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+
+        if(!data.validEmail())
+            return Response.status(Response.Status.FORBIDDEN).build();
+
+        if(!data.validPasswordLenght())
+            return Response.status(Response.Status.LENGTH_REQUIRED).build();
+
+        if(!data.validPasswordConfirmation())
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
 
         Transaction txn = datastore.newTransaction();
 
@@ -173,17 +145,17 @@ public class RegisterResource {
         				.set("landLine", "")
         				.set("mobile", "")
         				.set("address", "")
-        				.set("postal", "")
-        				.set("profilePic", "")
-                        .set("role", "INSTITUTION")
-                        .set("state", "ENABLED")
+        				.set("zipCode", "")
         				.set("website", "")
         				.set("twitter", "")
         				.set("instagram", "")
         				.set("youtube", "")
         				.set("facebook", "")
         				.set("fax", "")
+        				.set("bio", "")
         				.set("events", gson.toJson(new ArrayList<String>()))
+        		        .set("role", "INSTITUTION")
+                        .set("state", "ENABLED")
                         .build();
 
                 txn.add(user);
@@ -195,9 +167,6 @@ public class RegisterResource {
                 txn.rollback();
             }
         }
-
     }
     
-    
-
 }

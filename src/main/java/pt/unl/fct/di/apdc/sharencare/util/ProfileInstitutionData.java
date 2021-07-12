@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.sharencare.util;
 import java.net.URL;
 import java.util.List;
 
+import com.google.cloud.datastore.Entity;
 import com.google.gson.Gson;
 
 public class ProfileInstitutionData {
@@ -45,14 +46,6 @@ public class ProfileInstitutionData {
 		this.bio = bio;
 	}
 	
-	
-	public boolean allEmptyParameters() {
-		return  email.equals("") && mobile.equals("") && address.equals("") && profilePic.length == 0
-				&& zipCode.equals("") && landLine.equals("") && website.equals("") && instagram.equals("")
-				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("") && bio.equals("");
-	}
-
-	
 	public boolean validEmail() {
 		String[] splitEmail = email.split("\\.");
 		int emailSize = splitEmail.length - 1;
@@ -85,5 +78,21 @@ public class ProfileInstitutionData {
             return false;
         }
     }
+	
+
+	public boolean noChange(Entity institution) {
+		return institution.getString("address").equals(address) &&
+				institution.getString("bio").equals(bio) &&
+				institution.getString("email").equals(email) &&
+				institution.getString("facebook").equals(facebook) &&
+				institution.getString("fax").equals(fax) &&
+				institution.getString("instagram").equals(instagram) &&
+				institution.getString("landLine").equals(landLine) &&
+				institution.getString("mobile").equals(mobile) &&
+				institution.getString("twitter").equals(twitter) &&
+				institution.getString("website").equals(website) &&
+				institution.getString("youtube").equals(youtube) &&
+				institution.getString("zipCode").equals(zipCode);
+	}
 
 }
