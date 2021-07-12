@@ -121,149 +121,6 @@ public class InsideLoginResource {
 	@POST
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response changeProperty(@QueryParam("tokenId") String tokenId, ProfileData data) {
-
-		/*
-		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
-		 */
-
-		if (tokenId.equals(""))
-			return Response.status(Status.UNAUTHORIZED).build();
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist")
-					.build();
-
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity user = datastore.get(userKey);
-
-		if (user == null)
-			return Response.status(Status.FORBIDDEN)
-					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
-
-		if (user.getString("state").equals("DISABLED"))
-			return Response.status(Status.NOT_ACCEPTABLE)
-					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-
-		/*
-		 * END OF VERIFICATIONS
-		 */
-
-		String email = data.email;
-		String mobile = data.mobile;
-		String landLine = data.landLine;
-		String address = data.address;
-		String secondAddress = data.secondAddress;
-		String zipCode = data.zipCode;
-		String profileType = data.profileType;
-		String tags = g.toJson(data.tags);
-		String bio = data.bio;
-		byte[] profilePic = data.profilePic;
-
-		if (data.noChange(user) && getProfilePic(user.getString("username")) == profilePic)
-			return Response.status(Status.LENGTH_REQUIRED).build();
-
-		if (!data.validEmail())
-			return Response.status(Status.PRECONDITION_FAILED).build();
-
-		if (!data.validPhones())
-			return Response.status(Status.EXPECTATION_FAILED).build();
-
-		if (!data.validZipCode())
-			return Response.status(Status.METHOD_NOT_ALLOWED).build();
-
-		if (!data.validProfileType())
-			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
-
-		bucket.create(user.getString("username"), profilePic);
-
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("bio", bio).set("email", email)
-				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
-				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
-				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
-
-		datastore.update(user);
-
-		return Response.ok("Properties changed").build();
-	}
-
-	@GET
-	@Path("/getPic")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPic(@QueryParam("tokenId") String tokenId) {
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null) {
-			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
-
-		}
-
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity user = datastore.get(userKey);
-
-		if (user == null) {
-			System.out.println("The user with the given token does not exist.");
-			return Response.status(Status.FORBIDDEN)
-					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
-		}
-		byte[] pic = null;
-		Page<Blob> blobs = bucket.list();
-		for (Blob blob : blobs.getValues()) {
-			if (token.getString("username").equals(blob.getName())) {
-				pic = blob.getContent();
-			}
-		}
-
-		return Response.ok(g.toJson(pic)).build();
-	}
-
-	@GET
-	@Path("/getUser")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@QueryParam("username") String username, @QueryParam("tokenId") String tokenId) {
-
-		/*
-		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
-		 */
-
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-		Entity user = datastore.get(userKey);
-
-		if (user == null)
-			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
-					.build();
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist").build();
-
-		/*
-		 * END OF VERIFICATIONS
-		 */
-
-		byte[] pic = null;
-		Page<Blob> blobs = bucket.list();
-		for (Blob blob : blobs.getValues()) {
-			if (token.getString("username").equals(blob.getName())) {
-				pic = blob.getContent();
-			}
-		}
-
-		return Response.ok(g.toJson(user.getProperties().values()) + g.toJson(pic)).build();
-	}
-
-	@POST
-	@Path("/changeAttributesWeb")
-	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeProperty(@CookieParam("Token") NewCookie cookie, ProfileData data) {
 
 		/*
@@ -324,16 +181,94 @@ public class InsideLoginResource {
 		bucket.create(user.getString("username"), profilePic);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("email", email).set("bio", bio)
+				.set("password", user.getString("password")).set("bio", bio).set("email", email)
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
 				.set("events", user.getString("events")).set("role", user.getString("role"))
 				.set("state", user.getString("state")).build();
 
 		datastore.update(user);
-		return Response.ok("Properties changed.").cookie(cookie).build();
+
+		return Response.ok("Properties changed").cookie(cookie).build();
 	}
 
+	@GET
+	@Path("/getPic")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPic(@CookieParam("Token") NewCookie cookie) {
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		byte[] pic = null;
+		Page<Blob> blobs = bucket.list();
+		for (Blob blob : blobs.getValues()) {
+			if (token.getString("username").equals(blob.getName())) {
+				pic = blob.getContent();
+			}
+		}
+
+		return Response.ok(g.toJson(pic)).cookie(cookie).build();
+	}
+
+	@GET
+	@Path("/getUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUser(@CookieParam("Token") NewCookie cookie, @QueryParam("username") String username) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		byte[] pic = null;
+		Page<Blob> blobs = bucket.list();
+		for (Blob blob : blobs.getValues()) {
+			if (token.getString("username").equals(blob.getName())) {
+				pic = blob.getContent();
+			}
+		}
+
+		return Response.ok(g.toJson(user.getProperties().values()) + g.toJson(pic)).cookie(cookie).build();
+	}
+
+	
 	@POST
 	@Path("/changeRole")
 	@Consumes(MediaType.APPLICATION_JSON)
