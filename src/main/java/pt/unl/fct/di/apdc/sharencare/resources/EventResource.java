@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -30,6 +32,8 @@ import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.JoinEventData;
+import pt.unl.fct.di.apdc.sharencare.util.RatingData;
+import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 
 @Path("/event")
@@ -195,6 +199,7 @@ public class EventResource {
 			events = g.fromJson(e, List.class);
 
 		events.add(data.eventId);
+		List<Integer> l = new ArrayList<Integer>();
 
 		user = Entity.newBuilder(userKey).set("nif", token.getString("username"))
 				.set("username", user.getString("username")).set("password", user.getString("password"))
@@ -205,12 +210,66 @@ public class EventResource {
 				.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
 				.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
 				.set("fax", user.getString("fax")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("state", user.getString("state")).set("rating", g.toJson(l)).build();
 
 		datastore.update(user);
 
 		return Response.ok("Properties changed").cookie(cookie).build();
 	}
+	
+	@POST
+	@Path("/rating")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response registerRating(@CookieParam("Token") NewCookie cookie, RatingData data) {
+		
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+
+		Transaction txn = datastore.newTransaction();
+
+		try {
+			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.eventName);
+			Entity track = txn.get(mapKey);
+			
+			String commentList = track.getString("rating");
+			
+			Type rating = new TypeToken<ArrayList<RatingData>>(){}.getType();
+			List<RatingData> ratings = new Gson().fromJson(commentList, rating);
+			
+
+			List<RatingData> newRatings = new ArrayList<RatingData>();
+
+			for (int i = 0; i < ratings.size(); i++)
+				newRatings.add(ratings.get(i));
+
+			newRatings.add(data);
+
+			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("description", track.getString("description")).set("origin", track.getString("origin"))
+					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("distance", track.getString("distance")).set("comments", g.toJson(newRatings)).build();
+
+			txn.add(track);
+			txn.commit();
+			
+			return Response.ok("Comment from " + data.username + " registered.").cookie(cookie).build();
+
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
+	}
+
 	
 	@GET
 	@Path("/getAllEvents")

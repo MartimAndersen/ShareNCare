@@ -18,7 +18,7 @@ import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.sharencare.util.CommentData;
+import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 
@@ -59,7 +59,7 @@ public class MapResource {
 				return Response.status(Status.CONFLICT).entity("The track with the given title already exists.")
 						.build();
 			} else {
-				List<CommentData> l = new ArrayList<CommentData>();
+				List<ReviewData> l = new ArrayList<ReviewData>();
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("origin", data.origin).set("destination", data.destination)
 						.set("difficulty", data.difficulty).set("distance", data.distance).set("comments", g.toJson(l)).build();
@@ -107,7 +107,7 @@ public class MapResource {
 	@POST
 	@Path("/comment")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response registerComment(@CookieParam("Token") NewCookie cookie, CommentData data) {
+	public Response registerComment(@CookieParam("Token") NewCookie cookie, ReviewData data) {
 		
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -129,11 +129,11 @@ public class MapResource {
 			
 			String commentList = track.getString("comment");
 			
-			Type comment = new TypeToken<ArrayList<CommentData>>(){}.getType();
-			List<CommentData> comments = new Gson().fromJson(commentList, comment);
+			Type comment = new TypeToken<ArrayList<ReviewData>>(){}.getType();
+			List<ReviewData> comments = new Gson().fromJson(commentList, comment);
 			
 
-			List<CommentData> newComments = new ArrayList<CommentData>();
+			List<ReviewData> newComments = new ArrayList<ReviewData>();
 
 			for (int i = 0; i < comments.size(); i++)
 				newComments.add(comments.get(i));

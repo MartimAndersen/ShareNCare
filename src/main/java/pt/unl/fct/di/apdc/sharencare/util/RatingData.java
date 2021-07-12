@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-public class CommentData {
+public class RatingData {
 	
 	/*
 	 * nome de quem comentou
@@ -11,18 +11,16 @@ public class CommentData {
 	 */
 	
 	public String username;
-	public String routeName;
-	public String comment;
+	public String eventName;
 	public String rating;
 	
-	public CommentData() {
+	public RatingData() {
 		
 	}
 	
-	public CommentData(String username, String routeName, String comment, String rating) {
+	public RatingData(String username, String routeName, String rating) {
 		this.username = username;
-		this.routeName = routeName;
-		this.comment = comment;
+		this.eventName = routeName;
 		this.rating = rating;
 	}
 	
