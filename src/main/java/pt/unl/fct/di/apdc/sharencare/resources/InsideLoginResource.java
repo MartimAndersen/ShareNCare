@@ -118,24 +118,23 @@ public class InsideLoginResource {
 		return Response.ok("Tags changed").build();
 	}
 
-	@Secured
 	@POST
 	@Path("/changeAttributes")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response changeProperty(ProfileData data) {
+	public Response changeProperty(@QueryParam("tokenId") String tokenId, ProfileData data) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
 
-		if (data.tokenId.equals(""))
+		if (tokenId.equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + tokenId + " doesn't exist")
 					.build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
@@ -278,7 +277,7 @@ public class InsideLoginResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + data.tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));

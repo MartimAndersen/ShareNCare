@@ -17,7 +17,6 @@ public class ProfileData {
 	public String profileType;
 	public String secondAddress;
 	public List<Integer> tags;
-	public String tokenId;
 	public String zipCode;
 	
 	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports, summer, holidays, turism};
@@ -28,7 +27,7 @@ public class ProfileData {
 	}
 
 	public ProfileData(String address, String bio, String email, List<String> events, String landLine, String mobile,
-			byte[] profilePic, String profileType, String secondAddress, List<Integer> tags, String tokenId, String zipCode) {
+			byte[] profilePic, String profileType, String secondAddress, List<Integer> tags, String zipCode) {
 		this.email = email;
 		this.mobile = mobile;
 		this.profilePic = profilePic;
@@ -39,7 +38,6 @@ public class ProfileData {
 		this.landLine = landLine;
 		this.tags = tags;
 		this.events = events;
-		this.tokenId = tokenId;
 		this.bio = bio;
 	}
 	
