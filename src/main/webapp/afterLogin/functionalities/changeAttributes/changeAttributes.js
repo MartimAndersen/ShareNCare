@@ -62,7 +62,8 @@ function handleChangeAttributes() {
         newMobile: inputs[4].value,
         newAddress: inputs[5].value,
         newSecondAddress: inputs[6].value,
-        newPostal: inputs[7].value
+        newPostal: inputs[7].value,
+        newBio: inputs[8].value
     }
     callChangeAttributes(JSON.stringify(data));
 }

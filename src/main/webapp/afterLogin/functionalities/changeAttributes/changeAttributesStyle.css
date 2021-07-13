@@ -74,7 +74,20 @@ div {
   background-color: rgba(144, 238, 144, 0.80);
 }
 
-
+#description{
+  /*height:170px;*/
+  /*width:750px;*/
+  /*border-radius: 5px;*/
+  /*padding: 20px;*/
+  width: 100%;
+  /*background-color: white;*/
+  /*color: white;*/
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
 
 

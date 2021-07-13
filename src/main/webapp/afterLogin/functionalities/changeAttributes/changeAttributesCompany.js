@@ -41,8 +41,8 @@ function handleChangeAttributes() {
         youtube: inputs[10].value,
         profilePic: [],
         // members: [],
-        tokenId: "",
-        events: []
+        events: [],
+        bio: inputs[11].value,
 
     }
     callChangeAttributes(JSON.stringify(data));

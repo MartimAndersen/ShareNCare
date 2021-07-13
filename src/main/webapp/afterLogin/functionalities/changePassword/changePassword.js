@@ -27,7 +27,7 @@ function callChangePassword(data) {
     if(isUserPage === "true") {
         xhttp.open("POST", "/rest/loggedIn/changePassword", true);
     } else{
-        xhttp.open("POST", "/rest/loggedIn/changePasswordCompany", true);
+        xhttp.open("POST", "/rest/loggedInInstitution/changePasswordCompany", true);
     }
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);

@@ -93,4 +93,11 @@ public class ProfileInstitutionData {
 				institution.getString("zipCode").equals(zipCode);
 	}
 
+	public boolean allEmptyParameters() {
+		return  email.equals("") && mobile.equals("") && address.equals("") && profilePic.length == 0
+				&& zipCode.equals("") && landLine.equals("") && website.equals("") && instagram.equals("")
+				&& twitter.equals("") && facebook.equals("") && youtube.equals("") && fax.equals("") && bio.equals("");
+	}
+
+
 }
