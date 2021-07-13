@@ -8,9 +8,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.google.cloud.datastore.Value;
+import com.google.gson.Gson;
 
 
 public class EventData {
+	
+	private Gson g = new Gson();
 
     public String description;
     public String durability;
@@ -23,7 +26,7 @@ public class EventData {
     public List<String> members;
     public String minParticipants;
     public String name;
-    public int points;
+    public String points;
     public List<Integer> tags;
     public String time;
 
@@ -31,7 +34,7 @@ public class EventData {
 
     }
 
-    public EventData(String description, String durability, String endingDate, String initialDate, String institutionName,  Double lat, Double lon, String maxParticipants, List<String> members, String minParticipants, String name, int points, List<Integer> tags, String time){   	
+    public EventData(String description, String durability, String endingDate, String initialDate, String institutionName,  Double lat, Double lon, String maxParticipants, List<String> members, String minParticipants, String name, List<Integer> tags, String time){   	
         this.name = name;
         this.description = description;
         this.minParticipants = minParticipants;
@@ -45,7 +48,16 @@ public class EventData {
         this.tags = tags;
         this.institutionName = institutionName;
         this.members = members;
-        this.points = points;
+        this.points = calculatePoints();
+    }
+    
+    public String calculatePoints() {
+    	int p = 0;
+    	return g.toJson(p);
+    }
+    
+    public String getPoints() {
+    	return points;
     }
 
     public boolean atLeastOneEmptyParameter() {

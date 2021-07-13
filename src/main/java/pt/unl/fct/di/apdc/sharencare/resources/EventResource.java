@@ -82,6 +82,8 @@ public class EventResource {
 				return Response.status(Status.CONFLICT).entity("The event with the given title already exists.")
 						.build();
 			} else {
+				
+				String points = g.toJson(0);
 				String coordinates = data.lat + " " + data.lon;
 				List<Integer> l = new ArrayList<Integer>();
 				event = Entity.newBuilder(eventKey).set("name", data.name).set("description", data.description)
@@ -89,7 +91,7 @@ public class EventResource {
 						.set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
 						.set("institutionName", data.institutionName).set("initial_date", data.initialDate)
 						.set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
-						.set("points", 0).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).build();
+						.set("points", points).set("tags", g.toJson(data.tags)).build();
 
 				txn.add(event);
 				txn.commit();
