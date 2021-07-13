@@ -112,7 +112,7 @@ function callCreateEvent(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/event/addEventWeb", true);
+    xhttp.open("POST", "/rest/event/registerEvent", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
@@ -158,8 +158,10 @@ function handleCreateEvent() {
         endingDate: inputs[5].value,
         time: inputs[6].value,
         durability: radioButtonResult,
-        tags: fillTagsList(inputs)
-
+        tags: fillTagsList(inputs),
+        members: [],
+        institutionName: localStorage.getItem("currUser"),
+        points: 0
     }
     callCreateEvent(JSON.stringify(data));
 }
