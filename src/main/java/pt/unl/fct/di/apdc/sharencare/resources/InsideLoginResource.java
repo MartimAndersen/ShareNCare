@@ -538,7 +538,7 @@ public class InsideLoginResource {
 							.set("address", user.getString("address"))
 							.set("secondAddress", user.getString("secondAddress"))
 							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
-							.set("state", user.getString("state"))/**.set("profilePic", user.getString("profilePic"))*/
+							.set("state", user.getString("state"))
 							.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();

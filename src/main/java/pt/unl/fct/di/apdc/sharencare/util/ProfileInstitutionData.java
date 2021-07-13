@@ -51,7 +51,7 @@ public class ProfileInstitutionData {
 	}
 
 	public boolean validFax() {
-		return fax.matches("\"^\\+[0-9]{1,3}\\([0-9]{3}\\)[0-9]{7}$\"");
+		return fax.equals("") || fax.matches("\"^\\+[0-9]{1,3}\\([0-9]{3}\\)[0-9]{7}$\"");
 	}
 	
 	public boolean validPhone() {
@@ -64,6 +64,8 @@ public class ProfileInstitutionData {
 	
 	public boolean validWebsite()
     {
+		if(website.equals(""))
+			return true;
         /* Try creating a valid URL */
         try {
             new URL(website).toURI();
