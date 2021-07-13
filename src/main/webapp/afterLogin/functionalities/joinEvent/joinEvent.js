@@ -20,7 +20,7 @@ var locations = [];
 
 function fillLocationsArray(obj) {
     let locationAux = [];
-    locationAux.push(obj[7].value);
+    locationAux.push(obj[9].value);
     locationAux.push(obj[0].value.split(" ")[0]);
     locationAux.push(obj[0].value.split(" ")[1]);
     locations.push(locationAux);
@@ -64,44 +64,65 @@ function goToPageBefore() {
 //     }
 // }
 
-function populate_table(jsonResponse) {
+function fillTable(obj) {
+
     let table = document.getElementById('demo_table');
+
+    let row = table.insertRow(-1);
+    let cell = row.insertCell(0);
+    let text = document.createTextNode((obj[2].value)); // frequency
+    cell.appendChild(text);
+    cell = row.insertCell(0);
+    text = document.createTextNode((obj[6].value)); // maxParticipants
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[8].value)); // minParticipants
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[3].value)); // endDate
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[13].value)); // hour
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[4].value)); // initDate
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[1].value)); // description
+    cell.appendChild(text);
+    cell = row.insertCell(0)
+    text = document.createTextNode((obj[9].value)) // eventName
+    cell.appendChild(text);
+}
+
+function populate_table(jsonResponse) {
     for (let i = 0; i < jsonResponse.length; i++) {
 
         let obj = [];
-
         obj = JSON.parse(jsonResponse[i]);
 
-        fillLocationsArray(obj);
+        // obj[pos] - value
+        // 0 - coordinates
+        // 1 - description
+        // 2 - frequency
+        // 3 - endDate
+        // 4 - initDate
+        // 5 - institutionName
+        // 6 - maxParticipants
+        // 7 - members
+        // 8 - minParticipants
+        // 9 - eventName
+        // 10 - points
+        // 11 - rating
+        // 12 - tags
+        // 13 - hour
 
-        let row = table.insertRow(-1);
-        let cell = row.insertCell(0);
-        let text = document.createTextNode((obj[9].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0);
-        text = document.createTextNode((obj[5].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[6].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[2].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[3].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[4].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[1].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[7].value));
-        cell.appendChild(text);
+        fillLocationsArray(obj);
+        //fillTable(obj);
     }
     addMarkers();
 }
+
 
 function callGetEvents() {
     var jsonResponse = []
@@ -117,19 +138,19 @@ function callGetEvents() {
         }
 
     };
-    xhttp.open("GET", "/rest/event/getAllEventsWeb", true);
+    xhttp.open("GET", "/rest/event/getAllEvents", true);
     xhttp.send();
 
 
 }
 
-function validEventName(givenEventName){
-    if(givenEventName===""){
+function validEventName(givenEventName) {
+    if (givenEventName === "") {
         alert("Please insert the name of the event you want to join.");
         return false;
     } else {
         for (let i = 0; i < locations.length; i++) {
-            if(locations[i][0] === givenEventName){
+            if (locations[i][0] === givenEventName) {
                 return true;
             }
         }
