@@ -119,6 +119,13 @@ public class MapResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		if(data.commentIsValid()) {
+			return Response.status(Status.CONFLICT).build();
+		}
+		
+		if(data.ratingIsValid()) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
 
 
 		Transaction txn = datastore.newTransaction();
@@ -131,8 +138,6 @@ public class MapResource {
 			
 			Type comment = new TypeToken<ArrayList<ReviewData>>(){}.getType();
 			List<ReviewData> comments = new Gson().fromJson(commentList, comment);
-			
-
 			List<ReviewData> newComments = new ArrayList<ReviewData>();
 
 			for (int i = 0; i < comments.size(); i++)

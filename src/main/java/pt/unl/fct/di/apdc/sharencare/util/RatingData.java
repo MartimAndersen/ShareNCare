@@ -2,14 +2,6 @@ package pt.unl.fct.di.apdc.sharencare.util;
 
 public class RatingData {
 	
-	/*
-	 * nome de quem comentou
-    - id/nome do evento/percurso
-    - comentario
-    - usefulness
-    -time
-	 */
-	
 	public String username;
 	public String eventName;
 	public String rating;
@@ -22,6 +14,14 @@ public class RatingData {
 		this.username = username;
 		this.eventName = routeName;
 		this.rating = rating;
+	}
+	
+	public boolean ratingIsValid() {
+		if(Integer.parseInt(rating) >= 1 && Integer.parseInt(rating) <= 5) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 	
 	

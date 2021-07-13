@@ -83,12 +83,13 @@ public class EventResource {
 						.build();
 			} else {
 				String coordinates = data.lat + " " + data.lon;
+				List<Integer> l = new ArrayList<Integer>();
 				event = Entity.newBuilder(eventKey).set("name", data.name).set("description", data.description)
 						.set("minParticipants", data.minParticipants).set("maxParticipants", data.maxParticipants)
 						.set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
 						.set("institutionName", data.institutionName).set("initial_date", data.initialDate)
 						.set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
-						.set("points", 0).set("tags", g.toJson(data.tags)).build();
+						.set("points", 0).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).build();
 
 				txn.add(event);
 				txn.commit();
@@ -199,7 +200,6 @@ public class EventResource {
 			events = g.fromJson(e, List.class);
 
 		events.add(data.eventId);
-		List<Integer> l = new ArrayList<Integer>();
 
 		user = Entity.newBuilder(userKey).set("nif", token.getString("username"))
 				.set("username", user.getString("username")).set("password", user.getString("password"))
@@ -210,7 +210,7 @@ public class EventResource {
 				.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
 				.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
 				.set("fax", user.getString("fax")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).set("rating", g.toJson(l)).build();
+				.set("state", user.getString("state")).build();
 
 		datastore.update(user);
 
@@ -232,15 +232,19 @@ public class EventResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		
+		if(data.ratingIsValid()) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
 
 
 		Transaction txn = datastore.newTransaction();
 
 		try {
-			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.eventName);
-			Entity track = txn.get(mapKey);
+			Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventName);
+			Entity event = txn.get(eventKey);
 			
-			String commentList = track.getString("rating");
+			String commentList = event.getString("rating");
 			
 			Type rating = new TypeToken<ArrayList<RatingData>>(){}.getType();
 			List<RatingData> ratings = new Gson().fromJson(commentList, rating);
@@ -253,12 +257,14 @@ public class EventResource {
 
 			newRatings.add(data);
 
-			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
-					.set("description", track.getString("description")).set("origin", track.getString("origin"))
-					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
-					.set("distance", track.getString("distance")).set("comments", g.toJson(newRatings)).build();
+			event = Entity.newBuilder(eventKey).set("name", event.getString("name")).set("description", event.getString("description"))
+					.set("minParticipants", event.getString("minParticipants")).set("maxParticipants", event.getString("maxParticipants"))
+					.set("time", event.getString("time")).set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+					.set("institutionName", event.getString("institutionName")).set("initial_date", event.getString("initialDate"))
+					.set("ending_date", event.getString("endingDate")).set("members", event.getString("members"))
+					.set("points", event.getString("points")).set("tags", event.getString("tags")).set("rating", g.toJson(newRatings)).build();
 
-			txn.add(track);
+			txn.add(event);
 			txn.commit();
 			
 			return Response.ok("Comment from " + data.username + " registered.").cookie(cookie).build();

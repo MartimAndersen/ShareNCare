@@ -26,6 +26,18 @@ public class ReviewData {
 		this.rating = rating;
 	}
 	
+	public boolean commentIsValid() {
+		return !comment.isEmpty();
+	}
+	
+	public boolean ratingIsValid() {
+		if(Integer.parseInt(rating) >= 1 && Integer.parseInt(rating) <= 5) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 	
 
 }
