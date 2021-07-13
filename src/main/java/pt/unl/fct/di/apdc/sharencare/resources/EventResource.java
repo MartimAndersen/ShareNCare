@@ -91,7 +91,7 @@ public class EventResource {
 						.set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
 						.set("institutionName", data.institutionName).set("initial_date", data.initialDate)
 						.set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
-						.set("points", points).set("tags", g.toJson(data.tags)).build();
+						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).build();
 
 				txn.add(event);
 				txn.commit();
@@ -108,6 +108,22 @@ public class EventResource {
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteEvent(@QueryParam("eventId") String eventId) {
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+		Entity event = datastore.get(eventKey);
+
+		if (event == null)
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
+		
+		datastore.delete(eventKey);
+
+		return Response.ok("Event deleted.").build();
+
+	}
+	
+	@POST
+	@Path("/removeUser")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteUserEvent(@QueryParam("eventId") String eventId) {
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 		Entity event = datastore.get(eventKey);
 
