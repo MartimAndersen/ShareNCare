@@ -9,67 +9,72 @@
 </head>
 
 
-
 <body>
 
 <ul>
     <img src="../../images/logo" height="5%" width="5%">
-<!--    &nbsp;&nbsp;-->
-<!--    <img id="imgPreview" src="" alt="Preview" height="5%" width="5%" style="border-radius: 20px">-->
+    <!--    &nbsp;&nbsp;-->
+    <!--    <img id="imgPreview" src="" alt="Preview" height="5%" width="5%" style="border-radius: 20px">-->
     <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
-    <li><a class="active" onclick="goToPageBefore()">Go Back</a></li>
+    <li><a class="active" onclick="goToPageBefore()" style="cursor: pointer">Go Back</a></li>
 </ul>
-
 
 
 <div class="center">
 
-<form id="changeAttributesFormId" action="#" method="post">
-    <h1>Update Personal Info</h1>
+    <form id="changeAttributesFormId" action="#" method="post">
+        <h1>Update Personal Info</h1>
 
-    <p>
-        <label for="newEmail" class="floatLabel">Email</label>
-        <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
-    </p>
-    <p>
-        Profile Type<br>
-        <input type="radio" id="newProfile" name="changeAttributesInput" value="public">
-        <label for="newProfile">Public</label>
-        <input type="radio" id="newProfile1" name="changeAttributesInput" value="private">
-        <label for="newProfile">Private</label><br>
-    </p>
-    <p>
-        <label for="newLandLine" class="floatLabel">Land Line</label>
-        <input id="newLandLine" name="changeAttributesInput" type="text" placeholder="Landline">
-    </p>
-    <p>
-        <label for="newMobile" class="floatLabel">Mobile</label>
-        <input id="newMobile" name="changeAttributesInput" type="text" placeholder="Mobile">
-    </p>
-    <p>
-        <label for="newAddress" class="floatLabel">Address</label>
-        <input id="newAddress" name="changeAttributesInput" type="text" placeholder="Address">
-    </p>
-    <p>
-        <label for="newSecondAddress" class="floatLabel">Second Address</label>
-        <input id="newSecondAddress" name="changeAttributesInput" type="text" placeholder="Second Address">
-    </p>
-    <p>
-        <label for="newPostal" class="floatLabel">Postal</label>
-        <input id="newPostal" name="changeAttributesInput" type="text" placeholder="Postal">
-    </p>
+        <p>
+            <label for="newEmail" class="floatLabel">Email</label>
+            <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
+        </p>
+        <p>
+            Profile Type<br>
+            <input type="radio" id="newProfile" name="changeAttributesInput" value="public">
+            <label for="newProfile">Public</label>
+            <input type="radio" id="newProfile1" name="changeAttributesInput" value="private">
+            <label for="newProfile">Private</label><br>
+        </p>
+        <p>
+            <label for="newLandLine" class="floatLabel">Land Line</label>
+            <input id="newLandLine" name="changeAttributesInput" type="text" placeholder="Landline">
+        </p>
+        <p>
+            <label for="newMobile" class="floatLabel">Mobile</label>
+            <input id="newMobile" name="changeAttributesInput" type="text" placeholder="Mobile">
+        </p>
+        <p>
+            <label for="newAddress" class="floatLabel">Address</label>
+            <input id="newAddress" name="changeAttributesInput" type="text" placeholder="Address">
+        </p>
+        <p>
+            <label for="newSecondAddress" class="floatLabel">Second Address</label>
+            <input id="newSecondAddress" name="changeAttributesInput" type="text" placeholder="Second Address">
+        </p>
+        <p>
+            <label for="newPostal" class="floatLabel">Postal</label>
+            <input id="newPostal" name="changeAttributesInput" type="text" placeholder="Postal">
+        </p>
 
-<!--    <p>-->
-<!--    <div class="drop-zone">-->
-<!--        <span class="drop-zone__prompt">Drop photo here or click to upload a profile picture</span>-->
-<!--        <input type="file" name="myFile" class="drop-zone__input">-->
-<!--    </div>-->
-<!--    </p>-->
+        <p>
+            User bio
+        </p>
+        <label for="description" class="floatLabel"></label>
+        <textarea id="description" name="changeAttributesInput" type="text" placeholder="User bio"></textarea>
 
-    <p>
-        <input type="submit" value="Update" id="submitChangeAttributes">
-    </p>
-</form>
+
+        <!--    <p>-->
+        <!--    <div class="drop-zone">-->
+        <!--        <span class="drop-zone__prompt">Drop photo here or click to upload a profile picture</span>-->
+        <!--        <input type="file" name="myFile" class="drop-zone__input">-->
+        <!--    </div>-->
+        <!--    </p>-->
+
+        <p>
+            <input type="submit" value="Update" id="submitChangeAttributes">
+        </p>
+    </form>
 
 </div>
 
