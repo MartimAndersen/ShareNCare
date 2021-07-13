@@ -8,6 +8,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -160,6 +162,22 @@ public class MapResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	@POST
+	@Path("/deleteTrack")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteTrack(@QueryParam("title") String title) {
+		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+		
+		datastore.delete(trackKey);
+
+		return Response.ok("Event deleted.").build();
+
 	}
 
 	/*

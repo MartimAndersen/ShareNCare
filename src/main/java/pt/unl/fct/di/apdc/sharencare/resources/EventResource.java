@@ -104,6 +104,22 @@ public class EventResource {
 		}
 	}
 	
+	@POST
+	@Path("/deleteEvent")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteEvent(@QueryParam("eventId") String eventId) {
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+		Entity event = datastore.get(eventKey);
+
+		if (event == null)
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
+		
+		datastore.delete(eventKey);
+
+		return Response.ok("Event deleted.").build();
+
+	}
+	
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/joinEvent")
