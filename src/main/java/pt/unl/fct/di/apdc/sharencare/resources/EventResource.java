@@ -11,6 +11,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -121,18 +122,58 @@ public class EventResource {
 	}
 	
 	@POST
-	@Path("/removeUser")
+	@Path("/removeUserFromEvent/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteUserEvent(@QueryParam("eventId") String eventId) {
+	public Response deleteUserFromEvent(@QueryParam("eventId") String eventId, @PathParam("username") String username) {
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 		Entity event = datastore.get(eventKey);
 
 		if (event == null)
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
 		
-		datastore.delete(eventKey);
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
 
-		return Response.ok("Event deleted.").build();
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + username + " doesn't exist").build();
+		
+
+		Transaction txn = datastore.newTransaction();
+		
+		try {
+			
+			String members = event.getString("members");
+			
+			Type membersL = new TypeToken<ArrayList<String>>(){}.getType();
+			List<String> membersList = new Gson().fromJson(members, membersL);
+			
+
+			List<String> newMembers = new ArrayList<String>();
+
+			for (int i = 0; i < membersList.size(); i++)
+				if(!membersList.get(i).equals(username)) {
+					newMembers.add(membersList.get(i));
+				}
+
+			
+			event = Entity.newBuilder(eventKey).set("name", event.getString("name")).set("description", event.getString("description"))
+					.set("minParticipants", event.getString("minParticipants")).set("maxParticipants", event.getString("maxParticipants"))
+					.set("time", event.getString("time")).set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+					.set("institutionName", event.getString("institutionName")).set("initial_date", event.getString("initialDate"))
+					.set("ending_date", event.getString("endingDate")).set("members", g.toJson(newMembers))
+					.set("points", event.getString("points")).set("tags", event.getString("tags")).set("rating", event.getString("rating")).build();
+
+			txn.add(event);
+			txn.commit();
+			
+			return Response.ok("User removed").build();
+
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
 
 	}
 	
