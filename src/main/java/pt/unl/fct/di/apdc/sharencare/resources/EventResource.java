@@ -24,11 +24,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
+import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.EntityQuery.Builder;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
@@ -513,23 +515,36 @@ public class EventResource {
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
 
-	@POST
+	@GET
 	@Path("/filterEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response filterEvents(FilterData data) {
-		
+	public Response filterEvents(@QueryParam("filterString") String filterString) {
+
+		FilterData data = g.fromJson(filterString, FilterData.class);
 		List<PropertyFilter> filters = data.getFilter();
 		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
 		PropertyFilter first = filters.get(0);
-		
-		for(int i = 1; i < filters.size(); i++) {
-			subFilter[i] = filters.get(i);
-		}
-			
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event")
-				.setFilter(CompositeFilter.and(first, subFilter)).build();
 
-		QueryResults<Entity> eventsQuery = datastore.run(query);
+		Builder query = Query.newEntityQueryBuilder().setKind("Event");
+
+		if (filters.size() == 1)
+			query.setFilter(first);
+		
+		else {
+			for (int i = 1; i < filters.size(); i++)
+				subFilter[i] = filters.get(i);
+			
+			query.setFilter(CompositeFilter.and(first, subFilter));
+		}
+		
+		if(data.popularity.equals("Most Popular"))
+			query.setOrderBy(OrderBy.desc("points"));
+		if(data.popularity.equals("Least Popular"))
+			query.setOrderBy(OrderBy.asc("points"));
+	
+		Query<Entity> q = query.build();
+		
+		QueryResults<Entity> eventsQuery = datastore.run(q);
 		List<String> events = new ArrayList<>();
 
 		while (eventsQuery.hasNext()) {
