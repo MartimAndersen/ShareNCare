@@ -44,12 +44,9 @@ public class EventResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
-
-	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports,
-																										// summer,
-																										// holidays,
-																										// turism};
-
+	
+	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports, summer, holidays, turism};
+	
 	@POST
 	@Path("/registerEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -452,7 +449,7 @@ public class EventResource {
 
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
-
+	
 	@GET
 	@Path("/listEventPreferences")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -461,7 +458,7 @@ public class EventResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-
+		
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -469,9 +466,8 @@ public class EventResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
-					.build();
-
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
 
@@ -489,9 +485,9 @@ public class EventResource {
 		List<String> events = new ArrayList<>();
 
 		ObjectMapper mapper = new ObjectMapper();
-		List<Integer> userTags = new ArrayList<Integer>();
-		List<Integer> eventTags = new ArrayList<Integer>();
-
+		List<Integer> userTags = new ArrayList<Integer>();	
+		List<Integer> eventTags = new ArrayList<Integer>();	
+		
 		try {
 			userTags = Arrays.asList(mapper.readValue(user.getString("tags"), Integer[].class));
 			while (eventsQuery.hasNext()) {
@@ -508,19 +504,18 @@ public class EventResource {
 
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
-
+	
 	@GET
 	@Path("/listEventsFilter")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listEventFilter(@QueryParam("tags") List<Integer> tags) {
 		String gsonTags = g.toJson(tags);
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event")
-				.setFilter(PropertyFilter.eq("tags", gsonTags)).build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").setFilter(PropertyFilter.eq("tags", gsonTags)).build();
 
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 		List<String> events = new ArrayList<>();
-
+		
 		while (eventsQuery.hasNext()) {
 			Entity e = eventsQuery.next();
 			String event = g.toJson(e.getProperties().values());
@@ -543,10 +538,10 @@ public class EventResource {
 		return Response.ok(g.toJson(event.getProperties().values())).build();
 
 	}
-
+	
 	private boolean containsAny(List<Integer> list1, List<Integer> list2) {
-		for (int i = 0; i < list2.size(); i++)
-			if (list1.contains(list2.get(i)))
+		for(int i = 0; i < list2.size(); i++)
+			if(list1.contains(list2.get(i)))
 				return true;
 		return false;
 	}
