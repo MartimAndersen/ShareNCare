@@ -19,7 +19,6 @@ public class ProfileData {
 	public List<Integer> tags;
 	public String zipCode;
 	
-	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports, summer, holidays, turism};
 	private final Gson g = new Gson();
 
 	public ProfileData() {
