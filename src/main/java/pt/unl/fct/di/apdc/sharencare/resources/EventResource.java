@@ -513,10 +513,9 @@ public class EventResource {
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
 
-	@GET
+	@POST
 	@Path("/filterEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response filterEvents(FilterData data) {
 		
 		List<PropertyFilter> filters = data.getFilter();
