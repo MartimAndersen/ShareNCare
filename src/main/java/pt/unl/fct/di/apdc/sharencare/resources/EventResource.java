@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,6 +23,8 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
@@ -37,6 +40,7 @@ import pt.unl.fct.di.apdc.sharencare.util.JoinEventData;
 import pt.unl.fct.di.apdc.sharencare.util.RatingData;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
+import pt.unl.fct.di.apdc.sharencare.util.FilterData;
 
 @Path("/event")
 public class EventResource {
@@ -510,13 +514,21 @@ public class EventResource {
 	}
 
 	@GET
-	@Path("/listEventsFilter")
+	@Path("/filterEvents")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listEventFilter(@QueryParam("tags") List<Integer> tags) {
-		String gsonTags = g.toJson(tags);
+	public Response filterEvents(FilterData data) {
+		
+		List<PropertyFilter> filters = data.getFilter();
+		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
+		PropertyFilter first = filters.get(0);
+		
+		for(int i = 1; i < filters.size(); i++) {
+			subFilter[i] = filters.get(i);
+		}
+			
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event")
-				.setFilter(PropertyFilter.eq("tags", gsonTags)).build();
+				.setFilter(CompositeFilter.and(first, subFilter)).build();
 
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 		List<String> events = new ArrayList<>();
