@@ -1,5 +1,9 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -10,6 +14,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -41,10 +46,39 @@ public class DeleteUsersResource {
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST).entity("User with username: " + username + " doesn't exist").build();
 		
+		String e = user.getString("events");
+
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> events = g.fromJson(e, stringList);
+		
+		for(String eventId: events) {
+			Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+			Entity event = datastore.get(eventKey);
+			
+			String m = event.getString("members");
+			List<String> members = g.fromJson(m, stringList);
+			
+			members.remove(username);
+			
+			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+					.set("description", event.getString("description"))
+					.set("minParticipants", event.getString("minParticipants"))
+					.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+					.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+					.set("institutionName", event.getString("institutionName"))
+					.set("initial_date", event.getString("initial_date"))
+					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
+					.set("points", event.getString("points")).set("tags", event.getString("tags"))
+					.set("rating", event.getString("rating")).build();
+			
+			datastore.update(event);
+		}
+
+		
 		datastore.delete(userKey);
 
 		return Response.ok("User deleted.").build();
-
 	}
 	
 	@POST
