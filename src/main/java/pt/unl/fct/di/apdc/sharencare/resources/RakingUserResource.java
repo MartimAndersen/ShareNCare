@@ -60,7 +60,7 @@ public class RakingUserResource {
 	
 	public void takePointsQuit(String username) {
 		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 		
 		int points =  Integer.parseInt( user.getString("points"));
