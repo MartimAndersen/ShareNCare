@@ -5,6 +5,10 @@ public class ChangeEmailData {
 	public String oldEmail;
 	public String newEmail;
 	public String password;
+	
+	public ChangeEmailData() {
+	
+	}
 
 	public ChangeEmailData(String oldEmail, String newEmail, String password) {
 		this.oldEmail = oldEmail;
