@@ -1,4 +1,5 @@
 document.getElementById("eventOrigin").style.visibility = "hidden";
+document.getElementById("distanceBox").style.visibility = "hidden";
 
 let map;
 let eventLat;
@@ -14,6 +15,8 @@ function initMap() {
 }
 
 let originInput;
+
+let dist = 0;
 
 class AutocompleteDirectionsHandler {
     constructor(map) {
@@ -52,6 +55,7 @@ class AutocompleteDirectionsHandler {
 
     route() {
         document.getElementById("eventOrigin").style.visibility = "hidden";
+        document.getElementById("distanceBox").style.visibility = "visible";
         if (!this.originPlaceId) {
             return;
         }
@@ -68,8 +72,8 @@ class AutocompleteDirectionsHandler {
             (response, status) => {
                 if (status === "OK") {
                     me.directionsRenderer.setDirections(response);
-                    // dist = response.routes[0].legs[0].distance.text;
-                    // document.getElementById("distanceBox").innerHTML = "Distance: " + dist;
+                    dist = response.routes[0].legs[0].distance.text;
+                    document.getElementById("distanceBox").value = "Distance: " + dist;
                 } else {
                     window.alert("Directions request failed due to " + status);
                 }
