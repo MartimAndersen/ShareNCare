@@ -20,6 +20,10 @@ function goToCreateEvent() {
     window.location.href = "functionalities/createEvent/createEvent.html";
 }
 
+function goToMyEvent() {
+    window.location.href = "functionalities/myEvents/myEvents.html";
+}
+
 function logout() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {

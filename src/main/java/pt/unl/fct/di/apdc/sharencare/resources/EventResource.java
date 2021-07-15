@@ -515,6 +515,62 @@ public class EventResource {
 	}
 
 	@GET
+	@Path("/listInstitutionEvents")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listInstitutionEvents(@CookieParam("Token") NewCookie cookie) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity currentUser = datastore.get(currentUserKey);
+
+		if (currentUser == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("Institution with username: " + token.getString("username") + " doesn't exist").build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> userEvents = new ArrayList<String>();
+
+		try {
+			userEvents = Arrays.asList(mapper.readValue(currentUser.getString("events"), String[].class));
+			while (eventsQuery.hasNext()) {
+				Entity e = eventsQuery.next();
+				if (userEvents.contains(e.getString("name"))) {
+					String event = g.toJson(e.getProperties().values());
+					events.add(event);
+				}
+			}
+		} catch (JsonProcessingException e1) {
+			e1.printStackTrace();
+		}
+
+		return Response.ok(g.toJson(events)).cookie(cookie).build();
+	}
+
+	
+	@GET
 	@Path("/listEventPreferences")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
