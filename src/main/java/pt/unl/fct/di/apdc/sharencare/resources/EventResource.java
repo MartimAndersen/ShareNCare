@@ -60,6 +60,7 @@ public class EventResource {
 																										// holidays,
 																										// turism};
 
+	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/registerEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -71,6 +72,22 @@ public class EventResource {
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		String username =token.getString("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+
 
 		/*
 		 * END OF VERIFICATIONS
@@ -111,6 +128,28 @@ public class EventResource {
 						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).build();
 
 				txn.add(event);
+				
+				List<String> events = new ArrayList<String>();
+				String e = user.getString("events");
+
+				if (!e.equals(""))
+					events = g.fromJson(e, List.class);
+
+				events.add(data.name);
+
+				user = Entity.newBuilder(userKey).set("nif", token.getString("username"))
+						.set("username", user.getString("username")).set("password", user.getString("password"))
+						.set("email", user.getString("email")).set("landLine", user.getString("landLine"))
+						.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
+						.set("zipCode", user.getString("zipCode")).set("events", g.toJson(events))
+						.set("website", user.getString("website")).set("instagram", user.getString("instagram"))
+						.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
+						.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
+						.set("fax", user.getString("fax")).set("role", user.getString("role"))
+						.set("state", user.getString("state")).build();
+
+				txn.update(user);
+
 				txn.commit();
 				return Response.ok("Event " + data.name + " registered.").cookie(cookie).build();
 			}
