@@ -506,6 +506,7 @@ public class EventResource {
 		 */
 
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+		
 
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 		List<String> events = new ArrayList<>();
