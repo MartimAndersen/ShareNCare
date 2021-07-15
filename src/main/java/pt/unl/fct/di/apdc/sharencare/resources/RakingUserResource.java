@@ -14,6 +14,10 @@ public class RakingUserResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
 	
+	public RakingUserResource() {
+		
+	}
+	
 	public void addPointsEvents(String username) {
 		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey("username");
