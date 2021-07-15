@@ -492,6 +492,59 @@ public class InsideLoginResource {
 
 		return Response.ok(user + " is now logged out.").cookie(cookieAux).build();
 	}
+	
+	@POST
+	@Path("/changeEmail")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response changeEmail(@CookieParam("Token") NewCookie cookie, ChangeEmailData data) {
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (data.emptyParameters() || data.cantBeSameEmail())
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();
+
+		if (user.getString("state").equals("DISABLED"))
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+		
+		String hashedPWD = user.getString("password");
+		if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			if (data.validEmail()) {
+					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+							.set("password", user.getString("password"))
+							.set("email", data.newEmail).set("bio", user.getString("bio"))
+							.set("profileType", user.getString("profileType"))
+							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+							.set("address", user.getString("address"))
+							.set("secondAddress", user.getString("secondAddress"))
+							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+							.set("state", user.getString("state"))
+							.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
+					datastore.put(user);
+					return Response.ok("Email was changed").cookie(cookie).build();
+			}
+			return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+		}
+		return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
+	}
 
 	@POST
 	@Path("/changePassword")
