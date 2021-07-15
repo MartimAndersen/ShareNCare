@@ -271,7 +271,7 @@ public class EventResource {
 		List<String> events = g.fromJson(e, stringList);
 
 		if (members.size() == Integer.parseInt(event.getString("maxParticipants")))
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Event has max participants").build();
+			return Response.status(Status.EXPECTATION_FAILED).entity("Event has max participants").build();
 
 		if (members.contains(user.getString("username")) || events.contains(data.eventId))
 			return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
