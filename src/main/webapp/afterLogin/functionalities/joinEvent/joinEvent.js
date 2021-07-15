@@ -1,4 +1,8 @@
+document.getElementById("eventOrigin").style.visibility = "hidden";
+
 let map;
+let eventLat;
+let eventLon;
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -6,6 +10,72 @@ function initMap() {
         center: {lat: 38.659784, lng: -9.202765},
         zoom: 9
     });
+    new AutocompleteDirectionsHandler(map);
+}
+
+let originInput;
+
+class AutocompleteDirectionsHandler {
+    constructor(map) {
+        this.map = map;
+        this.originPlaceId = "";
+        this.travelMode = google.maps.TravelMode.WALKING;
+        this.directionsService = new google.maps.DirectionsService();
+        this.directionsRenderer = new google.maps.DirectionsRenderer();
+        this.directionsRenderer.setMap(map);
+        originInput = document.getElementById("eventOrigin");
+        const modeSelector = document.getElementById("mode-selector");
+        // map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+        // Specify just the place data fields that you need.
+        originAutocomplete.setFields(["place_id"]);
+        this.setupPlaceChangedListener(originAutocomplete, "ORIG");
+    }
+
+    setupPlaceChangedListener(autocomplete, mode) {
+        autocomplete.bindTo("bounds", this.map);
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+
+            if (!place.place_id) {
+                window.alert("Please select an option from the dropdown list.");
+                return;
+            }
+
+            if (mode === "ORIG") {
+                this.originPlaceId = place.place_id;
+            }
+            this.route();
+        });
+    }
+
+    route() {
+        document.getElementById("eventOrigin").style.visibility = "hidden";
+        if (!this.originPlaceId) {
+            return;
+        }
+        const me = this;
+        this.directionsService.route(
+            {
+                origin: {placeId: this.originPlaceId},
+                destination: {
+                    "lat": parseFloat(eventLat),
+                    "lng": parseFloat(eventLon)
+                },
+                travelMode: this.travelMode,
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    me.directionsRenderer.setDirections(response);
+                    // dist = response.routes[0].legs[0].distance.text;
+                    // document.getElementById("distanceBox").innerHTML = "Distance: " + dist;
+                } else {
+                    window.alert("Directions request failed due to " + status);
+                }
+            }
+        );
+    }
 }
 
 var locations = [];
@@ -35,6 +105,15 @@ function fillLocationsArray(obj) {
 }
 
 var markers = [];
+
+function showOriginInput(i){
+    let elem = document.getElementById("eventOrigin");
+    elem.style.visibility = "visible";
+    elem.value="";
+
+    eventLat = locations[i][1];
+    eventLon = locations[i][2];
+}
 
 function fillInfoWindow(marker, i) {
     var infowindow = new google.maps.InfoWindow();
@@ -67,7 +146,8 @@ function fillInfoWindow(marker, i) {
         '<p></p>' +
         'Description: ' + description +
         '<p></p>' +
-        '<button onclick="handleJoinEvent(locationAux[0])">Join event</button>'
+        '<button onclick="handleJoinEvent(locationAux[0])">Join event</button> &nbsp &nbsp' +
+        `<button onclick="showOriginInput(${i})">View directions</button>`
     );
     infowindow.open(map, marker);
 }
