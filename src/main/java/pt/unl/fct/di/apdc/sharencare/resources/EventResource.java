@@ -165,8 +165,7 @@ public class EventResource {
 
 		try {
 
-			for (int i = 0; i < data.eventsId.size(); i++) {
-				String eventId = data.eventsId.get(i);
+			for (String eventId: data.eventsId) {
 
 				Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 				Entity event = datastore.get(eventKey);
