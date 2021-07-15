@@ -211,12 +211,10 @@ public class EventResource {
 						.set("rating", event.getString("rating")).build();
 
 				txn.add(event);
-				txn.add(user);
 				txn.commit();
-				
 				raking.takePointsQuit(data.username);
 			}
-
+			datastore.update(user);
 			return Response.ok("User removed").build();
 
 		} finally {
@@ -287,7 +285,7 @@ public class EventResource {
 				return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
 		
 		members.add(user.getString("username"));
-		events.remove(data.eventId);
+		events.add(data.eventId);
 		
 		user = Entity.newBuilder(userKey).set("username",user.getString("username")).set("password", user.getString("password"))
 				.set("email", user.getString("email")).set("bio", user.getString("bio"))
