@@ -120,13 +120,13 @@ public class EventResource {
 	@POST
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteEvent(@QueryParam("tokenId") String tokenId, @QueryParam("eventId") String eventId) {
+	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, @QueryParam("eventId") String eventId) {
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 		
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
@@ -144,13 +144,13 @@ public class EventResource {
 	@POST
 	@Path("/removeUserFromEvent/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteUserFromEvent(@QueryParam("tokenId") String tokenId, @QueryParam("eventId") String eventId, @PathParam("username") String username) {
+	public Response deleteUserFromEvent(@CookieParam("Token") NewCookie cookie, @QueryParam("eventId") String eventId, @PathParam("username") String username) {
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 		
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);

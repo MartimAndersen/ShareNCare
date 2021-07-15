@@ -1,10 +1,12 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -24,15 +26,15 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/user")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@QueryParam("tokenId") String tokenId, @QueryParam("username") String username) {
+	public Response deleteUser(@CookieParam("Token") NewCookie cookie, @QueryParam("username") String username) {
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
+
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 
@@ -48,15 +50,15 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/institution")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteInstitution(@QueryParam("tokenId") String tokenId, @QueryParam("username") String nif) {
+	public Response deleteInstitution(@CookieParam("Token") NewCookie cookie, @QueryParam("username") String nif) {
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
+
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(nif);
 		Entity user = datastore.get(userKey);
 

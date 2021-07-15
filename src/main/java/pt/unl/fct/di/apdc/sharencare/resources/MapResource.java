@@ -168,13 +168,13 @@ public class MapResource {
 	@POST
 	@Path("/deleteTrack")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteTrack(@QueryParam("tokenId") String tokenId, @QueryParam("title") String title) {
+	public Response deleteTrack(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
 		
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 		
 		
