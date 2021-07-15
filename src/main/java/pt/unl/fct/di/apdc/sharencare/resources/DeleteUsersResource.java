@@ -24,7 +24,15 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/user")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@QueryParam("username") String username) {
+	public Response deleteUser(@QueryParam("tokenId") String tokenId, @QueryParam("username") String username) {
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+					.build();
+		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 
@@ -40,7 +48,15 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/institution")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteInstitution(@QueryParam("username") String nif) {
+	public Response deleteInstitution(@QueryParam("tokenId") String tokenId, @QueryParam("username") String nif) {
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+					.build();
+		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(nif);
 		Entity user = datastore.get(userKey);
 

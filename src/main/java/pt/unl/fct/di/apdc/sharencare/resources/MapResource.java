@@ -168,7 +168,16 @@ public class MapResource {
 	@POST
 	@Path("/deleteTrack")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteTrack(@QueryParam("title") String title) {
+	public Response deleteTrack(@QueryParam("tokenId") String tokenId, @QueryParam("title") String title) {
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+					.build();
+		
+		
 		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
 		Entity track = datastore.get(trackKey);
 
