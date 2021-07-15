@@ -108,7 +108,7 @@ function callSeeEvents(){
         }
 
     };
-    xhttp.open("GET", "/rest/event/listUserEventsWeb", true);
+    xhttp.open("GET", "/rest/event/listUserEvents", true);
     xhttp.send();
 
 

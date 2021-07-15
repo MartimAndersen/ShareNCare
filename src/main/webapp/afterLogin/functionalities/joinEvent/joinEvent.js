@@ -20,17 +20,59 @@ var locations = [];
 
 function fillLocationsArray(obj) {
     let locationAux = [];
-    locationAux.push(obj[9].value);
-    locationAux.push(obj[0].value.split(" ")[0]);
-    locationAux.push(obj[0].value.split(" ")[1]);
+    locationAux.push(obj[9].value); // eventName - 0
+    locationAux.push(obj[0].value.split(" ")[0]); // latitude - 1
+    locationAux.push(obj[0].value.split(" ")[1]); // longitude - 2
+    locationAux.push(obj[4].value); // initDate - 3
+    locationAux.push(obj[3].value); // endDate - 4
+    locationAux.push(obj[13].value); // hour - 5
+    locationAux.push(obj[2].value); // frequency - 6
+    locationAux.push(obj[8].value); // minParticipants - 7
+    locationAux.push(obj[6].value); // maxParticipants - 8
+    locationAux.push(obj[1].value); // description - 9
+
     locations.push(locationAux);
 }
 
 var markers = [];
 
-function addMarkers() {
-
+function fillInfoWindow(marker, i) {
     var infowindow = new google.maps.InfoWindow();
+
+    locationAux = locations[i];
+
+    let eventName = locationAux[0];
+    let initDate = locationAux[3];
+    let endDate = locationAux[4];
+    let hour = locationAux[5];
+    let frequency = locationAux[6];
+    let minParticipants = locationAux[7];
+    let maxParticipants = locationAux[8];
+    let description = locationAux[9];
+
+    infowindow.setContent(
+        'Event name: ' + eventName +
+        '<p></p>' +
+        'Initial date: ' + initDate +
+        '<p></p>' +
+        'End date: ' + endDate +
+        '<p></p>' +
+        'Hour: ' + hour +
+        '<p></p>' +
+        'Frequency: ' + frequency +
+        '<p></p>' +
+        'Min participants: ' + minParticipants +
+        '<p></p>' +
+        'Max participants: ' + maxParticipants +
+        '<p></p>' +
+        'Description: ' + description +
+        '<p></p>' +
+        '<button onclick="handleJoinEvent(locationAux[0])">Join event</button>'
+    );
+    infowindow.open(map, marker);
+}
+
+function addMarkers() {
 
     var marker, i;
 
@@ -44,8 +86,7 @@ function addMarkers() {
 
         google.maps.event.addListener(marker, 'click', (function (marker, i) {
             return function () {
-                infowindow.setContent(locations[i][0]);
-                infowindow.open(map, marker);
+                fillInfoWindow(marker, i)
             }
         })(marker, i));
     }
@@ -134,9 +175,7 @@ function callGetEvents() {
             // console.log(xhttp.responseText);
             jsonResponse = JSON.parse(xhttp.responseText);
             populate_table(jsonResponse)
-
         }
-
     };
     xhttp.open("GET", "/rest/event/getAllEvents", true);
     xhttp.send();
@@ -144,69 +183,50 @@ function callGetEvents() {
 
 }
 
-function validEventName(givenEventName) {
-    if (givenEventName === "") {
-        alert("Please insert the name of the event you want to join.");
-        return false;
-    } else {
-        for (let i = 0; i < locations.length; i++) {
-            if (locations[i][0] === givenEventName) {
-                return true;
+function callJoinEvents(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200:
+                    alert("Joined successfully.");
+                    break;
+                case 411:
+                    alert("You need to give a name of an event.");
+                    break;
+                case 401:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+                case 404:
+                    alert("Token does not exist.");
+                    break;
+                case 403:
+                    alert("The user with the given token does not exist.");
+                    break;
+                case 406:
+                    alert("The user with the given token is disabled.");
+                    break;
+                case 417:
+                    alert("You cannot join now because the participants' limit was already reached.");
+                    break;
+                case 409:
+                    alert("You are already a  member of this event.");
+                    break;
+                default:
+                    alert("Wrong parameters.");
+                    break;
             }
         }
-        alert("The event with the given name does not exist.");
-        return false;
-    }
+    };
+    xhttp.open("POST", "/rest/event/joinEvent", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
 }
 
-function callJoinEvents(data, givenEventName) {
-
-    if (validEventName(givenEventName)) {
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState === 4) {
-                switch (this.status) {
-                    case 200:
-                        alert("Joined successfully.");
-                        break;
-                    case 411:
-                        alert("You need to give a name of an event.");
-                        break;
-                    case 401:
-                        alert("You need to be logged in to execute this operation.");
-                        break;
-                    case 404:
-                        alert("Token does not exist.");
-                        break;
-                    case 403:
-                        alert("The user with the given token does not exist.");
-                        break;
-                    case 406:
-                        alert("The user with the given token is disabled.");
-                        break;
-                    default:
-                        alert("Wrong parameters.");
-                        break;
-                }
-            }
-        };
-        xhttp.open("POST", "/rest/event/joinEvent", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(data);
-    }
-}
-
-function handleJoinEvents() {
-    let inputs = document.getElementsByName("joinEventInput")
-    let givenEventName = inputs[0].value;
+function handleJoinEvent(eventName) {
     let data = {
-        eventId: givenEventName
+        eventId: eventName
     }
-    callJoinEvents(JSON.stringify(data), givenEventName);
+    callJoinEvents(JSON.stringify(data));
 }
 
-let joinEventForm = document.getElementById("joinEventFormId");
-joinEventForm.onsubmit = () => {
-    handleJoinEvents();
-    return false;
-}
