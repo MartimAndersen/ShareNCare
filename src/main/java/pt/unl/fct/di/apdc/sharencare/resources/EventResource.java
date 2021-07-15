@@ -202,8 +202,8 @@ public class EventResource {
 						.set("coordinates", event.getString("coordinates"))
 						.set("durability", event.getString("durability"))
 						.set("institutionName", event.getString("institutionName"))
-						.set("initial_date", event.getString("initialDate"))
-						.set("ending_date", event.getString("endingDate")).set("members", g.toJson(members))
+						.set("initial_date", event.getString("initial_date"))
+						.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
 						.set("points", event.getString("points")).set("tags", event.getString("tags"))
 						.set("rating", event.getString("rating")).build();
 
@@ -299,8 +299,8 @@ public class EventResource {
 				.set("coordinates", event.getString("coordinates"))
 				.set("durability", event.getString("durability"))
 				.set("institutionName", event.getString("institutionName"))
-				.set("initial_date", event.getString("initialDate"))
-				.set("ending_date", event.getString("endingDate")).set("members", g.toJson(members))
+				.set("initial_date", event.getString("initial_date"))
+				.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
 				.set("points", event.getString("points")).set("tags", event.getString("tags"))
 				.set("rating", event.getString("rating")).build();
 
@@ -410,8 +410,8 @@ public class EventResource {
 					.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
 					.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
 					.set("institutionName", event.getString("institutionName"))
-					.set("initial_date", event.getString("initialDate"))
-					.set("ending_date", event.getString("endingDate")).set("members", event.getString("members"))
+					.set("initial_date", event.getString("initial_date"))
+					.set("ending_date", event.getString("ending_date")).set("members", event.getString("members"))
 					.set("points", event.getString("points")).set("tags", event.getString("tags"))
 					.set("rating", g.toJson(newRatings)).build();
 
