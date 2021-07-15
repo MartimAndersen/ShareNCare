@@ -44,6 +44,7 @@ import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
+import pt.unl.fct.di.apdc.sharencare.util.FinishEvent;
 import pt.unl.fct.di.apdc.sharencare.resources.RakingUserResource;
 
 @Path("/event")
@@ -302,6 +303,8 @@ public class EventResource {
 
 		return Response.ok("Joined successfully.").cookie(cookie).build();
 	}
+	
+	
 
 	@SuppressWarnings("unchecked")
 	@POST
@@ -565,6 +568,66 @@ public class EventResource {
 		}
 
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@POST
+	@Path("/finishEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response finishEvent(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("Institution with username: " + token.getString("username") + " doesn't exist").build();
+
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The Institution with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("Institution with id: " + user.getString("username") + " is disabled.").build();
+		}
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.name);
+		Entity event = datastore.get(eventKey);
+
+		if (event == null)
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.name + " doesn't exist")
+					.build();
+
+		String m = event.getString("members");
+		//String e = user.getString("events");
+
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> members = g.fromJson(m, stringList);
+		//List<String> events = g.fromJson(e, stringList);
+
+		for (String member : members) {
+			raking.addPointsEvents(member);
+		}
+		return Response.ok("Event finished").cookie(cookie).build();
+
+		
 	}
 
 	@GET
