@@ -101,6 +101,12 @@ public class EventResource {
 
 		if (!data.verifyDate())
 			return Response.status(Status.FORBIDDEN).build();
+		
+		if (!data.futureDate())
+			return Response.status(Status.BAD_REQUEST).build();
+		
+		if (!data.dateOrder())
+			return Response.status(Status.PRECONDITION_FAILED).build();
 
 		if (!data.isHourValid())
 			return Response.status(Status.EXPECTATION_FAILED).build();

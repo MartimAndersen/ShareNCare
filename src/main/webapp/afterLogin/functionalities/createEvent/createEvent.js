@@ -88,11 +88,17 @@ function callCreateEvent(data) {
                 case 200:
                     alert(this.responseText);
                     break;
+                case 400:
+                    alert("Initial date needs to be in the future");
+                    break;
                 case 401:
                     alert("You need to be logged in to execute this operation.");
                     break;
                 case 411:
                     alert("Please fill in all fields.");
+                    break;
+                case 412:
+                    alert("Final date needs to be after initial date or in the same day");
                     break;
                 case 406:
                     alert("Number of participants is invalid.");

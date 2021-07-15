@@ -1,12 +1,15 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.cloud.Date;
 import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
@@ -128,4 +131,47 @@ public class EventData {
         }
         
     }
+    
+    public boolean futureDate() {
+ 
+    	 String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    	 String[] curr = currDate.split("/");
+    	 String[] date =  initialDate.split("/");
+    	 
+    	 if(Integer.parseInt(curr[2]) <= Integer.parseInt(date[2])) {
+    		  
+    		 if(Integer.parseInt(curr[1]) <= Integer.parseInt(date[1])) {
+    			  	 
+    			 if(Integer.parseInt(curr[0]) < Integer.parseInt(date[0])) {
+    		    		 
+    				 return true;
+    		    	 
+    			 }
+    	    }
+    	 }
+    	 
+    	 return false;
+    	 
+    }
+    
+    public boolean dateOrder() {
+    	 
+    String[] initial = initialDate.split("/");
+    String[] end= endingDate.split("/");
+   	 
+    if(Integer.parseInt(initial[2]) <= Integer.parseInt(end[2])) {
+   	   	 
+   		 if(Integer.parseInt(initial[1]) <= Integer.parseInt(end[1])) {
+   	    	 
+   	   		 if(Integer.parseInt(initial[0]) <= Integer.parseInt(end[0])) {
+   	    		 
+   	   			 return true;
+   	    	 }
+   	   	 }
+   	 }
+
+   	 	return false;
+   	 
+   }
 }
+
