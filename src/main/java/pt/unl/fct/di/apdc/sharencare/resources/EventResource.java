@@ -122,14 +122,14 @@ public class EventResource {
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, @QueryParam("eventId") String eventId) {
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
+
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 		Entity event = datastore.get(eventKey);
 
@@ -146,19 +146,13 @@ public class EventResource {
 	@Path("/removeUserFromEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteUserFromEvent(@CookieParam("Token") NewCookie cookie, AbandonEventData data) {
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
-		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventId);
-		Entity event = datastore.get(eventKey);
-
-		if (event == null)
-			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.eventId + " doesn't exist").build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
 		Entity user = datastore.get(userKey);
@@ -171,32 +165,51 @@ public class EventResource {
 
 		try {
 
-			String members = event.getString("members");
+			for (String eventId : data.eventsId) {
 
-			Type membersL = new TypeToken<ArrayList<String>>() {
-			}.getType();
-			List<String> membersList = new Gson().fromJson(members, membersL);
+				Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+				Entity event = datastore.get(eventKey);
 
-			List<String> newMembers = new ArrayList<String>();
+				if (event == null)
+					return Response.status(Status.BAD_REQUEST)
+							.entity("Event with id: " + eventId + " doesn't exist").build();
 
-			for (int i = 0; i < membersList.size(); i++)
-				if (!membersList.get(i).equals(data.username)) {
-					newMembers.add(membersList.get(i));
-				}
+				String m = event.getString("members");
+				String e = user.getString("events");
 
-			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
-					.set("description", event.getString("description"))
-					.set("minParticipants", event.getString("minParticipants"))
-					.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
-					.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
-					.set("institutionName", event.getString("institutionName"))
-					.set("initial_date", event.getString("initialDate"))
-					.set("ending_date", event.getString("endingDate")).set("members", g.toJson(newMembers))
-					.set("points", event.getString("points")).set("tags", event.getString("tags"))
-					.set("rating", event.getString("rating")).build();
+				Type stringList = new TypeToken<ArrayList<String>>() {}.getType();
+				List<String> members = g.fromJson(m, stringList);
+				List<String> events = g.fromJson(e, stringList);
 
-			txn.add(event);
-			txn.commit();
+				if (!members.contains(data.username) || !events.contains(eventId))
+						return Response.status(Status.CONFLICT).entity("User is not a member of the event").build();
+				
+				members.remove(data.username);
+				events.remove(eventId);
+				
+				user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
+						.set("email", user.getString("email")).set("bio", user.getString("bio"))
+						.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
+						.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
+						.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
+						.set("tags", user.getString("tags")).set("events", g.toJson(events))
+						.set("role", user.getString("role")).set("state", user.getString("state")).build();
+
+				event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+						.set("description", event.getString("description"))
+						.set("minParticipants", event.getString("minParticipants"))
+						.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+						.set("coordinates", event.getString("coordinates"))
+						.set("durability", event.getString("durability"))
+						.set("institutionName", event.getString("institutionName"))
+						.set("initial_date", event.getString("initialDate"))
+						.set("ending_date", event.getString("endingDate")).set("members", g.toJson(members))
+						.set("points", event.getString("points")).set("tags", event.getString("tags"))
+						.set("rating", event.getString("rating")).build();
+
+				txn.add(event);
+				txn.commit();
+			}
 
 			return Response.ok("User removed").build();
 
@@ -253,9 +266,9 @@ public class EventResource {
 		if (!e.equals(""))
 			events = g.fromJson(e, List.class);
 
-		if(events.contains(data.eventId))
+		if (events.contains(data.eventId))
 			return Response.status(Status.CONFLICT).encoding("User already has event").build();
-		
+
 		events.add(data.eventId);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
@@ -510,7 +523,6 @@ public class EventResource {
 		 */
 
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
-		
 
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 		List<String> events = new ArrayList<>();
@@ -550,22 +562,21 @@ public class EventResource {
 
 		if (filters.size() == 1)
 			query.setFilter(first);
-		
+
 		else {
 			for (int i = 1; i < filters.size(); i++)
 				subFilter[i] = filters.get(i);
-			
+
 			query.setFilter(CompositeFilter.and(first, subFilter));
 		}
-		
+
 		Query<Entity> q = null;
-		
-		if(data.popularity.equals("Most Popular"))
+
+		if (data.popularity.equals("Most Popular"))
 			q = query.setOrderBy(OrderBy.desc("points")).build();
-		if(data.popularity.equals("Least Popular"))
+		if (data.popularity.equals("Least Popular"))
 			q = query.setOrderBy(OrderBy.asc("points")).build();
 
-		
 		QueryResults<Entity> eventsQuery = datastore.run(q);
 		List<String> events = new ArrayList<>();
 
