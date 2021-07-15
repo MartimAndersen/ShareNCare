@@ -41,6 +41,7 @@ import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.sharencare.util.JoinEventData;
 import pt.unl.fct.di.apdc.sharencare.util.RatingData;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
+import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
 
@@ -142,9 +143,9 @@ public class EventResource {
 	}
 
 	@POST
-	@Path("/removeUserFromEvent/{username}")
+	@Path("/removeUserFromEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteUserFromEvent(@CookieParam("Token") NewCookie cookie, @QueryParam("eventId") String eventId, @PathParam("username") String username) {
+	public Response deleteUserFromEvent(@CookieParam("Token") NewCookie cookie, AbandonEventData data) {
 		
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -153,17 +154,17 @@ public class EventResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 		
-		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventId);
 		Entity event = datastore.get(eventKey);
 
 		if (event == null)
-			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.eventId + " doesn't exist").build();
 
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
 		Entity user = datastore.get(userKey);
 
 		if (user == null)
-			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + data.username + " doesn't exist")
 					.build();
 
 		Transaction txn = datastore.newTransaction();
@@ -179,7 +180,7 @@ public class EventResource {
 			List<String> newMembers = new ArrayList<String>();
 
 			for (int i = 0; i < membersList.size(); i++)
-				if (!membersList.get(i).equals(username)) {
+				if (!membersList.get(i).equals(data.username)) {
 					newMembers.add(membersList.get(i));
 				}
 
