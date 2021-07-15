@@ -208,6 +208,7 @@ public class EventResource {
 						.set("rating", event.getString("rating")).build();
 
 				txn.add(event);
+				txn.add(user);
 				txn.commit();
 			}
 
@@ -259,28 +260,52 @@ public class EventResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventId);
+		Entity event = datastore.get(eventKey);
 
-		List<String> events = new ArrayList<String>();
+		if (event == null)
+			return Response.status(Status.BAD_REQUEST)
+					.entity("Event with id: " + data.eventId + " doesn't exist").build();
+
+		String m = event.getString("members");
 		String e = user.getString("events");
 
-		if (!e.equals(""))
-			events = g.fromJson(e, List.class);
+		Type stringList = new TypeToken<ArrayList<String>>() {}.getType();
+		List<String> members = g.fromJson(m, stringList);
+		List<String> events = g.fromJson(e, stringList);
+		
+		if(members.size() == Integer.parseInt(event.getString("maxParticipants")))
+			return Response.status(Status.NOT_ACCEPTABLE).entity("Event has max participants").build();
 
-		if (events.contains(data.eventId))
-			return Response.status(Status.CONFLICT).encoding("User already has event").build();
-
-		events.add(data.eventId);
-
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("email", user.getString("email"))
+		if (members.contains(user.getString("username")) || events.contains(data.eventId))
+				return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
+		
+		members.add(user.getString("username"));
+		events.remove(data.eventId);
+		
+		user = Entity.newBuilder(userKey).set("username",user.getString("username")).set("password", user.getString("password"))
+				.set("email", user.getString("email")).set("bio", user.getString("bio"))
 				.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
 				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
 				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
-				.set("tags", user.getString("tags")).set("bio", user.getString("bio")).set("events", g.toJson(events))
-				.set("points", user.getString("points"))
+				.set("tags", user.getString("tags")).set("events", g.toJson(events)).set("points", user.getString("points"))
 				.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
+		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+				.set("description", event.getString("description"))
+				.set("minParticipants", event.getString("minParticipants"))
+				.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+				.set("coordinates", event.getString("coordinates"))
+				.set("durability", event.getString("durability"))
+				.set("institutionName", event.getString("institutionName"))
+				.set("initial_date", event.getString("initialDate"))
+				.set("ending_date", event.getString("endingDate")).set("members", g.toJson(members))
+				.set("points", event.getString("points")).set("tags", event.getString("tags"))
+				.set("rating", event.getString("rating")).build();
+
 		datastore.update(user);
+		datastore.update(event);
 
 		return Response.ok("Joined successfully.").cookie(cookie).build();
 	}
