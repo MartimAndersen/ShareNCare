@@ -165,7 +165,8 @@ public class EventResource {
 
 		try {
 
-			for (String eventId : data.eventsId) {
+			for (int i = 0; i < data.eventsId.size(); i++) {
+				String eventId = data.eventsId.get(i);
 
 				Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 				Entity event = datastore.get(eventKey);
@@ -192,7 +193,7 @@ public class EventResource {
 						.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
 						.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
 						.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
-						.set("tags", user.getString("tags")).set("events", g.toJson(events))
+						.set("tags", user.getString("tags")).set("events", g.toJson(events)).set("points", user.getString("points"))
 						.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 				event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
@@ -277,6 +278,7 @@ public class EventResource {
 				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
 				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
 				.set("tags", user.getString("tags")).set("bio", user.getString("bio")).set("events", g.toJson(events))
+				.set("points", user.getString("points"))
 				.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 		datastore.update(user);
