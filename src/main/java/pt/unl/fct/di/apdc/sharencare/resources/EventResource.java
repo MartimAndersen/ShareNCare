@@ -252,6 +252,9 @@ public class EventResource {
 		if (!e.equals(""))
 			events = g.fromJson(e, List.class);
 
+		if(events.contains(data.eventId))
+			return Response.status(Status.CONFLICT).encoding("User already has event").build();
+		
 		events.add(data.eventId);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
