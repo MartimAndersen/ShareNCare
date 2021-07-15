@@ -53,7 +53,6 @@ public class EventResource {
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
 	private final RakingUserResource raking = new RakingUserResource();
-	
 
 	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports,
 																										// summer,
@@ -164,64 +163,55 @@ public class EventResource {
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + data.username + " doesn't exist")
 					.build();
 
-		Transaction txn = datastore.newTransaction();
+		for (String eventId : data.eventsId) {
 
-		try {
+			Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+			Entity event = datastore.get(eventKey);
 
-			for (String eventId: data.eventsId) {
+			if (event == null)
+				return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist")
+						.build();
 
-				Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
-				Entity event = datastore.get(eventKey);
+			String m = event.getString("members");
+			String e = user.getString("events");
 
-				if (event == null)
-					return Response.status(Status.BAD_REQUEST)
-							.entity("Event with id: " + eventId + " doesn't exist").build();
+			Type stringList = new TypeToken<ArrayList<String>>() {
+			}.getType();
+			List<String> members = g.fromJson(m, stringList);
+			List<String> events = g.fromJson(e, stringList);
 
-				String m = event.getString("members");
-				String e = user.getString("events");
+			if (!members.contains(data.username) || !events.contains(eventId))
+				return Response.status(Status.CONFLICT).entity("User is not a member of the event").build();
 
-				Type stringList = new TypeToken<ArrayList<String>>() {}.getType();
-				List<String> members = g.fromJson(m, stringList);
-				List<String> events = g.fromJson(e, stringList);
+			members.remove(data.username);
+			events.remove(eventId);
 
-				if (!members.contains(data.username) || !events.contains(eventId))
-						return Response.status(Status.CONFLICT).entity("User is not a member of the event").build();
-				
-				members.remove(data.username);
-				events.remove(eventId);
-				
-				user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
-						.set("email", user.getString("email")).set("bio", user.getString("bio"))
-						.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
-						.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
-						.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
-						.set("tags", user.getString("tags")).set("events", g.toJson(events)).set("points", user.getString("points"))
-						.set("role", user.getString("role")).set("state", user.getString("state")).build();
+			user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
+					.set("email", user.getString("email")).set("bio", user.getString("bio"))
+					.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
+					.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
+					.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
+					.set("tags", user.getString("tags")).set("events", g.toJson(events))
+					.set("points", user.getString("points")).set("role", user.getString("role"))
+					.set("state", user.getString("state")).build();
 
-				event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
-						.set("description", event.getString("description"))
-						.set("minParticipants", event.getString("minParticipants"))
-						.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
-						.set("coordinates", event.getString("coordinates"))
-						.set("durability", event.getString("durability"))
-						.set("institutionName", event.getString("institutionName"))
-						.set("initial_date", event.getString("initial_date"))
-						.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
-						.set("points", event.getString("points")).set("tags", event.getString("tags"))
-						.set("rating", event.getString("rating")).build();
+			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+					.set("description", event.getString("description"))
+					.set("minParticipants", event.getString("minParticipants"))
+					.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+					.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+					.set("institutionName", event.getString("institutionName"))
+					.set("initial_date", event.getString("initial_date"))
+					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
+					.set("points", event.getString("points")).set("tags", event.getString("tags"))
+					.set("rating", event.getString("rating")).build();
 
-				txn.add(event);
-				txn.commit();
-				raking.takePointsQuit(data.username);
-			}
-			datastore.update(user);
-			return Response.ok("User removed").build();
-
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-			}
+			datastore.update(event);
+			raking.takePointsQuit(data.username);
 		}
+		datastore.update(user);
+		return Response.ok("User removed").build();
+
 
 	}
 
@@ -263,49 +253,49 @@ public class EventResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		
+
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventId);
 		Entity event = datastore.get(eventKey);
 
 		if (event == null)
-			return Response.status(Status.BAD_REQUEST)
-					.entity("Event with id: " + data.eventId + " doesn't exist").build();
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.eventId + " doesn't exist")
+					.build();
 
 		String m = event.getString("members");
 		String e = user.getString("events");
 
-		Type stringList = new TypeToken<ArrayList<String>>() {}.getType();
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
 		List<String> members = g.fromJson(m, stringList);
 		List<String> events = g.fromJson(e, stringList);
-		
-		if(members.size() == Integer.parseInt(event.getString("maxParticipants")))
+
+		if (members.size() == Integer.parseInt(event.getString("maxParticipants")))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Event has max participants").build();
 
 		if (members.contains(user.getString("username")) || events.contains(data.eventId))
-				return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
-		
+			return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
+
 		members.add(user.getString("username"));
 		events.add(data.eventId);
-		
-		user = Entity.newBuilder(userKey).set("username",user.getString("username")).set("password", user.getString("password"))
-				.set("email", user.getString("email")).set("bio", user.getString("bio"))
-				.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
-				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
-				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
-				.set("tags", user.getString("tags")).set("events", g.toJson(events)).set("points", user.getString("points"))
+
+		user = Entity.newBuilder(userKey).set("username", user.getString("username"))
+				.set("password", user.getString("password")).set("email", user.getString("email"))
+				.set("bio", user.getString("bio")).set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
+				.set("zipCode", user.getString("zipCode")).set("tags", user.getString("tags"))
+				.set("events", g.toJson(events)).set("points", user.getString("points"))
 				.set("role", user.getString("role")).set("state", user.getString("state")).build();
 
 		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 				.set("description", event.getString("description"))
 				.set("minParticipants", event.getString("minParticipants"))
 				.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
-				.set("coordinates", event.getString("coordinates"))
-				.set("durability", event.getString("durability"))
+				.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
 				.set("institutionName", event.getString("institutionName"))
-				.set("initial_date", event.getString("initial_date"))
-				.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
-				.set("points", event.getString("points")).set("tags", event.getString("tags"))
-				.set("rating", event.getString("rating")).build();
+				.set("initial_date", event.getString("initial_date")).set("ending_date", event.getString("ending_date"))
+				.set("members", g.toJson(members)).set("points", event.getString("points"))
+				.set("tags", event.getString("tags")).set("rating", event.getString("rating")).build();
 
 		datastore.update(user);
 		datastore.update(event);
