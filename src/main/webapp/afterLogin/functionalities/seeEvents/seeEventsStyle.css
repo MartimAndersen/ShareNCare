@@ -34,76 +34,8 @@ li a:hover {
     background-color: #111;
 }
 
-
-
-
-table {
-    border-collapse: collapse;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-th, td {
-    text-align: left;
-    padding: 8px;
-}
-
-tr
-{
-    background-color:#8FBC8F;
-    color:white;
-}
-
-th {
-    background-color: #006400;
-    color: white; /*letras*/
-}
-
-input[type=text], select {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    text-color: #F5FFFA;
-}
-
-input[type=submit] {
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-input[type=submit]:hover {
-    background-color: #45a049;
-}
-
-/*div {*/
-/*    width: 20%;*/
-/*    border-radius: 5px;*/
-/*    padding: 20px;*/
-/*    background-color: rgba(144, 238, 144, 0.80);*/
-/*}*/
-
-
-/*.header1 {*/
-/*    text-align: center;*/
-/*    font-size: 30px;*/
-/*    font-family: 'Brush Script MT', cursive;*/
-/*    color: rgba(255, 255, 255, 0.88);*/
-/*}*/
-
-
 #map {
-    height: 50%;
+    height: 85%;
     width: 98%;
     color: #000000;
     margin-left: auto;
@@ -118,4 +50,10 @@ html, body {
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     color: #000000;
+}
+
+/*info window*/
+.gm-style .gm-style-iw {
+    font-size: 14px;
+    font-family: sans-serif;
 }

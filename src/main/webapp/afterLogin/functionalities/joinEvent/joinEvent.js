@@ -96,49 +96,8 @@ function goToPageBefore() {
     window.location.href = "../../afterLoginPage.html";
 }
 
-// function myFunction(jsonResponse) {
-//     for (var i = 0; i < jsonResponse.length; i++) {
-//         var obj = []
-//         obj = JSON.parse(jsonResponse[i]);
-//
-//         console.log(obj);
-//     }
-// }
-
-function fillTable(obj) {
-
-    let table = document.getElementById('demo_table');
-
-    let row = table.insertRow(-1);
-    let cell = row.insertCell(0);
-    let text = document.createTextNode((obj[2].value)); // frequency
-    cell.appendChild(text);
-    cell = row.insertCell(0);
-    text = document.createTextNode((obj[6].value)); // maxParticipants
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[8].value)); // minParticipants
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[3].value)); // endDate
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[13].value)); // hour
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[4].value)); // initDate
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[1].value)); // description
-    cell.appendChild(text);
-    cell = row.insertCell(0)
-    text = document.createTextNode((obj[9].value)) // eventName
-    cell.appendChild(text);
-}
-
-function populate_table(jsonResponse) {
+function populateMap(jsonResponse) {
     for (let i = 0; i < jsonResponse.length; i++) {
-
         let obj = [];
         obj = JSON.parse(jsonResponse[i]);
 
@@ -159,7 +118,6 @@ function populate_table(jsonResponse) {
         // 13 - hour
 
         fillLocationsArray(obj);
-        //fillTable(obj);
     }
     addMarkers();
 }
@@ -174,7 +132,7 @@ function callGetEvents() {
             //console.log(xhttp.response);
             // console.log(xhttp.responseText);
             jsonResponse = JSON.parse(xhttp.responseText);
-            populate_table(jsonResponse)
+            populateMap(jsonResponse)
         }
     };
     xhttp.open("GET", "/rest/event/getAllEvents", true);

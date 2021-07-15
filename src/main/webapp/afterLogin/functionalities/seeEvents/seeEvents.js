@@ -12,17 +12,57 @@ var locations = [];
 
 function fillLocationsArray(obj) {
     let locationAux = [];
-    locationAux.push(obj[7].value);
-    locationAux.push(obj[0].value.split(" ")[0]);
-    locationAux.push(obj[0].value.split(" ")[1]);
+    locationAux.push(obj[9].value); // eventName - 0
+    locationAux.push(obj[0].value.split(" ")[0]); // latitude - 1
+    locationAux.push(obj[0].value.split(" ")[1]); // longitude - 2
+    locationAux.push(obj[4].value); // initDate - 3
+    locationAux.push(obj[3].value); // endDate - 4
+    locationAux.push(obj[13].value); // hour - 5
+    locationAux.push(obj[2].value); // frequency - 6
+    locationAux.push(obj[8].value); // minParticipants - 7
+    locationAux.push(obj[6].value); // maxParticipants - 8
+    locationAux.push(obj[1].value); // description - 9
+
     locations.push(locationAux);
 }
 
 var markers = [];
 
-function addMarkers() {
-
+function fillInfoWindow(marker, i) {
     var infowindow = new google.maps.InfoWindow();
+
+    locationAux = locations[i];
+
+    let eventName = locationAux[0];
+    let initDate = locationAux[3];
+    let endDate = locationAux[4];
+    let hour = locationAux[5];
+    let frequency = locationAux[6];
+    let minParticipants = locationAux[7];
+    let maxParticipants = locationAux[8];
+    let description = locationAux[9];
+
+    infowindow.setContent(
+        'Event name: ' + eventName +
+        '<p></p>' +
+        'Initial date: ' + initDate +
+        '<p></p>' +
+        'End date: ' + endDate +
+        '<p></p>' +
+        'Hour: ' + hour +
+        '<p></p>' +
+        'Frequency: ' + frequency +
+        '<p></p>' +
+        'Min participants: ' + minParticipants +
+        '<p></p>' +
+        'Max participants: ' + maxParticipants +
+        '<p></p>' +
+        'Description: ' + description
+    );
+    infowindow.open(map, marker);
+}
+
+function addMarkers() {
 
     var marker, i;
 
@@ -36,8 +76,7 @@ function addMarkers() {
 
         google.maps.event.addListener(marker, 'click', (function (marker, i) {
             return function () {
-                infowindow.setContent(locations[i][0]);
-                infowindow.open(map, marker);
+                fillInfoWindow(marker, i)
             }
         })(marker, i));
     }
@@ -47,49 +86,12 @@ function goToPageBefore(){
     window.location.href = "../../afterLoginPage.html";
 }
 
-// function myFunction(jsonResponse) {
-//     for(var i = 0; i < jsonResponse.length; i++) {
-//         var obj = []
-//         obj= JSON.parse(jsonResponse[i]);
-//
-//         console.log(obj);
-//     }
-// }
-
-function populate_table(jsonResponse) {
-    let table = document.getElementById('demo_table');
-    for(var i = 0; i < jsonResponse.length; i++) {
+function populateMap(jsonResponse) {
+    for(let i = 0; i < jsonResponse.length; i++) {
         let obj = [];
-
         obj = JSON.parse(jsonResponse[i]);
 
         fillLocationsArray(obj);
-
-        let row = table.insertRow(-1);
-        let cell = row.insertCell(0);
-        let text = document.createTextNode((obj[9].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0);
-        text = document.createTextNode((obj[5].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[6].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[2].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[3].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[4].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[1].value));
-        cell.appendChild(text);
-        cell = row.insertCell(0)
-        text = document.createTextNode((obj[7].value));
-        cell.appendChild(text);
     }
     addMarkers();
 }
@@ -99,11 +101,8 @@ function callSeeEvents(){
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            // Typical action to be performed when the document is ready:
-            //console.log(xhttp.response);
-            // console.log(xhttp.responseText);
             jsonResponse = JSON.parse(xhttp.responseText);
-            populate_table(jsonResponse)
+            populateMap(jsonResponse)
 
         }
 
