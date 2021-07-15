@@ -44,6 +44,7 @@ import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
+import pt.unl.fct.di.apdc.sharencare.resources.RakingUserResource;
 
 @Path("/event")
 public class EventResource {
@@ -51,6 +52,8 @@ public class EventResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
+	private final RakingUserResource raking = new RakingUserResource();
+	
 
 	public String[] TAGS = { "animals", "environment", "children", "elderly", "supplies", "homeless" };// , sports,
 																										// summer,
@@ -210,6 +213,8 @@ public class EventResource {
 				txn.add(event);
 				txn.add(user);
 				txn.commit();
+				
+				raking.takePointsQuit(data.username);
 			}
 
 			return Response.ok("User removed").build();
