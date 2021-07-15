@@ -554,12 +554,13 @@ public class EventResource {
 			query.setFilter(CompositeFilter.and(first, subFilter));
 		}
 		
+		Query<Entity> q = null;
+		
 		if(data.popularity.equals("Most Popular"))
-			query.setOrderBy(OrderBy.desc("points"));
+			q = query.setOrderBy(OrderBy.desc("points")).build();
 		if(data.popularity.equals("Least Popular"))
-			query.setOrderBy(OrderBy.asc("points"));
-	
-		Query<Entity> q = query.build();
+			q = query.setOrderBy(OrderBy.asc("points")).build();
+
 		
 		QueryResults<Entity> eventsQuery = datastore.run(q);
 		List<String> events = new ArrayList<>();
