@@ -105,7 +105,8 @@ public class InsideLoginResource {
 				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
 				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
 				.set("tags", g.toJson(data.tags)).set("events", user.getString("events"))
-				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+				.set("role", user.getString("role")).set("state", user.getString("state")).set("points", user.getString("points"))
+				.build();
 
 		datastore.update(user);
 
@@ -179,7 +180,7 @@ public class InsideLoginResource {
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
 				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("state", user.getString("state")).set("points", user.getString("points")).build();
 
 		datastore.update(user);
 
@@ -281,7 +282,7 @@ public class InsideLoginResource {
 				.set("secondAddress", secondAddress).set("zipCode", postal).set("role", user.getString("role"))
 				.set("state", user.getString("state"))/**.set("profilePic", user.getString("profilePic"))*/
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("bio", bio).build();
+				.set("bio", bio).set("points", user.getString("points")).build();
 		datastore.update(user);
 		return Response.ok("Properties changed.").cookie(cookie).build();
 	}
@@ -413,7 +414,7 @@ public class InsideLoginResource {
 				.set("mobile", userToBeChanged.getString("mobile")).set("address", userToBeChanged.getString("address"))
 				.set("secondAddress", userToBeChanged.getString("secondAddress"))
 				.set("zipCode", userToBeChanged.getString("zipCode")).set("role", data.roleToChange)
-				.set("state", userToBeChanged.getString("state")).build();
+				.set("state", userToBeChanged.getString("state")).set("points", userToBeChanged.getString("points")).build();
 
 		datastore.update(userToBeChanged);
 		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).cookie(cookie).build();
@@ -468,7 +469,7 @@ public class InsideLoginResource {
 				.set("address", userToChange.getString("address"))
 				.set("secondAddress", userToChange.getString("secondAddress"))
 				.set("zipCode", userToChange.getString("zipCode")).set("role", userToChange.getString("role"))
-				.set("state", data.state).build();
+				.set("state", data.state).set("points", userToChange.getString("points")).build();
 
 		datastore.put(userToChange);
 		return Response.ok(data.userToChange + " state was changed to: " + data.state).build();
@@ -544,7 +545,8 @@ public class InsideLoginResource {
     						.set("secondAddress", user.getString("secondAddress"))
     						.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
     						.set("state", user.getString("state"))
-    						.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
+    						.set("tags", user.getString("tags")).set("events", user.getString("events"))
+    						.set("points", user.getString("points")).build();
     				datastore.put(user);
     				return Response.ok("Email was changed").cookie(cookie).build();  				
     			}
@@ -600,7 +602,8 @@ public class InsideLoginResource {
 							.set("secondAddress", user.getString("secondAddress"))
 							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 							.set("state", user.getString("state"))
-							.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
+							.set("tags", user.getString("tags")).set("events", user.getString("events"))
+							.set("points", user.getString("points")).build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();
 

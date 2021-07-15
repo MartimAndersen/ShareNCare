@@ -48,6 +48,7 @@ public class RegisterResource {
                     .set("events", gson.toJson(new ArrayList<String>()))
                     .set("role", "SU")
                     .set("state", "ENABLED")
+                    .set("points", "")
                     .build();
             datastore.add(user);
         } else {}
@@ -106,6 +107,7 @@ public class RegisterResource {
     						.set("events", gson.toJson(new ArrayList<String>()))
     						.set("role", "USER")
     						.set("state", "ENABLED")
+    						.set("points", "0")
     						.build();
     				
     				txn.add(user);
