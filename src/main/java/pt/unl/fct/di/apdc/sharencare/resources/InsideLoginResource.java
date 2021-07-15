@@ -515,7 +515,7 @@ public class InsideLoginResource {
 		Entity user = datastore.get(userKey);
 
 		if (user == null)
-			return Response.status(Status.FORBIDDEN).entity(token.getString("username") + " does not exist").build();
+			return Response.status(Status.BAD_REQUEST).entity(token.getString("username") + " does not exist").build();
 
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
@@ -528,18 +528,26 @@ public class InsideLoginResource {
 		String hashedPWD = user.getString("password");
 		if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 			if (data.validEmail()) {
-					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-							.set("password", user.getString("password"))
-							.set("email", data.newEmail).set("bio", user.getString("bio"))
-							.set("profileType", user.getString("profileType"))
-							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-							.set("address", user.getString("address"))
-							.set("secondAddress", user.getString("secondAddress"))
-							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
-							.set("state", user.getString("state"))
-							.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
-					datastore.put(user);
-					return Response.ok("Email was changed").cookie(cookie).build();
+				Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
+    					.setFilter(PropertyFilter.eq("email", data.newEmail)).build();
+    			QueryResults<Entity> results = datastore.run(query);
+    			if(results.hasNext()) {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity("Email " + data.newEmail + " already exists.").build();
+    			}else {		
+    				user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+    						.set("password", user.getString("password"))
+    						.set("email", data.newEmail).set("bio", user.getString("bio"))
+    						.set("profileType", user.getString("profileType"))
+    						.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+    						.set("address", user.getString("address"))
+    						.set("secondAddress", user.getString("secondAddress"))
+    						.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+    						.set("state", user.getString("state"))
+    						.set("tags", user.getString("tags")).set("events", user.getString("events")).build();
+    				datastore.put(user);
+    				return Response.ok("Email was changed").cookie(cookie).build();  				
+    			}
 			}
 			return Response.status(Response.Status.NOT_ACCEPTABLE).build();
 		}

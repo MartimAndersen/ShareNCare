@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -28,6 +30,7 @@ public class RegisterResource {
     public RegisterResource() {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey("superUser");
         Entity user = datastore.get(userKey);
+        
         if(user == null) {
             user = Entity.newBuilder(userKey)
                     .set("username", "superUser")
@@ -79,26 +82,36 @@ public class RegisterResource {
                 return Response.status(Response.Status.CONFLICT)
                         .entity("User " + data.username + " already exists.").build();
             } else {
-                user = Entity.newBuilder(userKey)
-                        .set("username", data.username)
-                        .set("email", data.email)
-                        .set("password", DigestUtils.sha512Hex(data.password))
-        				.set("profileType", "private")
-        				.set("landLine", "")
-        				.set("mobile", "")
-        				.set("address", "")
-        				.set("secondAddress", "")
-        				.set("zipCode", "")
-        				.set("bio", "")
-        		        .set("tags", gson.toJson(new ArrayList<Integer>()))
-                        .set("events", gson.toJson(new ArrayList<String>()))
-                        .set("role", "USER")
-                        .set("state", "ENABLED")
-                        .build();
-
-                txn.add(user);
-                txn.commit();
-                return Response.ok("User " + data.username + " registered.").build();
+            	
+            	Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
+    					.setFilter(PropertyFilter.eq("email", data.email)).build();
+    			QueryResults<Entity> results = datastore.run(query);
+    			if(results.hasNext()) {
+    				txn.rollback();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity("Email " + data.email + " already exists.").build();
+    			}else {		
+    				user = Entity.newBuilder(userKey)
+    						.set("username", data.username)
+    						.set("email", data.email)
+    						.set("password", DigestUtils.sha512Hex(data.password))
+    						.set("profileType", "private")
+    						.set("landLine", "")
+    						.set("mobile", "")
+    						.set("address", "")
+    						.set("secondAddress", "")
+    						.set("zipCode", "")
+    						.set("bio", "")
+    						.set("tags", gson.toJson(new ArrayList<Integer>()))
+    						.set("events", gson.toJson(new ArrayList<String>()))
+    						.set("role", "USER")
+    						.set("state", "ENABLED")
+    						.build();
+    				
+    				txn.add(user);
+    				txn.commit();
+    				return Response.ok("User " + data.username + " registered.").build();
+    			}   			    			
             }
         } finally {
             if (txn.isActive()) {
@@ -137,30 +150,41 @@ public class RegisterResource {
                 return Response.status(Response.Status.CONFLICT)
                         .entity("Institution " + data.username + " already exists.").build();
             } else {
-                user = Entity.newBuilder(userKey)
-                		.set("nif", data.nif)
-                        .set("username", data.username)
-                        .set("email", data.email)
-                        .set("password", DigestUtils.sha512Hex(data.password))
-        				.set("landLine", "")
-        				.set("mobile", "")
-        				.set("address", "")
-        				.set("zipCode", "")
-        				.set("website", "")
-        				.set("twitter", "")
-        				.set("instagram", "")
-        				.set("youtube", "")
-        				.set("facebook", "")
-        				.set("fax", "")
-        				.set("bio", "")
-        				.set("events", gson.toJson(new ArrayList<String>()))
-        		        .set("role", "INSTITUTION")
-                        .set("state", "ENABLED")
-                        .build();
-
-                txn.add(user);
-                txn.commit();
-                return Response.ok("Institution " + data.username + " registered.").build();
+            	
+            	Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
+    					.setFilter(PropertyFilter.eq("email", data.email)).build();
+    			QueryResults<Entity> results = datastore.run(query);
+    			if(results.hasNext()) {
+    				txn.rollback();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity("Email " + data.email + " already exists.").build();
+    			}else {		    				
+    				user = Entity.newBuilder(userKey)
+    						.set("nif", data.nif)
+    						.set("username", data.username)
+    						.set("email", data.email)
+    						.set("password", DigestUtils.sha512Hex(data.password))
+    						.set("landLine", "")
+    						.set("mobile", "")
+    						.set("address", "")
+    						.set("zipCode", "")
+    						.set("website", "")
+    						.set("twitter", "")
+    						.set("instagram", "")
+    						.set("youtube", "")
+    						.set("facebook", "")
+    						.set("fax", "")
+    						.set("bio", "")
+    						.set("events", gson.toJson(new ArrayList<String>()))
+    						.set("role", "INSTITUTION")
+    						.set("state", "ENABLED")
+    						.build();
+    				
+    				txn.add(user);
+    				txn.commit();
+    				return Response.ok("Institution " + data.username + " registered.").build();
+    			}
+            	
             }
         } finally {
             if (txn.isActive()) {
