@@ -108,7 +108,7 @@ public class RakingUserResource {
 	}
 	
 	@GET
-	@Path("/getPic")
+	@Path("/rankUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response rankUsers(@CookieParam("Token") NewCookie cookie) {
 		if (cookie.getName().equals(""))

@@ -2,11 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share&Care</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" href="leaderboardStyle.css">
 </head>
-<body>
+<body onload="callRank()">
 
-<button onclick="goToPageBefore()">Go back</button>
+<ul>
+    <img src="../../images/logo" height="5%" width="5%">
+    <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
+    <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
+</ul>
+
+<header><h1>Leader Board</h1></header>
+<table id="demo_table">
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>points</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 <script src="leaderboard.js"></script>
 
