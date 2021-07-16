@@ -47,7 +47,8 @@ public class RakingUserResource {
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey("username");
 		Entity user = datastore.get(userKey);
 		
-		int points =  Integer.parseInt( user.getString("points"));
+		String points1 =   user.getString("points");
+		int points = Integer.parseInt(points1);
 		points += 2;
 		
 		user = Entity.newBuilder(userKey).set("username",username)

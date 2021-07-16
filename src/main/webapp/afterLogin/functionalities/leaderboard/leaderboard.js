@@ -28,19 +28,22 @@ function callRank(){
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
+            switch (this.status) {
+
                 case 401: alert("Please enter a token."); break;
                 case 404: alert("Token does not exist."); break;
                 case 403: alert("The user with the given token does not exist."); break;
                 case 406: alert("The user with the given token is disabled."); break;
             case 200:
             jsonResponse = JSON.parse(xhttp.responseText);
-            populate_table(jsonResponse);break
+            populate_table(jsonResponse);break;
 
-        }
-
-    };
+            default: alert("Wrong parameters."); break;
+    }
+    	}
     xhttp.open("GET", "/rest/ranking/rankUsers", true);
     xhttp.send();
+    
 
-
+}
 }
