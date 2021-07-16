@@ -1,6 +1,7 @@
 document.getElementById("eventOrigin").style.visibility = "hidden";
 document.getElementById("distanceBox").style.visibility = "hidden";
 document.getElementById("floating-panel").style.visibility = "hidden";
+document.getElementById("clearMapButton").style.visibility = "hidden";
 
 let map;
 let eventLat;
@@ -25,6 +26,14 @@ function initMap() {
 let originInput;
 
 let dist = 0;
+
+function clearDirections(){
+    document.getElementById("clearMapButton").style.visibility = "hidden";
+    document.getElementById("distanceBox").style.visibility = "hidden";
+    directionsRenderer.setMap(null);
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+}
 
 class AutocompleteDirectionsHandler {
     constructor(map, waitForChanges) {
@@ -69,9 +78,7 @@ class AutocompleteDirectionsHandler {
 
         // this.directionsRenderer.set('directions', null);
 
-        directionsRenderer.setMap(null);
-        directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
+        clearDirections();
 
         this.route();
     }
@@ -95,6 +102,7 @@ class AutocompleteDirectionsHandler {
 
     route() {
         document.getElementById("eventOrigin").style.visibility = "hidden";
+        document.getElementById("clearMapButton").style.visibility = "visible";
         if (!this.originPlaceId && currOriginPlaceId === "") {
             return;
         }
