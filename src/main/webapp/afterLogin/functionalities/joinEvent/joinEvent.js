@@ -59,7 +59,6 @@ class AutocompleteDirectionsHandler {
         });
 
 
-
         this.originPlaceId = place.place_id;
         currOriginPlaceId = this.originPlaceId;
 
@@ -140,6 +139,20 @@ var locations = [];
 //     ['Casa de Acolhimento Residencial D. Nuno Álvares Pereira', 38.67591762242458, -9.160317675163238]
 // ];
 
+function getNrMembers(membersString){
+    // [b,g] comes looking like "[\"b\",\"g\"]"
+    let nrMembers = 0;
+    if(membersString !== "[]"){
+        let nrMembersAux = (membersString.match(/,/g) || []).length;
+            if(membersString === 0){
+                nrMembers = 1;
+            } else{
+                nrMembers = nrMembersAux + 1;
+            }
+    }
+    return nrMembers;
+}
+
 function fillLocationsArray(obj) {
     let locationAux = [];
     locationAux.push(obj[9].value); // eventName - 0
@@ -153,15 +166,21 @@ function fillLocationsArray(obj) {
     locationAux.push(obj[6].value); // maxParticipants - 8
     locationAux.push(obj[1].value); // description - 9
 
+    let tagsStringAux = obj[12].value.split("[")[1].split("]")[0].replace(/,/g, ''); // '[2,6]' to '26' (g means global/all string)
+
+    locationAux.push(tagsStringAux); // tags - 10
+
+    locationAux.push(getNrMembers(obj[7].value)); // nrMembers - 11
+
     locations.push(locationAux);
 }
 
 var markers = [];
 
-function showOriginInput(i){
+function showOriginInput(i) {
     let elem = document.getElementById("eventOrigin");
     elem.style.visibility = "visible";
-    elem.value="";
+    elem.value = "";
 
     eventLat = locations[i][1];
     eventLon = locations[i][2];
@@ -169,6 +188,64 @@ function showOriginInput(i){
     document.getElementById("floating-panel").style.visibility = "visible";
 
     new AutocompleteDirectionsHandler(map, true);
+}
+
+function convertToTags(currTags) {
+    // tags:  ["animals", "environment", "children", "elderly", "supplies", "homeless"]
+    // 1 to 6
+    // currTags: if '[2,6]' then comes looking like '26'
+    let tagsString = "";
+    let currNrTags = currTags.length;
+    if (currNrTags === 0) {
+        tagsString = "None.";
+    } else {
+        for (let j = 0; j < currNrTags; j++) {
+            switch (currTags[j]) {
+                case '1':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "animals.";
+                    } else {
+                        tagsString += "animals, ";
+                    }
+                    break;
+                case '2':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "environment.";
+                    } else {
+                        tagsString += "environment, ";
+                    }
+                    break;
+                case '3':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "children.";
+                    } else {
+                        tagsString += "children, ";
+                    }
+                    break;
+                case '4':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "elderly.";
+                    } else {
+                        tagsString += "elderly, ";
+                    }
+                    break;
+                case '5':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "supplies.";
+                    } else {
+                        tagsString += "supplies, ";
+                    }
+                    break;
+                case '6':
+                    tagsString += "homeless.";
+                    break;
+                default:
+                    tagsString += "ERROR ";
+                    break;
+            }
+        }
+    }
+    return tagsString;
 }
 
 function fillInfoWindow(marker, i) {
@@ -184,6 +261,11 @@ function fillInfoWindow(marker, i) {
     let minParticipants = locationAux[7];
     let maxParticipants = locationAux[8];
     let description = locationAux[9];
+    let currTags = locationAux[10];
+
+    let tagsString = convertToTags(currTags);
+
+    let nrMembers = locationAux[11];
 
     infowindow.setContent(
         'Event name: ' + eventName +
@@ -199,6 +281,10 @@ function fillInfoWindow(marker, i) {
         'Min participants: ' + minParticipants +
         '<p></p>' +
         'Max participants: ' + maxParticipants +
+        '<p></p>' +
+        'Number of current members: ' + nrMembers +
+        '<p></p>' +
+        'Tags: ' + tagsString +
         '<p></p>' +
         'Description: ' + description +
         '<p></p>' +
