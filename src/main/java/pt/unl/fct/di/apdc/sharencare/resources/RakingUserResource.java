@@ -125,6 +125,7 @@ public class RakingUserResource {
 	@Path("/rankUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response rankUsers(@CookieParam("Token") NewCookie cookie) {
+	
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 		
