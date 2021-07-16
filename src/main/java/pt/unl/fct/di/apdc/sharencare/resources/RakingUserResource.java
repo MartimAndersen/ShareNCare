@@ -27,6 +27,7 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
 
@@ -139,7 +140,7 @@ public class RakingUserResource {
 		List<String> events = new ArrayList<>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").setOrderBy(OrderBy.desc("points")).setLimit(5).build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).setOrderBy(OrderBy.desc("points")).setLimit(5).build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
