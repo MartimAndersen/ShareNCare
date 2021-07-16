@@ -4,6 +4,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -31,12 +32,15 @@ import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
 
+
+
 @Path("/ranking")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RakingUserResource {
 	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
+	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	
 	public RakingUserResource() {
 		
@@ -44,12 +48,20 @@ public class RakingUserResource {
 	
 	public void addPointsEvents(String username) {
 		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
+		System.out.println(username);
+		System.out.println(userKey);
 		
-		String points1 =   user.getString("points");
-		int points = Integer.parseInt(points1);
-		points += 2;
+		LOG.fine("points attempt by user: " + username);
+		
+		//String points1 = user.getString("points");
+		//int points = Integer.parseInt(points1);
+		//points += 2;
+		if(user == null) {
+			
+			return;
+		}
 		
 		user = Entity.newBuilder(userKey).set("username",username)
 				.set("password",user.getString("password"))
@@ -61,13 +73,13 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(points)).build();
+				.set("points", g.toJson(2)).build();
 		datastore.put(user);
 	}
 	
 	public void addPointsComents(String username) {
 		
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 		
 		int points =  Integer.parseInt( user.getString("points"));

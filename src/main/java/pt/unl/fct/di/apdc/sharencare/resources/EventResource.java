@@ -717,6 +717,7 @@ public class EventResource {
 
 		String m = event.getString("members");
 		//String e = user.getString("events");
+		
 
 		Type stringList = new TypeToken<ArrayList<String>>() {
 		}.getType();
@@ -724,6 +725,7 @@ public class EventResource {
 		//List<String> events = g.fromJson(e, stringList);
 
 		for (String member : members) {
+			
 			raking.addPointsEvents(member);
 		}
 		return Response.ok("Event finished").cookie(cookie).build();
