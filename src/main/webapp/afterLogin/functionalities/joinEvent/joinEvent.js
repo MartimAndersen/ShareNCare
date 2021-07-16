@@ -1,17 +1,25 @@
 document.getElementById("eventOrigin").style.visibility = "hidden";
 document.getElementById("distanceBox").style.visibility = "hidden";
+document.getElementById("floating-panel").style.visibility = "hidden";
 
 let map;
 let eventLat;
 let eventLon;
+let currTravelMode = "WALKING";
+let currOriginPlaceId = "";
+let place = "";
+let directionsRenderer;
+let directionsService;
 
 function initMap() {
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsService = new google.maps.DirectionsService();
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
         center: {lat: 38.659784, lng: -9.202765},
         zoom: 9
     });
-    new AutocompleteDirectionsHandler(map);
+    new AutocompleteDirectionsHandler(map, true);
 }
 
 let originInput;
@@ -19,61 +27,96 @@ let originInput;
 let dist = 0;
 
 class AutocompleteDirectionsHandler {
-    constructor(map) {
+    constructor(map, waitForChanges) {
         this.map = map;
         this.originPlaceId = "";
-        this.travelMode = google.maps.TravelMode.WALKING;
-        this.directionsService = new google.maps.DirectionsService();
-        this.directionsRenderer = new google.maps.DirectionsRenderer();
-        this.directionsRenderer.setMap(map);
+        directionsRenderer.setMap(map);
         originInput = document.getElementById("eventOrigin");
-        const modeSelector = document.getElementById("mode-selector");
+        // const modeSelector = document.getElementById("mode-selector");
         // map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+        // map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
         const originAutocomplete = new google.maps.places.Autocomplete(originInput);
         // Specify just the place data fields that you need.
         originAutocomplete.setFields(["place_id"]);
-        this.setupPlaceChangedListener(originAutocomplete, "ORIG");
+
+        if (waitForChanges) {
+            this.setupPlaceChangedListener(originAutocomplete);
+        } else {
+            this.setupPlace(originAutocomplete);
+        }
     }
 
-    setupPlaceChangedListener(autocomplete, mode) {
+    setupPlace(autocomplete) {
+        autocomplete.bindTo("bounds", this.map);
+
+        autocomplete.addListener("place_changed", () => {
+            if (!place.place_id) {
+                window.alert("Please select an option from the dropdown list.");
+                return;
+            }
+            this.originPlaceId = place.place_id;
+            currOriginPlaceId = this.originPlaceId;
+        });
+
+
+
+        this.originPlaceId = place.place_id;
+        currOriginPlaceId = this.originPlaceId;
+
+        // if (this.directionsRenderer != null) {
+        //     // this.directionsRenderer.setDirections({routes: []});
+        //     this.directionsRenderer.setMap(null);
+        // }
+
+        // this.directionsRenderer.set('directions', null);
+
+        directionsRenderer.setMap(null);
+        directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        this.route();
+    }
+
+    setupPlaceChangedListener(autocomplete) {
         autocomplete.bindTo("bounds", this.map);
         autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
+            place = autocomplete.getPlace();
 
             if (!place.place_id) {
                 window.alert("Please select an option from the dropdown list.");
                 return;
             }
 
-            if (mode === "ORIG") {
-                this.originPlaceId = place.place_id;
-            }
+            this.originPlaceId = place.place_id;
+            currOriginPlaceId = this.originPlaceId;
+
             this.route();
         });
     }
 
     route() {
         document.getElementById("eventOrigin").style.visibility = "hidden";
-        document.getElementById("distanceBox").style.visibility = "visible";
-        if (!this.originPlaceId) {
+        if (!this.originPlaceId && currOriginPlaceId === "") {
             return;
         }
-        const me = this;
-        this.directionsService.route(
+
+        // this.originPlaceId = currOriginPlaceId;
+
+        directionsService.route(
             {
-                origin: {placeId: this.originPlaceId},
+                origin: {placeId: currOriginPlaceId},
                 destination: {
                     "lat": parseFloat(eventLat),
                     "lng": parseFloat(eventLon)
                 },
-                travelMode: this.travelMode,
+                travelMode: google.maps.TravelMode[currTravelMode],
             },
             (response, status) => {
                 if (status === "OK") {
-                    me.directionsRenderer.setDirections(response);
+                    directionsRenderer.setDirections(response);
                     dist = response.routes[0].legs[0].distance.text;
                     document.getElementById("distanceBox").value = "Distance: " + dist;
+                    document.getElementById("distanceBox").style.visibility = "visible";
                 } else {
                     window.alert("Directions request failed due to " + status);
                 }
@@ -81,6 +124,11 @@ class AutocompleteDirectionsHandler {
         );
     }
 }
+
+document.getElementById("mode").addEventListener("change", () => {
+    currTravelMode = document.getElementById("mode").value;
+    new AutocompleteDirectionsHandler(map, false);
+});
 
 var locations = [];
 
@@ -117,6 +165,10 @@ function showOriginInput(i){
 
     eventLat = locations[i][1];
     eventLon = locations[i][2];
+
+    document.getElementById("floating-panel").style.visibility = "visible";
+
+    new AutocompleteDirectionsHandler(map, true);
 }
 
 function fillInfoWindow(marker, i) {

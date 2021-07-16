@@ -72,3 +72,17 @@ li a:hover {
 textarea{
     /*padding: 30px;*/
 }
+
+#floating-panel{
+    float: right;
+    color: white;
+    font-size: 20px;
+    margin-right: 20px;
+}
+
+#mode{
+    color: black;
+    font-size: 20px;
+    border-radius: 20px;
+    background-color: #a2d9e5;
+}

@@ -36,3 +36,17 @@ li a {
 li a:hover {
     background-color: #111;
 }
+
+#floating-panel{
+    float: right;
+    color: white;
+    font-size: 20px;
+    margin-right: 20px;
+}
+
+#mode{
+    color: black;
+    font-size: 20px;
+    border-radius: 20px;
+    background-color: #a2d9e5;
+}
