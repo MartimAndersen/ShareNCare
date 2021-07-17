@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -66,7 +68,7 @@ public class EventResource {
 	@POST
 	@Path("/registerEvent")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response registerEvent(@CookieParam("Token") NewCookie cookie, EventData data) {
+	public Response registerEvent(@CookieParam("Token") NewCookie cookie, EventData data) throws ParseException {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -74,7 +76,7 @@ public class EventResource {
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
@@ -82,14 +84,13 @@ public class EventResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		String username =token.getString("username");
+		String username = token.getString("username");
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 
 		if (user == null)
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
-
 
 		/*
 		 * END OF VERIFICATIONS
@@ -103,10 +104,10 @@ public class EventResource {
 
 		if (!data.verifyDate())
 			return Response.status(Status.FORBIDDEN).build();
-		
+
 		if (!data.futureDate())
 			return Response.status(Status.BAD_REQUEST).build();
-		
+
 		if (!data.dateOrder())
 			return Response.status(Status.PRECONDITION_FAILED).build();
 
@@ -133,10 +134,11 @@ public class EventResource {
 						.set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
 						.set("institutionName", data.institutionName).set("initial_date", data.initialDate)
 						.set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
-						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).set("ended", "false").build();
+						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l))
+						.set("ended", "false").build();
 
 				txn.add(event);
-				
+
 				List<String> events = new ArrayList<String>();
 				String e = user.getString("events");
 
@@ -168,10 +170,13 @@ public class EventResource {
 		}
 	}
 
-	@POST
+	@DELETE
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, @QueryParam("eventId") String eventId) {
+	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+		
+		String eventId = data.name;
+		
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -187,6 +192,35 @@ public class EventResource {
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
 
 		datastore.delete(eventKey);
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+
+		QueryResults<Entity> usersQuery = datastore.run(query);
+
+
+		while (usersQuery.hasNext()) {
+			Key userKey = datastore.newKeyFactory().setKind("User").newKey(eventId);
+			Entity user = datastore.get(userKey);
+			
+			//ObjectMapper mapper = new ObjectMapper();
+			String ev = user.getString("events"); 
+			Type stringList = new TypeToken<ArrayList<String>>() {
+			}.getType();
+			List<String> userEvents = g.fromJson(ev, stringList);
+			userEvents.remove(eventId);
+			user = Entity.newBuilder(userKey).set("nif", token.getString("username"))
+					.set("username", user.getString("username")).set("password", user.getString("password"))
+					.set("email", user.getString("email")).set("landLine", user.getString("landLine"))
+					.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
+					.set("zipCode", user.getString("zipCode")).set("events", g.toJson(userEvents))
+					.set("website", user.getString("website")).set("instagram", user.getString("instagram"))
+					.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
+					.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
+					.set("fax", user.getString("fax")).set("role", user.getString("role"))
+					.set("state", user.getString("state")).build();
+
+			datastore.update(user);
+			}
 
 		return Response.ok("Event deleted.").build();
 
@@ -252,15 +286,13 @@ public class EventResource {
 					.set("initial_date", event.getString("initial_date"))
 					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
 					.set("points", event.getString("points")).set("tags", event.getString("tags"))
-					.set("rating", event.getString("rating"))
-					.set("ended", event.getString("ended")).build();
+					.set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
 
 			datastore.update(event);
 			raking.takePointsQuit(data.username);
 		}
 		datastore.update(user);
 		return Response.ok("User removed").build();
-
 
 	}
 
@@ -344,15 +376,14 @@ public class EventResource {
 				.set("institutionName", event.getString("institutionName"))
 				.set("initial_date", event.getString("initial_date")).set("ending_date", event.getString("ending_date"))
 				.set("members", g.toJson(members)).set("points", event.getString("points"))
-				.set("tags", event.getString("tags")).set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
+				.set("tags", event.getString("tags")).set("rating", event.getString("rating"))
+				.set("ended", event.getString("ended")).build();
 
 		datastore.update(user);
 		datastore.update(event);
 
 		return Response.ok("Joined successfully.").cookie(cookie).build();
 	}
-	
-	
 
 	@SuppressWarnings("unchecked")
 	@POST
@@ -617,7 +648,6 @@ public class EventResource {
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
 
-	
 	@GET
 	@Path("/listEventPreferences")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -673,7 +703,7 @@ public class EventResource {
 
 		return Response.ok(g.toJson(events)).cookie(cookie).build();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/finishEvent")
@@ -686,7 +716,6 @@ public class EventResource {
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -715,25 +744,20 @@ public class EventResource {
 		Entity event = datastore.get(eventKey);
 
 		if (event == null)
-			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.name + " doesn't exist")
-					.build();
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.name + " doesn't exist").build();
 
 		String m = event.getString("members");
-		
-		
 
 		Type stringList = new TypeToken<ArrayList<String>>() {
 		}.getType();
 		List<String> members = g.fromJson(m, stringList);
-		
 
 		for (String member : members) {
-			
+
 			raking.addPointsEvents(member);
 		}
 		return Response.ok("Event finished").cookie(cookie).build();
 
-		
 	}
 
 	@GET
@@ -758,12 +782,10 @@ public class EventResource {
 			query.setFilter(CompositeFilter.and(first, subFilter));
 		}
 
-
 		if (data.popularity.equals("Most Popular"))
 			query = query.setOrderBy(OrderBy.desc("points"));
 		if (data.popularity.equals("Least Popular"))
 			query = query.setOrderBy(OrderBy.asc("points"));
-		
 
 		Query<Entity> q = query.build();
 
@@ -799,26 +821,20 @@ public class EventResource {
 				return true;
 		return false;
 	}
-	
+
 	@GET
 	@Path("/checkEventDate")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response checkEventDate() {
-		
+
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
 
 		QueryResults<Entity> eventsQuery = datastore.run(query);
-		List<String> events = new ArrayList<>();
 
-		ObjectMapper mapper = new ObjectMapper();
-		List<Integer> userTags = new ArrayList<Integer>();
-		List<Integer> eventTags = new ArrayList<Integer>();
-
-		
 		while (eventsQuery.hasNext()) {
 			Entity e = eventsQuery.next();
-			if(e.getString("ended").equals("false")) {
+			if (e.getString("ended").equals("false")) {
 				String date = e.getString("ending_date");
 				if (hasEnded(date)) {
 					Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(e.getString("name"));
@@ -826,44 +842,43 @@ public class EventResource {
 					event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 							.set("description", event.getString("description"))
 							.set("minParticipants", event.getString("minParticipants"))
-							.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
-							.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+							.set("maxParticipants", event.getString("maxParticipants"))
+							.set("time", event.getString("time")).set("coordinates", event.getString("coordinates"))
+							.set("durability", event.getString("durability"))
 							.set("institutionName", event.getString("institutionName"))
 							.set("initial_date", event.getString("initial_date"))
-							.set("ending_date", event.getString("ending_date")).set("members", event.getString("members"))
-							.set("points", event.getString("points")).set("tags", event.getString("tags"))
-							.set("rating", event.getString("rating")).set("ended", event.getString("true")).build();
+							.set("ending_date", event.getString("ending_date"))
+							.set("members", event.getString("members")).set("points", event.getString("points"))
+							.set("tags", event.getString("tags")).set("rating", event.getString("rating"))
+							.set("ended", event.getString("true")).build();
 
 					datastore.update(event);
-				
-			}
+
+				}
 			}
 		}
-		return Response.status(Status.OK)
-					.build();
+		return Response.status(Status.OK).build();
 
-	
-		
 	}
-	
+
 	private boolean hasEnded(String date) {
-   	 String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-   	 String[] curr = currDate.split("/");
-   	 String[] datefinal =  date.split("/");
-   	 
-   	 if(Integer.parseInt(curr[2]) >= Integer.parseInt(datefinal[2])) {
-   		  
-   		 if(Integer.parseInt(curr[1]) >= Integer.parseInt(datefinal[1])) {
-   			  	 
-   			 if(Integer.parseInt(curr[0]) >= Integer.parseInt(datefinal[0])) {
-   		    		 
-   				 return true;
-   		    	 
-   			 }
-   	    }
-   	 }
-   	 
-   	 return false;
+		String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		String[] curr = currDate.split("/");
+		String[] datefinal = date.split("/");
+
+		if (Integer.parseInt(curr[2]) >= Integer.parseInt(datefinal[2])) {
+
+			if (Integer.parseInt(curr[1]) >= Integer.parseInt(datefinal[1])) {
+
+				if (Integer.parseInt(curr[0]) >= Integer.parseInt(datefinal[0])) {
+
+					return true;
+
+				}
+			}
+		}
+
+		return false;
 	}
 
 }

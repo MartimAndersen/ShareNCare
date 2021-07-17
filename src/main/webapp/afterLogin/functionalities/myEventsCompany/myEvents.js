@@ -240,6 +240,26 @@ function editEvent(eventName){
 
 }
 
+function callDeleteEvent(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText);  break;
+                case 400: alert("Event does not exist."); break;
+                case 404: alert("Token does not exist."); break;
+                default: alert("Wrong parameters."); break;
+            }
+        }
+    };
+    xhttp.open("DELETE", "/rest/event/deleteEvent", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
+
 function handleDeleteEvent(eventName) {
-    // /rest/event/deleteEvent nao tira o evento dos membros
+    let data = {
+           name: eventName
+        }
+        callDeleteEvent(JSON.stringify(data));
 }

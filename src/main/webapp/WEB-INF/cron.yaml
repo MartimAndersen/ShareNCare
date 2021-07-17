@@ -1,4 +1,4 @@
 cron:
 - description: "cheack events ended"
-  url: /event/checkEventDate
+  url: /rest/event/checkEventDate
   schedule: every 24 hours
