@@ -21,7 +21,7 @@ function goToCreateEvent() {
 }
 
 function goToMyEvent() {
-    window.location.href = "functionalities/myEvents/myEvents.html";
+    window.location.href = "functionalities/myEventsCompany/myEvents.html";
 }
 
 function logout() {
