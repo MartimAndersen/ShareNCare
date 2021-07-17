@@ -11,6 +11,29 @@ function initMap() {
 
 var locations = [];
 
+const coordinates = "coordinates";
+const description = "description";
+const ended = "ended";
+const durability = "durability";
+const ending_date = "ending_date";
+const initial_date = "initial_date";
+const institutionName = "institutionName";
+const maxParticipants = "maxParticipants";
+const members = "members";
+const minParticipants = "minParticipants";
+const name = "name";
+const points = "points";
+const rating = "rating";
+const tags = "tags";
+const time = "time";
+
+const attributes = [coordinates, description, durability, ended, ending_date, initial_date, institutionName,
+    maxParticipants, members, minParticipants, name, points, rating, tags, time];
+
+function stringToIndex(id) {
+    return attributes.indexOf(id);
+}
+
 function getNrMembers(membersString){
     // [b,g] comes looking like "[\"b\",\"g\"]"
     let nrMembers = 0;
@@ -26,25 +49,24 @@ function getNrMembers(membersString){
 }
 
 function fillLocationsArray(obj) {
-    let locationAux = [];
-    locationAux.push(obj[9].value); // eventName - 0
-    locationAux.push(obj[0].value.split(" ")[0]); // latitude - 1
-    locationAux.push(obj[0].value.split(" ")[1]); // longitude - 2
-    locationAux.push(obj[4].value); // initDate - 3
-    locationAux.push(obj[3].value); // endDate - 4
-    locationAux.push(obj[13].value); // hour - 5
-    locationAux.push(obj[2].value); // frequency - 6
-    locationAux.push(obj[8].value); // minParticipants - 7
-    locationAux.push(obj[6].value); // maxParticipants - 8
-    locationAux.push(obj[1].value); // description - 9
-
-    let tagsStringAux = obj[12].value.split("[")[1].split("]")[0].replace(/,/g, ''); // '[2,6]' to '26' (g means global/all string)
-
-    locationAux.push(tagsStringAux); // tags - 10
-
-    locationAux.push(getNrMembers(obj[7].value)); // nrMembers - 11
-
-    locations.push(locationAux);
+    let locationInfo = {
+        name: obj[stringToIndex(name)].value,
+        initial_date: obj[stringToIndex(initial_date)].value,
+        ending_date: obj[stringToIndex(ending_date)].value,
+        time: obj[stringToIndex(time)].value,
+        durability: obj[stringToIndex(durability)].value,
+        minParticipants: obj[stringToIndex(minParticipants)].value,
+        maxParticipants: obj[stringToIndex(maxParticipants)].value,
+        description: obj[stringToIndex(description)].value,
+        tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
+        nrMembers: getNrMembers(obj[stringToIndex(members)].value),
+        latitude:  obj[stringToIndex(coordinates)].value.split(" ")[0],
+        longitude:  obj[stringToIndex(coordinates)].value.split(" ")[1],
+        ended: obj[stringToIndex(ended)].value,
+        points: obj[stringToIndex(points)].value,
+        rating: obj[stringToIndex(rating)].value
+    }
+    locations.push(locationInfo);
 }
 
 var markers = [];
@@ -112,45 +134,31 @@ function fillInfoWindow(marker, i) {
 
     locationAux = locations[i];
 
-    let eventName = locationAux[0];
-    let initDate = locationAux[3];
-    let endDate = locationAux[4];
-    let hour = locationAux[5];
-    let frequency = locationAux[6];
-    let minParticipants = locationAux[7];
-    let maxParticipants = locationAux[8];
-    let description = locationAux[9];
-
-    let currTags = locationAux[10];
-
-    let tagsString = convertToTags(currTags);
-
-    let nrMembers = locationAux[11];
-
     infowindow.setContent(
-        'Event name: ' + eventName +
+        'Event name: ' + locationAux.name +
         '<p></p>' +
-        'Initial date: ' + initDate +
+        'Initial date: ' + locationAux.initial_date +
         '<p></p>' +
-        'End date: ' + endDate +
+        'End date: ' + locationAux.ending_date +
         '<p></p>' +
-        'Hour: ' + hour +
+        'Hour: ' + locationAux.time +
         '<p></p>' +
-        'Frequency: ' + frequency +
+        'Frequency: ' + locationAux.durability +
         '<p></p>' +
-        'Min participants: ' + minParticipants +
+        'Min participants: ' + locationAux.minParticipants +
         '<p></p>' +
-        'Max participants: ' + maxParticipants +
+        'Max participants: ' + locationAux.maxParticipants +
         '<p></p>' +
-        'Number of current members: ' + nrMembers +
+        'Number of current members: ' + locationAux.nrMembers +
         '<p></p>' +
-        'Tags: ' + tagsString +
+        'Tags: ' + convertToTags(locationAux.tags) +
         '<p></p>' +
-        'Description: ' + description +
+        'Description: ' + locationAux.description +
         '<p></p>' +
-        '<button onclick="editEvent(locationAux[0])">Edit event</button> &nbsp &nbsp' +
-        `<button onclick="handleEventFinished(locationAux[0])">Finish event</button> &nbsp &nbsp` +
-        `<button onclick="handleDeleteEvent(locationAux[0])">Delete event</button>`
+        '<p></p>' +
+        '<button onclick="editEvent(locationAux.name)">Edit event</button> &nbsp &nbsp' +
+        `<button onclick="handleEventFinished(locationAux.name)">Finish event</button> &nbsp &nbsp` +
+        `<button onclick="handleDeleteEvent(locationAux.name)">Delete event</button>`
     );
     infowindow.open(map, marker);
 }
@@ -161,7 +169,7 @@ function addMarkers() {
 
     for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            position: new google.maps.LatLng(locations[i].latitude, locations[i].longitude),
             map: map
         });
 
@@ -224,7 +232,6 @@ function callEventFinished(data) {
 function handleEventFinished(eventName) {
     let data = {
        name: eventName
-
     }
     callEventFinished(JSON.stringify(data));
 }

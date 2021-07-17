@@ -217,7 +217,7 @@ public class EventResource {
 			Entity event = datastore.get(eventKey);
 
 			if (event == null)
-				return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist")
+				return Response.status(Status.EXPECTATION_FAILED).entity("Event with id: " + eventId + " doesn't exist")
 						.build();
 
 			String m = event.getString("members");
@@ -252,7 +252,8 @@ public class EventResource {
 					.set("initial_date", event.getString("initial_date"))
 					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
 					.set("points", event.getString("points")).set("tags", event.getString("tags"))
-					.set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
+					.set("rating", event.getString("rating"))
+					.set("ended", event.getString("ended")).build();
 
 			datastore.update(event);
 			raking.takePointsQuit(data.username);
