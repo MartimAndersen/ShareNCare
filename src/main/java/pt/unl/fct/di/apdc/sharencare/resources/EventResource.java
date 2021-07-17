@@ -1,6 +1,8 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -716,13 +718,13 @@ public class EventResource {
 					.build();
 
 		String m = event.getString("members");
-		//String e = user.getString("events");
+		
 		
 
 		Type stringList = new TypeToken<ArrayList<String>>() {
 		}.getType();
 		List<String> members = g.fromJson(m, stringList);
-		//List<String> events = g.fromJson(e, stringList);
+		
 
 		for (String member : members) {
 			
@@ -795,6 +797,72 @@ public class EventResource {
 			if (list1.contains(list2.get(i)))
 				return true;
 		return false;
+	}
+	
+	@GET
+	@Path("/checkEventDate")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkEventDate() {
+		
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<Integer> userTags = new ArrayList<Integer>();
+		List<Integer> eventTags = new ArrayList<Integer>();
+
+		
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			if(e.getString("ended").equals("false")) {
+				String date = e.getString("ending_date");
+				if (hasEnded(date)) {
+					Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(e.getString("name"));
+					Entity event = datastore.get(eventKey);
+					event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+							.set("description", event.getString("description"))
+							.set("minParticipants", event.getString("minParticipants"))
+							.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+							.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+							.set("institutionName", event.getString("institutionName"))
+							.set("initial_date", event.getString("initial_date"))
+							.set("ending_date", event.getString("ending_date")).set("members", event.getString("members"))
+							.set("points", event.getString("points")).set("tags", event.getString("tags"))
+							.set("rating", event.getString("rating")).set("ended", event.getString("true")).build();
+
+					datastore.update(event);
+				
+			}
+			}
+		}
+		return Response.status(Status.OK)
+					.build();
+
+	
+		
+	}
+	
+	private boolean hasEnded(String date) {
+   	 String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+   	 String[] curr = currDate.split("/");
+   	 String[] datefinal =  date.split("/");
+   	 
+   	 if(Integer.parseInt(curr[2]) >= Integer.parseInt(datefinal[2])) {
+   		  
+   		 if(Integer.parseInt(curr[1]) >= Integer.parseInt(datefinal[1])) {
+   			  	 
+   			 if(Integer.parseInt(curr[0]) >= Integer.parseInt(datefinal[0])) {
+   		    		 
+   				 return true;
+   		    	 
+   			 }
+   	    }
+   	 }
+   	 
+   	 return false;
 	}
 
 }
