@@ -131,7 +131,7 @@ public class EventResource {
 						.set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
 						.set("institutionName", data.institutionName).set("initial_date", data.initialDate)
 						.set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
-						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).build();
+						.set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l)).set("ended", "false").build();
 
 				txn.add(event);
 				
@@ -250,7 +250,7 @@ public class EventResource {
 					.set("initial_date", event.getString("initial_date"))
 					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
 					.set("points", event.getString("points")).set("tags", event.getString("tags"))
-					.set("rating", event.getString("rating")).build();
+					.set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
 
 			datastore.update(event);
 			raking.takePointsQuit(data.username);
@@ -341,7 +341,7 @@ public class EventResource {
 				.set("institutionName", event.getString("institutionName"))
 				.set("initial_date", event.getString("initial_date")).set("ending_date", event.getString("ending_date"))
 				.set("members", g.toJson(members)).set("points", event.getString("points"))
-				.set("tags", event.getString("tags")).set("rating", event.getString("rating")).build();
+				.set("tags", event.getString("tags")).set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
 
 		datastore.update(user);
 		datastore.update(event);
@@ -454,7 +454,7 @@ public class EventResource {
 					.set("initial_date", event.getString("initial_date"))
 					.set("ending_date", event.getString("ending_date")).set("members", event.getString("members"))
 					.set("points", event.getString("points")).set("tags", event.getString("tags"))
-					.set("rating", g.toJson(newRatings)).build();
+					.set("rating", g.toJson(newRatings)).set("ended", event.getString("ended")).build();
 
 			txn.add(event);
 			txn.commit();
