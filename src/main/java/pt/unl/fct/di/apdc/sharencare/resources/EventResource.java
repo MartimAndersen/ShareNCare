@@ -190,37 +190,38 @@ public class EventResource {
 
 		if (event == null)
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
+		
+
+		String m = event.getString("members");
+
+
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> members = g.fromJson(m, stringList);
+
 
 		datastore.delete(eventKey);
-
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
-
-		QueryResults<Entity> usersQuery = datastore.run(query);
-
-
-		while (usersQuery.hasNext()) {
-			Key userKey = datastore.newKeyFactory().setKind("User").newKey(eventId);
+		for (String member : members) {
+			Key userKey = datastore.newKeyFactory().setKind("User").newKey(member);
 			Entity user = datastore.get(userKey);
-			
-			//ObjectMapper mapper = new ObjectMapper();
 			String ev = user.getString("events"); 
-			Type stringList = new TypeToken<ArrayList<String>>() {
-			}.getType();
+
 			List<String> userEvents = g.fromJson(ev, stringList);
 			userEvents.remove(eventId);
-			user = Entity.newBuilder(userKey).set("nif", token.getString("username"))
-					.set("username", user.getString("username")).set("password", user.getString("password"))
-					.set("email", user.getString("email")).set("landLine", user.getString("landLine"))
+			user = Entity.newBuilder(userKey).set("username", member).set("password", user.getString("password"))
+					.set("email", user.getString("email")).set("bio", user.getString("bio"))
+					.set("profileType", user.getString("profileType")).set("landLine", user.getString("landLine"))
 					.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
-					.set("zipCode", user.getString("zipCode")).set("events", g.toJson(userEvents))
-					.set("website", user.getString("website")).set("instagram", user.getString("instagram"))
-					.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
-					.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
-					.set("fax", user.getString("fax")).set("role", user.getString("role"))
+					.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
+					.set("tags", user.getString("tags")).set("events", g.toJson(userEvents))
+					.set("points", user.getString("points")).set("role", user.getString("role"))
 					.set("state", user.getString("state")).build();
 
 			datastore.update(user);
-			}
+			
+		}
+		
+		
 
 		return Response.ok("Event deleted.").build();
 
