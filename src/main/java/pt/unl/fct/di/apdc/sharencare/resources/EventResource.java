@@ -199,6 +199,27 @@ public class EventResource {
 		List<String> members = g.fromJson(m, stringList);
 
 		datastore.delete(eventKey);
+		
+		Key institutionKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity institution = datastore.get(institutionKey);
+		
+		String eventsInstitution = institution.getString("events");
+
+		List<String> institutionEvents = g.fromJson(eventsInstitution, stringList);
+		institutionEvents.remove(eventId);
+		institution = Entity.newBuilder(institutionKey).set("nif", token.getString("username"))
+				.set("username", institution.getString("username")).set("password", institution.getString("password"))
+				.set("email", institution.getString("email")).set("landLine", institution.getString("landLine"))
+				.set("mobile", institution.getString("mobile")).set("address", institution.getString("address"))
+				.set("zipCode", institution.getString("zipCode")).set("events", g.toJson(institutionEvents))
+				.set("website", institution.getString("website")).set("instagram", institution.getString("instagram"))
+				.set("twitter", institution.getString("twitter")).set("facebook", institution.getString("facebook"))
+				.set("youtube", institution.getString("youtube")).set("bio", institution.getString("bio"))
+				.set("fax", institution.getString("fax")).set("role", institution.getString("role"))
+				.set("state", institution.getString("state")).set("coordinates", institution.getString("coordinates")).build();
+		
+		datastore.update(institution);
+		
 		for (String member : members) {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(member);
 			Entity user = datastore.get(userKey);
