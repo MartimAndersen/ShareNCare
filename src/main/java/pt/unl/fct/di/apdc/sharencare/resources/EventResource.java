@@ -158,7 +158,7 @@ public class EventResource {
 						.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
 						.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
 						.set("fax", user.getString("fax")).set("role", user.getString("role"))
-						.set("state", user.getString("state")).build();
+						.set("state", user.getString("state")).set("coordinates", user.getString("coordinates")).build();
 
 				txn.update(user);
 
@@ -430,7 +430,7 @@ public class EventResource {
 				.set("twitter", user.getString("twitter")).set("facebook", user.getString("facebook"))
 				.set("youtube", user.getString("youtube")).set("bio", user.getString("bio"))
 				.set("fax", user.getString("fax")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("state", user.getString("state")).set("coordinates", user.getString("coordinates")).build();
 
 		datastore.update(user);
 

@@ -112,7 +112,7 @@ public class InsideLoginInstitutionResource {
 				.set("zipCode", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
 				.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
 				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).build();
+				.set("state", user.getString("state")).set("coordinates", user.getString("coordinates")).build();
 
 		datastore.update(user);
 
@@ -253,7 +253,7 @@ public class InsideLoginInstitutionResource {
 				.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
 //			.set("members", g.toJson(user.getString("members")))
 				.set("events", g.toJson(user.getString("events")))
-				.set("role", user.getString("role")).set("state", user.getString("state")).set("bio", bio).build();
+				.set("role", user.getString("role")).set("state", user.getString("state")).set("bio", bio).set("coordinates", user.getString("coordinates")).build();
 
 		datastore.update(user);
 
@@ -307,7 +307,7 @@ public class InsideLoginInstitutionResource {
 							.set("website", user.getString("website")).set("twitter", user.getString("twitter"))
 							.set("instagram", user.getString("instagram")).set("youtube", user.getString("youtube"))
 							.set("facebook", user.getString("facebook")).set("fax", user.getString("fax"))
-							.set("events", user.getString("events")).build();
+							.set("events", user.getString("events")).set("coordinates", user.getString("coordinates")).build();
 					datastore.put(user);
 
 					return Response.ok("Password was changed").cookie(cookie).build();

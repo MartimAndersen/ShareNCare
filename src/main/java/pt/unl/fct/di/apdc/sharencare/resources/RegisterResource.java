@@ -143,6 +143,7 @@ public class RegisterResource {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
 
         Transaction txn = datastore.newTransaction();
+        String coordinates = data.lat + " " + data.lon;
 
         try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.nif);
@@ -180,6 +181,7 @@ public class RegisterResource {
     						.set("events", gson.toJson(new ArrayList<String>()))
     						.set("role", "INSTITUTION")
     						.set("state", "ENABLED")
+    						.set("coordinates", coordinates)
     						.build();
     				
     				txn.add(user);

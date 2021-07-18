@@ -9,12 +9,14 @@ public class RegisterInstitutionData {
 	public String confirmation;
 	public String role;
 	public String state;
+	public Double lat;
+	public Double lon;
 
 	public RegisterInstitutionData() {
 
 	}
 
-	public RegisterInstitutionData(String username, String nif, String email, String password, String confirmation) {
+	public RegisterInstitutionData(String username, String nif, String email, String password, String confirmation, Double lat, Double lon) {
 		this.username = username;
 		this.nif = nif;
 		this.password = password;
@@ -22,6 +24,8 @@ public class RegisterInstitutionData {
 		this.email = email;
 		this.role = "INSTITUTION";
 		this.state = "ENABLED";
+		this.lat = lat;
+		this.lon = lon;
 	}
 
 //	public boolean validateData(RegisterData data) {
@@ -44,7 +48,7 @@ public class RegisterInstitutionData {
 //	}
 
 	public boolean emptyParameters() {
-		return username.equals("") || email.equals("") || password.equals("") || confirmation.equals("");
+		return username.equals("") || email.equals("") || password.equals("") || confirmation.equals("")  ;
 	}
 
 	public boolean validEmail() {

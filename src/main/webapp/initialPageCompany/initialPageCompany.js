@@ -62,7 +62,9 @@ function handleRegisterCompany() {
         nif: inputs[1].value,
         email: inputs[2].value,
         password: inputs[3].value,
-        confirmation: inputs[4].value
+        confirmation: inputs[4].value,
+        lat: "",
+        lon: ""
     }
     callRegisterCompany(JSON.stringify(data));
 }
