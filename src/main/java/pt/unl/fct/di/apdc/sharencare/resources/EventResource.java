@@ -917,12 +917,13 @@ public class EventResource {
 		String durability = data.durability;
 		String endingDate = data.endingDate;
 		String initialDate = data.initialDate;
-		Double lat = data.lat;
-		Double lon = data.lon;
+
 		String maxParticipants = data.maxParticipants;
 		String minParticipants = data.minParticipants;
 		List<Integer> tags = data.tags;
 		String time = data.time;
+		
+
 
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.name);
 		Entity event = datastore.get(eventKey);
@@ -935,21 +936,22 @@ public class EventResource {
 			durability= event.getString("durability");
 		}
 		if (data.endingDate.equals("")) {
-			endingDate = event.getString("ending_Date");
+			endingDate = event.getString("ending_date");
 		}else {
 			if (!data.verifyDate(endingDate)) {
-				return Response.status(Status.EXPECTATION_FAILED).build();
+				return Response.status(Status.FORBIDDEN).build();
 			}
 		}
 		if (data.initialDate.equals("")) {
-			initialDate = event.getString("initial_Date");
+			initialDate = event.getString("initial_date");
 		} else {
 			if (!data.verifyDate(initialDate)) {
-				return Response.status(Status.EXPECTATION_FAILED).build();
+				return Response.status(Status.FORBIDDEN).build();
 			}
 		}
 		String coordinates = data.lat + " " + data.lon;
-		if (data.lat.equals("") || data.lat.equals("")) {
+		
+		if (data.lat == null || data.lat == null) {
 			coordinates =event.getString("coordinates");
 		}
 		if (data.maxParticipants.equals("")) {
@@ -958,8 +960,8 @@ public class EventResource {
 		if (data.minParticipants.equals("")) {
 			minParticipants = event.getString("minParticipants");
 		}
-		if (!data.validParticipants()) {
-			return Response.status(Status.CONFLICT).build();
+		if (!data.validParticipants(minParticipants, maxParticipants)) {
+			return Response.status(Status.NOT_ACCEPTABLE).build();
 			}
 		
 		String tags1 = g.toJson(tags);
@@ -967,19 +969,20 @@ public class EventResource {
 			tags1 = event.getString("tags");
 		}
 		if (data.time.equals("")) {
-			time = event.getString(time);
+			time = event.getString("time");
 		}
 
 
 
 		if (!data.futureDate(initialDate))
-			return Response.status(Status.EXPECTATION_FAILED).build();
+			return Response.status(Status.PRECONDITION_FAILED).build();
 
 		if (!data.dateOrder(initialDate, endingDate))
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 
 		if (!data.isHourValid(time))
-			return Response.status(Status.BAD_REQUEST).build();
+			return Response.status(Status.EXPECTATION_FAILED).build();
+
 
 
 
@@ -997,7 +1000,7 @@ public class EventResource {
 				.set("ended", event.getString("ended")).build();
 
 
-		datastore.update(user);
+		datastore.update(event);
 
 		return Response.ok("Properties changed").cookie(cookie).build();
 	}

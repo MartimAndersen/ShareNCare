@@ -237,7 +237,8 @@ function handleEventFinished(eventName) {
 }
 
 function editEvent(eventName){
-
+    localStorage.setItem("eventName",eventName);
+    window.location.href = "../../functionalities/editEvent/editEvent.html";
 }
 
 function callDeleteEvent(data) {

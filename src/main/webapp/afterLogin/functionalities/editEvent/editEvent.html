@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share&Care</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" href="editEventStyle.css">
+
+</head>
+<body>
+
+<ul>
+    <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>
+    <li><a class="active" onclick="goBack()" style="cursor: pointer">Go Back</a></li>
+    <img src="../../../afterLogin/images/logo" height="5%" width="5%">
+</ul>
+
+<input id="searchBoxInput" class="controls" type="text" style="width: 25%" placeholder="Event location"/>
+<div id="map" class="split right"></div>
+
+<div class="split left">
+    <form id="editEventId" action="#" method="post">
+        <h1 style="text-align: center">Edit event</h1>
+
+
+        <p>
+            <label for="description" class="floatLabel"></label>
+            <textarea id="description" name="editEventInput" placeholder="New Event Description"></textarea>
+        </p>
+
+        <p>&nbsp;Change number of participants:
+            &nbsp;
+            <label for="minParticipants" class="floatLabel"></label>
+            <input id="minParticipants" name="editEventInput"
+                   style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="minimum">
+            &nbsp; - &nbsp;
+            <label for="maxParticipants" class="floatLabel"></label>
+            <input id="maxParticipants" name="editEventInput"
+                   style="width: 13%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="maximum">
+        </p>
+        </p>
+
+        <p>
+            <label for="date1" class="floatLabel"></label>
+            <input id="date1" name="editEventInput" type="text" placeholder="New initial date of event (day/month/year)"
+                   style="width: 35%">
+
+            <label for="date2" class="floatLabel"></label>
+            <input id="date2" name="editEventInput" type="text" placeholder="New ending date of event (day/month/year)"
+                   style="width: 35%">
+        </p>
+
+        <p>
+            <label for="hour" class="floatLabel"></label>
+            <input id="hour" name="editEventInput" type="text" placeholder="New hour of event (hour:minutes)"
+                   style="width: 28%">
+        </p>
+
+        <p>&nbsp;
+            New Event Type:
+            &nbsp;
+            <input type="radio" id="temporary" name="editEventInput" value="temporary">
+            <label for="temporary">One day</label>
+            &nbsp;&nbsp;
+            <input type="radio" id="temporary2" name="editEventInput" value="weekly">
+            <label for="temporary">Weekly</label><br>
+
+            <input type="radio" id="temporary3" name="editEventInput" value="monthly">
+            <label for="temporary">Monthly</label>
+            &nbsp;&nbsp;
+            <input type="radio" id="temporary4" name="editEventInput" value="annual">
+            <label for="temporary">Annual</label><br>
+        </p>
+        </p>
+
+        <p>
+            New Tags (select at least one):
+        <p>&nbsp;
+            <input type="checkbox" id="tag1" name="editEventInput" value="animals"> Animals
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag2" name="editEventInput" value="environment"> Environment
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag3" name="editEventInput" value="children"> Children
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag4" name="editEventInput" value="elderly"> Elderly
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag5" name="editEventInput" value="supplies"> Supplies
+            &nbsp;&nbsp;
+            <input type="checkbox" id="tag6" name="editEventInput" value="homeless"> Homeless
+        </p>
+
+        <input type="submit" value="Edit" id="submitEditEvent">
+        </p>
+    </form>
+
+</div>
+
+<script src="editEvent.js"></script>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback.-->
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCswsWteMRuc4U3LJngGKdSIYbTASbvgCs&callback=initAutocomplete&libraries=places&v=weekly"
+        async
+></script>
+
+
+</body>
+</html>

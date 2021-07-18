@@ -29,6 +29,7 @@ import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 public class MapResource {
 
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+	private final RakingUserResource raking = new RakingUserResource();
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -129,13 +130,15 @@ public class MapResource {
 		if(data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
-
+		 
 
 		Transaction txn = datastore.newTransaction();
 
 		try {
 			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
 			Entity track = txn.get(mapKey);
+			
+			raking.addPointsComents(data.username);
 			
 			String commentList = track.getString("comment");
 			
@@ -153,7 +156,7 @@ public class MapResource {
 					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments)).build();
 
-			txn.add(track);
+			txn.update(track);
 			txn.commit();
 			
 			return Response.ok("Comment from " + data.username + " registered.").cookie(cookie).build();

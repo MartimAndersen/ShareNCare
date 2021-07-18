@@ -20,8 +20,8 @@ public class EditEventData {
 	public String durability;
 	public String endingDate;
 	public String initialDate;
-	public Double lat;
-	public Double lon;
+	public String lat;
+	public String lon;
 	public String maxParticipants;
 	public String minParticipants;
 	public List<Integer> tags;
@@ -31,8 +31,8 @@ public class EditEventData {
 
 	}
 
-	public EditEventData(String name, String description, String durability, String endingDate, String initialDate, Double lat,
-			Double lon, String maxParticipants, String minParticipants, List<Integer> tags, String time) {
+	public EditEventData(String name, String description, String durability, String endingDate, String initialDate, String lat,
+			String lon, String maxParticipants, String minParticipants, List<Integer> tags, String time) {
 
 		this.name = name;
 		this.description = description;
@@ -91,9 +91,9 @@ public class EditEventData {
 		return true;
 	}
 
-	public boolean validParticipants() {
-		return Integer.parseInt(minParticipants) > 0
-				&& Integer.parseInt(maxParticipants) >= Integer.parseInt(minParticipants);
+	public boolean validParticipants(String min, String max) {
+		return Integer.parseInt(min) > 0
+				&& Integer.parseInt(max) >= Integer.parseInt(min);
 	}
 
 	public boolean verifyDate(String date) {
