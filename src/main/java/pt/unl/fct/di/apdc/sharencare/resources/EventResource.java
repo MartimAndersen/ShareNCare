@@ -15,6 +15,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -46,6 +47,7 @@ import pt.unl.fct.di.apdc.sharencare.util.JoinEventData;
 import pt.unl.fct.di.apdc.sharencare.util.RatingData;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
+import pt.unl.fct.di.apdc.sharencare.util.EditEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
 import pt.unl.fct.di.apdc.sharencare.util.FinishEvent;
@@ -174,9 +176,8 @@ public class EventResource {
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
-		
+
 		String eventId = data.name;
-		
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -190,21 +191,18 @@ public class EventResource {
 
 		if (event == null)
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
-		
 
 		String m = event.getString("members");
-
 
 		Type stringList = new TypeToken<ArrayList<String>>() {
 		}.getType();
 		List<String> members = g.fromJson(m, stringList);
 
-
 		datastore.delete(eventKey);
 		for (String member : members) {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(member);
 			Entity user = datastore.get(userKey);
-			String ev = user.getString("events"); 
+			String ev = user.getString("events");
 
 			List<String> userEvents = g.fromJson(ev, stringList);
 			userEvents.remove(eventId);
@@ -218,10 +216,8 @@ public class EventResource {
 					.set("state", user.getString("state")).build();
 
 			datastore.update(user);
-			
+
 		}
-		
-		
 
 		return Response.ok("Event deleted.").build();
 
@@ -851,7 +847,7 @@ public class EventResource {
 							.set("ending_date", event.getString("ending_date"))
 							.set("members", event.getString("members")).set("points", event.getString("points"))
 							.set("tags", event.getString("tags")).set("rating", event.getString("rating"))
-							.set("ended", event.getString("true")).build();
+							.set("ended", "true").build();
 
 					datastore.update(event);
 
@@ -881,5 +877,132 @@ public class EventResource {
 
 		return false;
 	}
+
+	@PUT
+	@Path("/editEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response editEvent(@CookieParam("Token") NewCookie cookie, EditEventData data  ) throws ParseException {
+		
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("Institution with username: " + token.getString("username") + " doesn't exist").build();
+
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The Institution with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("Institution with id: " + user.getString("username") + " is disabled.").build();
+		}
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+		String description = data.description;
+		String durability = data.durability;
+		String endingDate = data.endingDate;
+		String initialDate = data.initialDate;
+		Double lat = data.lat;
+		Double lon = data.lon;
+		String maxParticipants = data.maxParticipants;
+		String minParticipants = data.minParticipants;
+		List<Integer> tags = data.tags;
+		String time = data.time;
+
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.name);
+		Entity event = datastore.get(eventKey);
+
+		if (data.description.equals("")) {
+			description = event.getString("description");
+		} 
+		
+		if (data.durability.equals("")) {
+			durability= event.getString("durability");
+		}
+		if (data.endingDate.equals("")) {
+			endingDate = event.getString("ending_Date");
+		}else {
+			if (!data.verifyDate(endingDate)) {
+				return Response.status(Status.EXPECTATION_FAILED).build();
+			}
+		}
+		if (data.initialDate.equals("")) {
+			initialDate = event.getString("initial_Date");
+		} else {
+			if (!data.verifyDate(initialDate)) {
+				return Response.status(Status.EXPECTATION_FAILED).build();
+			}
+		}
+		String coordinates = data.lat + " " + data.lon;
+		if (data.lat.equals("") || data.lat.equals("")) {
+			coordinates =event.getString("coordinates");
+		}
+		if (data.maxParticipants.equals("")) {
+			maxParticipants = event.getString("maxParticipants");
+		}
+		if (data.minParticipants.equals("")) {
+			minParticipants = event.getString("minParticipants");
+		}
+		if (!data.validParticipants()) {
+			return Response.status(Status.CONFLICT).build();
+			}
+		
+		String tags1 = g.toJson(tags);
+		if (data.tags.isEmpty()) {
+			tags1 = event.getString("tags");
+		}
+		if (data.time.equals("")) {
+			time = event.getString(time);
+		}
+
+
+
+		if (!data.futureDate(initialDate))
+			return Response.status(Status.EXPECTATION_FAILED).build();
+
+		if (!data.dateOrder(initialDate, endingDate))
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
+
+		if (!data.isHourValid(time))
+			return Response.status(Status.BAD_REQUEST).build();
+
+
+
+		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+				.set("description", description)
+				.set("minParticipants", minParticipants)
+				.set("maxParticipants", maxParticipants)
+				.set("time", time).set("coordinates", coordinates)
+				.set("durability", durability)
+				.set("institutionName", event.getString("institutionName"))
+				.set("initial_date", initialDate)
+				.set("ending_date", endingDate)
+				.set("members", event.getString("members")).set("points", event.getString("points"))
+				.set("tags", tags1).set("rating", event.getString("rating"))
+				.set("ended", event.getString("ended")).build();
+
+
+		datastore.update(user);
+
+		return Response.ok("Properties changed").cookie(cookie).build();
+	}
+		
+		
+	
 
 }
