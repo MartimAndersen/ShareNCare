@@ -3,7 +3,7 @@ package pt.unl.fct.di.apdc.sharencare.util;
 public class PointsData {
 	
 	String username;
-	int events;
+	public int events;
 	int tracks;
 	int comments;
 	int quitEvents;
@@ -41,5 +41,22 @@ public class PointsData {
 	
 	public void addBadComents() {
 		badComments++;
+	}
+	
+	public int getEvents() {
+		return events;
+	}
+	
+	public int getTracks() {
+		return tracks;
+	}
+	
+	public int getComments() {
+		return comments;
+	}
+	
+	public int getLeaderBoard() {
+		int total = events + tracks + comments - quitEvents - badComments;
+		return total;
 	}
 }

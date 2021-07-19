@@ -4,6 +4,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -133,10 +134,115 @@ public class RakingUserResource {
 		datastore.put(user);
 	}
 	
+	public void takePointsComment(String username) {
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+		
+
+		String pointsString = user.getString("points");
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		PointsData userPoints = new Gson().fromJson(pointsString, points);
+		
+		userPoints.addBadComents();
+		
+		user = Entity.newBuilder(userKey).set("username",username)
+				.set("password",user.getString("password"))
+				.set("email", user.getString("email")).set("bio", user.getString("bio"))
+				.set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address"))
+				.set("secondAddress", user.getString("secondAddress"))
+				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.set("tags", user.getString("tags")).set("events", user.getString("events"))
+				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
+		datastore.put(user);
+	}
+	
+	public void addPointsTrack(String username) {
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+		
+
+		String pointsString = user.getString("points");
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		PointsData userPoints = new Gson().fromJson(pointsString, points);
+		
+		userPoints.addTrack();
+		
+		user = Entity.newBuilder(userKey).set("username",username)
+				.set("password",user.getString("password"))
+				.set("email", user.getString("email")).set("bio", user.getString("bio"))
+				.set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address"))
+				.set("secondAddress", user.getString("secondAddress"))
+				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+				.set("state", user.getString("state"))
+				.set("tags", user.getString("tags")).set("events", user.getString("events"))
+				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
+		datastore.put(user);
+	}
+	
 	@GET
 	@Path("/rankUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response rankUsers(@CookieParam("Token") NewCookie cookie) {
+	
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+
+
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		
+		List<PointsData> pointsList = new ArrayList<PointsData>();
+
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String pointsString = e.getString("points");
+			PointsData userPoints = new Gson().fromJson(pointsString, points);
+				pointsList.add(userPoints);
+			}
+		
+		pointsList.sort(Comparator.comparing(PointsData::getLeaderBoard));
+		
+		
+	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+	}
+	
+	@GET
+	@Path("/rankEventUsers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response rankEventUsers(@CookieParam("Token") NewCookie cookie) {
 	
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
@@ -161,23 +267,129 @@ public class RakingUserResource {
 		
 
 
-
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
 		
-		List<String> events = new ArrayList<>();
+		List<PointsData> pointsList = new ArrayList<PointsData>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).setOrderBy(OrderBy.desc("points")).setLimit(5).build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
 			Entity e = eventsQuery.next();
-				String event = g.toJson(e.getProperties().values());
-				events.add(event);
+			String pointsString = e.getString("points");
+			PointsData userPoints = new Gson().fromJson(pointsString, points);
+				pointsList.add(userPoints);
 			}
 		
+		pointsList.sort(Comparator.comparing(PointsData::getEvents));
 		
-	return Response.ok(g.toJson(events)).cookie(cookie).build();
+		
+	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
 	}
+	
+	@GET
+	@Path("/rankTrackUsers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response rankTrackUsers(@CookieParam("Token") NewCookie cookie) {
+	
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+
+
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		
+		List<PointsData> pointsList = new ArrayList<PointsData>();
+
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String pointsString = e.getString("points");
+			PointsData userPoints = new Gson().fromJson(pointsString, points);
+				pointsList.add(userPoints);
+			}
+		
+		pointsList.sort(Comparator.comparing(PointsData::getTracks));
+		
+		
+	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+	}
+	
+	@GET
+	@Path("/rankCommentsUsers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response rankCommentsUsers(@CookieParam("Token") NewCookie cookie) {
+	
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+
+
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		
+		List<PointsData> pointsList = new ArrayList<PointsData>();
+
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String pointsString = e.getString("points");
+			PointsData userPoints = new Gson().fromJson(pointsString, points);
+				pointsList.add(userPoints);
+			}
+		
+		pointsList.sort(Comparator.comparing(PointsData::getComments));
+		
+		
+	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+	}
+	
+
 	
 	
 	
