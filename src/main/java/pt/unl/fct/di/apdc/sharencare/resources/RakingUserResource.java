@@ -52,6 +52,7 @@ public class RakingUserResource {
 		Entity user = datastore.get(userKey);
 		System.out.println(username);
 		System.out.println(userKey);
+		System.out.println("point2");
 		
 		LOG.fine("points attempt by user: " + username);
 		
@@ -138,7 +139,7 @@ public class RakingUserResource {
 
 		}
 
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
 		Entity user = datastore.get(userKey);
 
 		if (user == null) {

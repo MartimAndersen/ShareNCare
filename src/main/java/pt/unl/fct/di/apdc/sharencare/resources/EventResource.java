@@ -97,8 +97,8 @@ public class EventResource {
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
 		
-		if(user.getString("role").equals("INSTITUTION")) {
-			return Response.status(Status.CONFLICT).build();
+		if(!user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 		}
 
 		/*
