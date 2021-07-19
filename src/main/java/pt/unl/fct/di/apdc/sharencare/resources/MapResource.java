@@ -68,7 +68,7 @@ public class MapResource {
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("origin", data.origin).set("destination", data.destination)
 						.set("difficulty", data.difficulty).set("distance", data.distance)
-						.set("points", g.toJson(data.points)).set("comments", g.toJson(l)).build();
+						.set("points", data.points).set("comments", g.toJson(l)).build();
 
 				txn.add(track);
 				txn.commit();
