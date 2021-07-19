@@ -39,21 +39,20 @@ public class MapResource {
 	@Path("/registerTrack")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerTrack(@CookieParam("Token") NewCookie cookie, TrackData data) {
-		
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
 
-		if (data.title.equals("")) 
+		if (data.title.equals(""))
 			return Response.status(Status.FORBIDDEN).build();
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.BAD_REQUEST).build();
-		
+
 		/*
 		 * END OF VERIFICATIONS
 		 */
-
 
 		Transaction txn = datastore.newTransaction();
 
@@ -68,7 +67,8 @@ public class MapResource {
 				List<ReviewData> l = new ArrayList<ReviewData>();
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("origin", data.origin).set("destination", data.destination)
-						.set("difficulty", data.difficulty).set("distance", data.distance).set("comments", g.toJson(l)).build();
+						.set("difficulty", data.difficulty).set("distance", data.distance)
+						.set("points", g.toJson(data.points)).set("comments", g.toJson(l)).build();
 
 				txn.add(track);
 				txn.commit();
@@ -85,7 +85,7 @@ public class MapResource {
 	@Path("/registerMarker")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerMarker(MarkerData data) {
-		
+
 		Transaction txn = datastore.newTransaction();
 
 		try {
@@ -114,42 +114,42 @@ public class MapResource {
 	@Path("/comment")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerComment(@CookieParam("Token") NewCookie cookie, ReviewData data) {
-		
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-		
+
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		if(data.commentIsValid()) {
+		if (data.commentIsValid()) {
 			return Response.status(Status.CONFLICT).build();
 		}
-		
-		if(data.ratingIsValid()) {
+
+		if (data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		
+
 		BadWordsUtil swears = new BadWordsUtil();
-		if(swears.hasBadWords(data.comment)) {
+		if (swears.hasBadWords(data.comment)) {
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 		}
-		 
 
 		Transaction txn = datastore.newTransaction();
 
 		try {
 			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
 			Entity track = txn.get(mapKey);
-			
+
 			raking.addPointsComents(data.username);
-			
+
 			String commentList = track.getString("comment");
-			
-			Type comment = new TypeToken<ArrayList<ReviewData>>(){}.getType();
+
+			Type comment = new TypeToken<ArrayList<ReviewData>>() {
+			}.getType();
 			List<ReviewData> comments = new Gson().fromJson(commentList, comment);
 			List<ReviewData> newComments = new ArrayList<ReviewData>();
 
@@ -165,7 +165,7 @@ public class MapResource {
 
 			txn.update(track);
 			txn.commit();
-			
+
 			return Response.ok("Comment from " + data.username + " registered.").cookie(cookie).build();
 
 		} finally {
@@ -174,79 +174,79 @@ public class MapResource {
 			}
 		}
 	}
-	
+
 	@POST
 	@Path("/deleteComment")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteComment(@CookieParam("Token") NewCookie cookie, RemoveCommentData data) {
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
+
 		Key backOfficeUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity backofficeUser = datastore.get(backOfficeUserKey);
-		
+
 		if (backofficeUser == null)
 			return Response.status(Status.BAD_REQUEST).entity("BackOffice given doesn't exist").build();
-		
-		if(!backofficeUser.getString("role").equals("GA")) {
+
+		if (!backofficeUser.getString("role").equals("GA")) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
-				
+
 		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(data.title);
 		Entity track = datastore.get(trackKey);
 
 		if (track == null)
-			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + data.title + " doesn't exist").build();
-		
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + data.title + " doesn't exist")
+					.build();
+
 		String m = track.getString("comments");
-		
+
 		Type stringList = new TypeToken<ArrayList<ReviewData>>() {
 		}.getType();
 		List<ReviewData> comment = g.fromJson(m, stringList);
-		
+
 		List<ReviewData> newComment = new ArrayList<ReviewData>();
-		
-		for(int i = 0; i < comment.size(); i++) {
-			if(!comment.get(i).getUsername().equals(data.userOfComment)) {
+
+		for (int i = 0; i < comment.size(); i++) {
+			if (!comment.get(i).getUsername().equals(data.userOfComment)) {
 				newComment.add(comment.get(i));
 			}
 		}
-		
+
 		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
 				.set("description", track.getString("description")).set("origin", track.getString("origin"))
 				.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
 				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment)).build();
-		
+
 		datastore.update(track);
 
 		return Response.ok("Comment deleted.").build();
 
 	}
-	
+
 	@POST
 	@Path("/deleteTrack")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteTrack(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
-		
+
 		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
 		Entity track = datastore.get(trackKey);
 
 		if (track == null)
 			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
-		
+
 		datastore.delete(trackKey);
 
 		return Response.ok("Event deleted.").build();
