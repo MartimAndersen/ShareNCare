@@ -342,6 +342,41 @@ public class MapResource {
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
 		
 	}
+	
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("/listUserTrack")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listUserTrack(@CookieParam("Token") NewCookie cookie) {
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+		
+		String e = user.getString("my_tracks");
+		List<String> tracks = new ArrayList<String>();
+
+
+			tracks = g.fromJson(e, List.class);
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+
+
+		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
+		
+	}
 
 
 	
