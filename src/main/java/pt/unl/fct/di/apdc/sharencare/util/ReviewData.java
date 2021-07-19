@@ -38,6 +38,10 @@ public class ReviewData {
 		}
 	}
 	
+	public String getUsername() {
+		return username;
+	}
+	
 	
 
 }

@@ -71,6 +71,17 @@ public class InsideLoginResource {
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST)
 					.entity("User with username: " + data.userToDelete + " doesn't exist").build();
+		
+		Key backOfficeUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity backofficeUser = datastore.get(backOfficeUserKey);
+		
+		if (backofficeUser == null)
+			return Response.status(Status.BAD_REQUEST).entity("BackOffice user with username: " + token.getString("username") + " doesn't exist").build();
+		
+		if(!backofficeUser.getString("role").equals("GA")) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
 
 		if (!token.getString("username").equals(data.userToDelete))
 			if (!checkRole(user.getString("role"), token.getString("role")))

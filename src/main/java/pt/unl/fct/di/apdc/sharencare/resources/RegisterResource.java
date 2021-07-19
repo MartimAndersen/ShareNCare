@@ -18,6 +18,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import pt.unl.fct.di.apdc.sharencare.util.RegisterInstitutionData;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterData;
+import pt.unl.fct.di.apdc.sharencare.util.RegisterDataGA;
 
 
 @Path("/register")
@@ -189,6 +190,63 @@ public class RegisterResource {
     				return Response.ok("Institution " + data.username + " registered.").build();
     			}
             	
+            }
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+    
+    @POST
+    @Path("/backofficega")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response registerBackOfficeGA(RegisterDataGA data) {
+
+        if(data.emptyParameters())
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+
+        if(!data.validEmail())
+            return Response.status(Response.Status.FORBIDDEN).build();
+
+        if(!data.validPasswordLenght())
+            return Response.status(Response.Status.LENGTH_REQUIRED).build();
+
+        if(!data.validPasswordConfirmation())
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+
+        Transaction txn = datastore.newTransaction();
+        
+        try {
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+            Entity user = txn.get(userKey);
+            if (user != null) {
+                txn.rollback();
+                return Response.status(Response.Status.CONFLICT)
+                        .entity("User " + data.username + " already exists.").build();
+            } else {
+            	
+            	Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
+    					.setFilter(PropertyFilter.eq("email", data.email)).build();
+    			QueryResults<Entity> results = datastore.run(query);
+    			if(results.hasNext()) {
+    				txn.rollback();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity("Email " + data.email + " already exists.").build();
+    			}else {		
+    				user = Entity.newBuilder(userKey)
+    						.set("username", data.username)
+    						.set("email", data.email)
+    						.set("password", DigestUtils.sha512Hex(data.password))
+    						.set("profileType", "private")
+    						.set("role", "GA")
+    						.set("state", "ENABLED")
+    						.build();
+    				
+    				txn.add(user);
+    				txn.commit();
+    				return Response.ok("BackOffice GA: " + data.username + " registered.").build();
+    			}   			    			
             }
         } finally {
             if (txn.isActive()) {

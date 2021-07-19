@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
+import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 
 @Path("/map")
@@ -172,6 +173,59 @@ public class MapResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	@POST
+	@Path("/deleteComment")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteComment(@CookieParam("Token") NewCookie cookie, RemoveCommentData data) {
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+		
+		Key backOfficeUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity backofficeUser = datastore.get(backOfficeUserKey);
+		
+		if (backofficeUser == null)
+			return Response.status(Status.BAD_REQUEST).entity("BackOffice given doesn't exist").build();
+		
+		if(!backofficeUser.getString("role").equals("GA")) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
+				
+		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(data.title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + data.title + " doesn't exist").build();
+		
+		String m = track.getString("comments");
+		
+		Type stringList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> comment = g.fromJson(m, stringList);
+		
+		List<ReviewData> newComment = new ArrayList<ReviewData>();
+		
+		for(int i = 0; i < comment.size(); i++) {
+			if(!comment.get(i).getUsername().equals(data.userOfComment)) {
+				newComment.add(comment.get(i));
+			}
+		}
+		
+		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
+				.set("description", track.getString("description")).set("origin", track.getString("origin"))
+				.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment)).build();
+		
+		datastore.update(track);
+
+		return Response.ok("Comment deleted.").build();
+
 	}
 	
 	@POST
