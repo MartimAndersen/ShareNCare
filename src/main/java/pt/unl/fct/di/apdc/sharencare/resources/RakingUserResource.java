@@ -1,6 +1,7 @@
  
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.search.SortExpression;
 import com.google.appengine.api.search.SortOptions;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -30,6 +32,9 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
+
+import pt.unl.fct.di.apdc.sharencare.util.PointsData;
+import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 
 
 
@@ -50,20 +55,15 @@ public class RakingUserResource {
 		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
-		System.out.println(username);
-		System.out.println(userKey);
-		System.out.println("point2");
 		
-		LOG.fine("points attempt by user: " + username);
 		
-		//String points1 = user.getString("points");
-		//int points = Integer.parseInt(points1);
-		//points += 2;
-		if(user == null) {
-			
-			return;
-		}
+		String pointsString = user.getString("points");
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		PointsData userPoints = new Gson().fromJson(pointsString, points);
 		
+		userPoints.addEvents();
+
 		user = Entity.newBuilder(userKey).set("username",username)
 				.set("password",user.getString("password"))
 				.set("email", user.getString("email")).set("bio", user.getString("bio"))
@@ -74,17 +74,23 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(2)).set("my_tracks", user.getString("my_tracks")).build();
+				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	
 	public void addPointsComents(String username) {
 		
+		
+		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 		
-		int points =  Integer.parseInt( user.getString("points"));
-		points += 1;
+		String pointsString = user.getString("points");
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		PointsData userPoints = new Gson().fromJson(pointsString, points);
+		
+		userPoints.addComments();
 		
 		user = Entity.newBuilder(userKey).set("username",username)
 				.set("password",user.getString("password"))
@@ -96,7 +102,7 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(points)).set("my_tracks", user.getString("my_tracks")).build();
+				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	
@@ -105,8 +111,13 @@ public class RakingUserResource {
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
 		
-		int points =  Integer.parseInt( user.getString("points"));
-		points -= 1;
+
+		String pointsString = user.getString("points");
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		PointsData userPoints = new Gson().fromJson(pointsString, points);
+		
+		userPoints.addQuitEvents();
 		
 		user = Entity.newBuilder(userKey).set("username",username)
 				.set("password",user.getString("password"))
@@ -118,7 +129,7 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(points)).set("my_tracks", user.getString("my_tracks")).build();
+				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	

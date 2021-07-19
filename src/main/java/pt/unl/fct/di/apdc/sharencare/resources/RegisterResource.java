@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import pt.unl.fct.di.apdc.sharencare.util.RegisterInstitutionData;
+import pt.unl.fct.di.apdc.sharencare.util.PointsData;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterData;
 import pt.unl.fct.di.apdc.sharencare.util.RegisterDataGA;
 
@@ -31,6 +32,7 @@ public class RegisterResource {
     public RegisterResource() {
         Key userKey = datastore.newKeyFactory().setKind("User").newKey("superUser");
         Entity user = datastore.get(userKey);
+        
         
         if(user == null) {
             user = Entity.newBuilder(userKey)
@@ -92,7 +94,9 @@ public class RegisterResource {
     				txn.rollback();
                     return Response.status(Response.Status.FORBIDDEN)
                             .entity("Email " + data.email + " already exists.").build();
-    			}else {		
+    			}else {
+    				
+    				PointsData points = new PointsData(data.username);
     				user = Entity.newBuilder(userKey)
     						.set("username", data.username)
     						.set("email", data.email)
@@ -108,7 +112,7 @@ public class RegisterResource {
     						.set("events", gson.toJson(new ArrayList<String>()))
     						.set("role", "USER")
     						.set("state", "ENABLED")
-    						.set("points", "0")
+    						.set("points", gson.toJson(points))
     						.set("my_tracks", gson.toJson(new ArrayList<String>()))
     						.build();
     				
