@@ -2,6 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
+import com.google.appengine.repackaged.com.google.type.Date;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -44,6 +46,7 @@ import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.JoinEventData;
+import pt.unl.fct.di.apdc.sharencare.util.LeaveEventData;
 import pt.unl.fct.di.apdc.sharencare.util.RatingData;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
@@ -409,6 +412,106 @@ public class EventResource {
 
 		members.add(user.getString("username"));
 		events.add(data.eventId);
+
+		user = Entity.newBuilder(userKey).set("username", user.getString("username"))
+				.set("password", user.getString("password")).set("email", user.getString("email"))
+				.set("bio", user.getString("bio")).set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
+				.set("zipCode", user.getString("zipCode")).set("tags", user.getString("tags"))
+				.set("events", g.toJson(events)).set("points", user.getString("points"))
+				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+
+		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+				.set("description", event.getString("description"))
+				.set("minParticipants", event.getString("minParticipants"))
+				.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+				.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+				.set("institutionName", event.getString("institutionName"))
+				.set("initial_date", event.getString("initial_date")).set("ending_date", event.getString("ending_date"))
+				.set("members", g.toJson(members)).set("points", event.getString("points"))
+				.set("tags", event.getString("tags")).set("rating", event.getString("rating"))
+				.set("ended", event.getString("ended")).build();
+
+		datastore.update(user);
+		datastore.update(event);
+
+		return Response.ok("Joined successfully.").cookie(cookie).build();
+	}
+	
+	@POST
+	@Path("/leaveEvent")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response leaveEvent(@CookieParam("Token") NewCookie cookie, LeaveEventData data) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		if (data.atLeastOneEmptyParameter())
+			return Response.status(Status.LENGTH_REQUIRED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+
+		if (user.getString("state").equals("DISABLED")) {
+			System.out.println("The user with the given token is disabled.");
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		}
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+		
+		
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventId);
+		Entity event = datastore.get(eventKey);
+
+		if (event == null)
+			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + data.eventId + " doesn't exist")
+					.build();
+
+		String m = event.getString("members");
+		String e = user.getString("events");
+
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> members = g.fromJson(m, stringList);
+		List<String> events = g.fromJson(e, stringList);
+
+		if (members.size() == Integer.parseInt(event.getString("maxParticipants")))
+			return Response.status(Status.EXPECTATION_FAILED).entity("Event has max participants").build();
+
+		if (members.contains(user.getString("username")) || events.contains(data.eventId))
+			return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
+		
+		if(is3DaysBefore(event.getString("initial_date"))) {
+			RakingUserResource r = new RakingUserResource();
+			r.takePointsQuit(token.getString("username"));
+		}
+		
+
+		members.remove(user.getString("username"));
+		events.remove(data.eventId);
 
 		user = Entity.newBuilder(userKey).set("username", user.getString("username"))
 				.set("password", user.getString("password")).set("email", user.getString("email"))
@@ -931,6 +1034,29 @@ public class EventResource {
 
 		return false;
 	}
+	
+	private boolean is3DaysBefore(String date) {
+		String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		String[] curr = currDate.split("/");
+		String[] datefinal = date.split("/");
+
+		if (Integer.parseInt(curr[2]) <= Integer.parseInt(datefinal[2])) {
+
+			if (Integer.parseInt(curr[1]) <= Integer.parseInt(datefinal[1])) {
+
+				if (Integer.parseInt(curr[0]) < Integer.parseInt(datefinal[0])) {
+
+					return true;
+
+				}
+			}else if(Integer.parseInt(curr[2]) != Integer.parseInt(datefinal[2])) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 	@PUT
 	@Path("/editEvent")
