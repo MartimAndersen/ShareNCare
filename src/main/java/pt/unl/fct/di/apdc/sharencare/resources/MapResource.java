@@ -22,6 +22,7 @@ import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
+import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 
@@ -129,6 +130,11 @@ public class MapResource {
 		
 		if(data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		BadWordsUtil swears = new BadWordsUtil();
+		if(swears.hasBadWords(data.comment)) {
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 		}
 		 
 
