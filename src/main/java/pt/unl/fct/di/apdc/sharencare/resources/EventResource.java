@@ -253,7 +253,7 @@ public class EventResource {
 					.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
 					.set("tags", user.getString("tags")).set("events", g.toJson(userEvents))
 					.set("points", user.getString("points")).set("role", user.getString("role"))
-					.set("state", user.getString("state")).build();
+					.set("state", user.getString("state")).set("my_tracks", user.getString("my_tracks")).build(); 
 
 			datastore.update(user);
 
@@ -323,7 +323,7 @@ public class EventResource {
 					.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
 					.set("tags", user.getString("tags")).set("events", g.toJson(events))
 					.set("points", user.getString("points")).set("role", user.getString("role"))
-					.set("state", user.getString("state")).build();
+					.set("state", user.getString("state")).set("my_tracks", user.getString("my_tracks")).build();
 
 			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 					.set("description", event.getString("description"))
@@ -379,8 +379,8 @@ public class EventResource {
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
 		
-		if(user.getString("role").equals("USER")) {
-			return Response.status(Status.CONFLICT).build();
+		if(!user.getString("role").equals("USER")) {
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
 		}
 		
 		
@@ -420,7 +420,7 @@ public class EventResource {
 				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
 				.set("zipCode", user.getString("zipCode")).set("tags", user.getString("tags"))
 				.set("events", g.toJson(events)).set("points", user.getString("points"))
-				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+				.set("role", user.getString("role")).set("state", user.getString("state")).set("my_tracks", user.getString("my_tracks")).build();
 
 		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 				.set("description", event.getString("description"))
@@ -520,7 +520,7 @@ public class EventResource {
 				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
 				.set("zipCode", user.getString("zipCode")).set("tags", user.getString("tags"))
 				.set("events", g.toJson(events)).set("points", user.getString("points"))
-				.set("role", user.getString("role")).set("state", user.getString("state")).build();
+				.set("role", user.getString("role")).set("state", user.getString("state")).set("my_tracks", user.getString("my_tracks")).build();
 
 		event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 				.set("description", event.getString("description"))
@@ -673,7 +673,7 @@ public class EventResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist") 
 					.build();
 
 		/*

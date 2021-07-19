@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,6 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
@@ -35,6 +38,7 @@ public class MapResource {
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
 
+	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/registerTrack")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -52,7 +56,10 @@ public class MapResource {
 
 		/*
 		 * END OF VERIFICATIONS
+		 * 
 		 */
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token= datastore.get(tokenKey);
 
 		Transaction txn = datastore.newTransaction();
 
@@ -71,6 +78,32 @@ public class MapResource {
 						.set("points", data.points).set("comments", g.toJson(l)).build();
 
 				txn.add(track);
+				
+
+				Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+				Entity user = datastore.get(userKey);
+				String e = user.getString("my_tracks");
+				List<String> tracks = new ArrayList<String>();
+
+				if (!e.equals(""))
+					tracks = g.fromJson(e, List.class);
+
+				tracks.add(data.title);
+
+				user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+						.set("password", user.getString("password"))
+						.set("email", user.getString("email")).set("bio", user.getString("bio"))
+						.set("profileType", user.getString("profileType"))
+						.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+						.set("address", user.getString("address"))
+						.set("secondAddress", user.getString("secondAddress"))
+						.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+						.set("state", user.getString("state"))
+						.set("tags", user.getString("tags")).set("events", user.getString("events"))
+						.set("points", user.getString("points")).set("my_tracks", g.toJson(tracks)).build();
+
+				txn.update(user);
+				
 				txn.commit();
 				return Response.ok("Track " + data.title + " registered.").cookie(cookie).build();
 			}
@@ -276,6 +309,43 @@ public class MapResource {
 		return Response.ok("Event deleted.").build();
 
 	}
+
+	
+	@GET
+	@Path("/listAllTrack")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listAllTrack(@CookieParam("Token") NewCookie cookie) {
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Track").build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> tracks = new ArrayList<>();
+		while (eventsQuery.hasNext()) {
+			String event = g.toJson(eventsQuery.next().getProperties().values());
+			tracks.add(event);
+		}
+
+		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
+		
+	}
+
+
+	
+	
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData

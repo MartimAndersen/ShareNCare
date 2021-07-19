@@ -109,6 +109,7 @@ public class RegisterResource {
     						.set("role", "USER")
     						.set("state", "ENABLED")
     						.set("points", "0")
+    						.set("my_tracks", gson.toJson(new ArrayList<String>()))
     						.build();
     				
     				txn.add(user);

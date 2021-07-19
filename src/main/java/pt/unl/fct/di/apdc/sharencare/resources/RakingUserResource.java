@@ -74,7 +74,7 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(2)).build();
+				.set("points", g.toJson(2)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	
@@ -96,7 +96,7 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(points)).build();
+				.set("points", g.toJson(points)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	
@@ -118,7 +118,7 @@ public class RakingUserResource {
 				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
 				.set("state", user.getString("state"))
 				.set("tags", user.getString("tags")).set("events", user.getString("events"))
-				.set("points", g.toJson(points)).build();
+				.set("points", g.toJson(points)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
 	
