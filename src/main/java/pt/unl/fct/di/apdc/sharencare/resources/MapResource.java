@@ -118,6 +118,17 @@ public class MapResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
@@ -132,6 +143,19 @@ public class MapResource {
 		if (data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
+		
+		String username = token.getString("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
 
 		BadWordsUtil swears = new BadWordsUtil();
 		if (swears.hasBadWords(data.comment)) {

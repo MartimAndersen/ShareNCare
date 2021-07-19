@@ -46,6 +46,10 @@ public class DeleteUsersResource {
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST).entity("User with username: " + username + " doesn't exist").build();
 		
+		if(token.getString("username").equals(username)){
+			return Response.status(Status.CONFLICT).build();
+		}
+		
 		String e = user.getString("events");
 
 		Type stringList = new TypeToken<ArrayList<String>>() {
@@ -92,6 +96,10 @@ public class DeleteUsersResource {
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
+		
+		if(token.getString("username").equals(nif)){
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(nif);
 		Entity user = datastore.get(userKey);

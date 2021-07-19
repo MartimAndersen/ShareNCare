@@ -109,6 +109,10 @@ public class InsideLoginResource {
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + data.username + " doesn't exist")
 					.build();
 		}
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		user = Entity.newBuilder(userKey).set("username", data.username).set("password", user.getString("password"))
 				.set("email", user.getString("email")).set("bio", user.getString("bio"))
@@ -153,6 +157,10 @@ public class InsideLoginResource {
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		/*
 		 * END OF VERIFICATIONS
@@ -240,6 +248,11 @@ public class InsideLoginResource {
 			return Response.status(Status.FORBIDDEN)
 					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 		}
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+		
 		if (user.getString("state").equals("DISABLED")) {
 			System.out.println("The user with the given token is disabled.");
 			return Response.status(Status.NOT_ACCEPTABLE)
@@ -285,6 +298,8 @@ public class InsideLoginResource {
 		if (data.newBio.equals("")) {
 			bio = user.getString("bio");
 		}
+		
+		
 
 //		bucket.create(token.getString("username"), profilePic);
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))

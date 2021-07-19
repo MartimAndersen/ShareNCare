@@ -67,6 +67,10 @@ public class InsideLoginInstitutionResource {
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		/*
 		 * END OF VERIFICATIONS
@@ -169,6 +173,10 @@ public class InsideLoginInstitutionResource {
 			System.out.println("The user with the given token is disabled.");
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		}
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
 		}
 
 
@@ -288,6 +296,10 @@ public class InsideLoginInstitutionResource {
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		/*
 		 * END OF VERIFICATIONS

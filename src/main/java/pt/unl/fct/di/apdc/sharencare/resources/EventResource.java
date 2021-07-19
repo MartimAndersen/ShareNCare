@@ -93,6 +93,10 @@ public class EventResource {
 		if (user == null)
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
 
 		/*
 		 * END OF VERIFICATIONS
@@ -185,12 +189,27 @@ public class EventResource {
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
+		
+		
 
 		Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
 		Entity event = datastore.get(eventKey);
 
 		if (event == null)
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
+		
+		String username = token.getString("username");
+		Key institutionKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity institution = datastore.get(institutionKey);
+
+		if (institution == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+		
+		if(institution.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
 
 		String m = event.getString("members");
 
@@ -199,9 +218,6 @@ public class EventResource {
 		List<String> members = g.fromJson(m, stringList);
 
 		datastore.delete(eventKey);
-		
-		Key institutionKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity institution = datastore.get(institutionKey);
 		
 		String eventsInstitution = institution.getString("events");
 
@@ -359,6 +375,12 @@ public class EventResource {
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+		
+		
 
 		/*
 		 * END OF VERIFICATIONS
