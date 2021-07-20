@@ -8,13 +8,20 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <link rel="stylesheet" href="leaderboardStyle.css">
 </head>
-<body onload="callRank()">
+<body>
 
 <ul>
     <img src="../../images/logo" height="5%" width="5%">
     <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
     <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
 </ul>
+
+<div class="btn-group">
+    <button onclick="callRank()">Overall leader</button>
+    <button onclick="callEventRank()">Event leader</button>
+    <button onclick="callTrackRank()">Track leader</button>
+    <button onclick="callCommentsRank()">Comments leader</button>
+</div>
 
 <header><h1>Leader Board</h1></header>
 <table id="demo_table">
