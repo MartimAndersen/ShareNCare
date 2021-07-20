@@ -4,29 +4,23 @@ function goToPageBefore(){
 
 var locations = [];
 
-function fillLocationsArray(obj) {
-    let locationAux = [];
-    locationAux.push(obj[7].value);
-    locationAux.push(obj[0].value.split(" ")[0]);
-    locationAux.push(obj[0].value.split(" ")[1]);
-    locations.push(locationAux);
-}
+
 
 function populate_table(jsonResponse) {
     let table = document.getElementById('demo_table');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
+        console.log(jsonResponse);
+        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
+        console.log(obj);
 
-        obj = JSON.parse(jsonResponse[i]);
-       
-        fillLocationsArray(obj);
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
-        let text = document.createTextNode((obj[7].value));
+        let text = document.createTextNode(obj.events);
         cell.appendChild(text);
         cell = row.insertCell(0);
-        text = document.createTextNode((obj[13].value));
+        text = document.createTextNode(obj.username);
         cell.appendChild(text);
 
     }

@@ -223,7 +223,7 @@ public class RakingUserResource {
 		List<PointsData> pointsList = new ArrayList<PointsData>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
@@ -273,7 +273,7 @@ public class RakingUserResource {
 		List<PointsData> pointsList = new ArrayList<PointsData>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
@@ -323,7 +323,7 @@ public class RakingUserResource {
 		List<PointsData> pointsList = new ArrayList<PointsData>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
@@ -373,7 +373,7 @@ public class RakingUserResource {
 		List<PointsData> pointsList = new ArrayList<PointsData>();
 
 
-		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
 
 		while (eventsQuery.hasNext()) {
