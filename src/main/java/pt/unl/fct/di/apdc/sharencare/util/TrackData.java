@@ -1,30 +1,24 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-import java.util.List;
-
-import com.google.cloud.datastore.LatLng;
-
 public class TrackData {
 
     public String description;
-    public String destination;
-    public String difficulty;
+    public int difficulty;
     public String distance;
-    public String origin;
-    public String points;
+    public String solidarityPoints;
+    public String polylines;
     public String title;
 
     public TrackData(){
 
     }
 
-    public TrackData(String description, String destination, String difficulty,  String distance, String origin, String points, String title){
+    public TrackData(String description, int difficulty,  String distance, String solidarityPoints, String polylines, String title){
         this.title = title;
         this.description = description;
-        this.origin = origin;
-        this.destination = destination;
         this.distance = distance;
         this.difficulty = difficulty;
-        this.points = points;
+        this.solidarityPoints = solidarityPoints;
+        this.polylines = polylines;
     }
 }
