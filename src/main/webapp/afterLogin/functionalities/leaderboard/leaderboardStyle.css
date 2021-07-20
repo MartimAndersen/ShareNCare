@@ -35,55 +35,67 @@ li a:hover {
 }
 
 table {
-    border-collapse: collapse;
-    width: 20%;
-    margin-left: auto;
-    margin-right: auto;
+  border-collapse: collapse;
+  width: 40%;
+      margin-left: auto;
+      margin-right: auto;
 }
 
 th, td {
-    text-align: left;
-    padding: 8px;
-}
-
-tr
-{
-    background-color:#8FBC8F;
-    color:white;
-}
-
-th {
-    background-color: #006400;
-    color: white; /*letras*/
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 header {
-   color: white;
+   color: Black;
+    margin-left: auto;
+    margin-right: auto;
    text-align: center;
+   width: 70%;
+
+
 
 }
 
-.btn-group button {
-  background-color: #04AA6D; /* Green background */
-  border: 1px solid green; /* Green border */
-  color: white; /* White text */
-  padding: 10px 24px; /* Some padding */
-  cursor: pointer; /* Pointer/hand icon */
-  float: left; /* Float the buttons side by side */
+
+
+
+
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
-/* Clear floats (clearfix hack) */
-.btn-group:after {
-  content: "";
-  clear: both;
-  display: table;
-}
 
-.btn-group button:not(:last-child) {
-  border-right: none; /* Prevent double borders */
-}
 
-/* Add a background color on hover */
-.btn-group button:hover {
-  background-color: #3e8e41;
+
+.column1 {
+    float: left;
+    width: 25%;
+    padding: 10px;
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(194, 215, 175, 1), rgba(183, 210, 150, 1));
+}
+.column2 {
+    float: left;
+    width: 25%;
+    padding: 10px;
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(183, 210, 150, 1), rgba(163, 196, 131, 1));
+}
+.column3 {
+    float: left;
+    width: 25%;
+    padding: 10px;
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(163, 196, 131, 1), rgba(153, 205, 173, 1));
+}
+.column4 {
+    float: left;
+    width: 25%;
+    padding: 10px;
+    height: 500px;
+    background-image: linear-gradient(to right, rgba(153, 205, 173, 1), rgba(143, 180, 150, 1));
 }

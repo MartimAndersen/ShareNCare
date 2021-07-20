@@ -8,7 +8,7 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <link rel="stylesheet" href="leaderboardStyle.css">
 </head>
-<body>
+<body onload="callTables()">
 
 <ul>
     <img src="../../images/logo" height="5%" width="5%">
@@ -16,13 +16,12 @@
     <li><a class="active" href="../../afterLoginPage.html">Go Back</a></li>
 </ul>
 
-<div class="btn-group">
-    <button onclick="callRank()">Overall leader</button>
-    <button onclick="callEventRank()">Event leader</button>
-    <button onclick="callTrackRank()">Track leader</button>
-    <button onclick="callCommentsRank()">Comments leader</button>
-</div>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
 
+<div class="column1" style="background-color:rgba(194,215,175,0.95);">
 <header><h1>Leader Board</h1></header>
 <table id="demo_table">
     <thead>
@@ -35,6 +34,52 @@
     <tbody>
     </tbody>
 </table>
+</div>
+
+<div class="column2" style="background-color:rgba(153, 205, 173, 1);">
+    <header><h1>Events Board</h1></header>
+<table id="demo_table2">
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>points</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
+
+<div class="column3" style="background-color:rgba(163,196,131,0.95);">
+    <header><h1>Tracks Board</h1></header>
+<table id="demo_table3">
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>points</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
+
+<div class="column4" style="background-color:rgba(163,196,131,0.95);">
+    <header><h1>Comments Board</h1></header>
+<table id="demo_table4">
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>points</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
 
 <script src="leaderboard.js"></script>
 

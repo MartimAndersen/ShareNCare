@@ -11,7 +11,7 @@ function clearTable(){
     }
 }
 function populate_table(jsonResponse) {
-    clearTable()
+    //clearTable()
     let table = document.getElementById('demo_table');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
@@ -54,8 +54,8 @@ function callRank(){
 }
 
 function populate_table_event(jsonResponse) {
-    clearTable()
-    let table = document.getElementById('demo_table');
+    //clearTable()
+    let table = document.getElementById('demo_table2');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         console.log(jsonResponse);
@@ -97,8 +97,8 @@ function callEventRank(){
 }
 
 function populate_table_track(jsonResponse) {
-    clearTable()
-    let table = document.getElementById('demo_table');
+    //clearTable()
+    let table = document.getElementById('demo_table3');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         console.log(jsonResponse);
@@ -141,8 +141,8 @@ function callTrackRank(){
 
 
 function populate_table_comments(jsonResponse) {
-    clearTable()
-    let table = document.getElementById('demo_table');
+    //clearTable()
+    let table = document.getElementById('demo_table4');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         console.log(jsonResponse);
@@ -181,4 +181,11 @@ function callCommentsRank(){
     xhttp.send();
 
 
+}
+
+function callTables(){
+callRank();
+callEventRank();
+callTrackRank();
+callCommentsRank();
 }
