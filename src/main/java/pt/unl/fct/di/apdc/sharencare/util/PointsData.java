@@ -8,6 +8,7 @@ public class PointsData {
 	int comments;
 	int quitEvents;
 	int badComments;
+	int total;
 	
 	public PointsData() {
 		
@@ -21,6 +22,7 @@ public class PointsData {
 		this.comments = 0;
 		this.quitEvents = 0;
 		this.badComments = 0;
+		this.total = 0;
 	}
 	
 	public void addEvents() {
@@ -56,7 +58,7 @@ public class PointsData {
 	}
 	
 	public int getLeaderBoard() {
-		int total = events + tracks + comments - quitEvents - badComments;
+		this.total = events + tracks + comments - quitEvents - badComments;
 		return total;
 	}
 }

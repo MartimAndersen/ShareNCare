@@ -17,7 +17,7 @@ function populate_table(jsonResponse) {
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
-        let text = document.createTextNode(obj.events);
+        let text = document.createTextNode(obj.total);
         cell.appendChild(text);
         cell = row.insertCell(0);
         text = document.createTextNode(obj.username);
