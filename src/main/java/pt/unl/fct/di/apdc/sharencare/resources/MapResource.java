@@ -373,7 +373,7 @@ public class MapResource {
 
 
 
-		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
+		return Response.ok(user.getString("my_tracks")).cookie(cookie).build();
 		
 	}
 
