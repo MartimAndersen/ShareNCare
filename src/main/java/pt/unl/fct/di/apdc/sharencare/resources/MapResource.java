@@ -2,6 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.*;
@@ -360,20 +362,34 @@ public class MapResource {
 		
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
-		
-		String e = user.getString("my_tracks");
-		List<String> tracks = new ArrayList<String>();
-
-
-			tracks = g.fromJson(e, List.class);
 
 		/*
 		 * END OF VERIFICATIONS
 		 */
+		
 
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Track").build();
 
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> tracks = new ArrayList<>();
 
-		return Response.ok(user.getString("my_tracks")).cookie(cookie).build();
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> userTracks = new ArrayList<String>();
+
+		try {
+			userTracks = Arrays.asList(mapper.readValue(user.getString("my_tracks"), String[].class));
+			while (eventsQuery.hasNext()) {
+				Entity t = eventsQuery.next();
+				if (userTracks.contains(t.getString("title"))) {
+					String track = g.toJson(t.getProperties().values());
+					tracks.add(track);
+				}
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
+		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
 		
 	}
 
