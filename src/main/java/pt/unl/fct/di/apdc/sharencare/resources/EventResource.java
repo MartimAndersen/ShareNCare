@@ -972,7 +972,7 @@ public class EventResource {
 	}
 
 	
-	@GET
+	@POST
 	@Path("/getEventsByLocation")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
