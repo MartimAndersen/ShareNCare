@@ -45,7 +45,6 @@ public class RegisterResource {
                     .set("address", "")
                     .set("secondAddress", "")
                     .set("zipCode", "")
-                    .set("events", "")
                     .set("bio", "")
                     .set("tags", gson.toJson(new ArrayList<Integer>()))
                     .set("events", gson.toJson(new ArrayList<String>()))

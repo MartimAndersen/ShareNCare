@@ -110,7 +110,7 @@ public class InsideLoginResource {
 					.build();
 		}
 		
-		if(user.getString("role").equals("USER")) {
+		if(!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
