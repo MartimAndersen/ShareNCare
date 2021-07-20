@@ -4,10 +4,12 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,7 +35,6 @@ import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
-import com.google.appengine.repackaged.com.google.type.Date;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -1036,26 +1037,26 @@ public class EventResource {
 	}
 	
 	private boolean is3DaysBefore(String date) {
-		String currDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		String[] curr = currDate.split("/");
+		String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		String[] curr = localDate.split("/");
 		String[] datefinal = date.split("/");
-
-		if (Integer.parseInt(curr[2]) <= Integer.parseInt(datefinal[2])) {
-
-			if (Integer.parseInt(curr[1]) <= Integer.parseInt(datefinal[1])) {
-
-				if (Integer.parseInt(curr[0]) < Integer.parseInt(datefinal[0])) {
-
-					return true;
-
-				}
-			}else if(Integer.parseInt(curr[2]) != Integer.parseInt(datefinal[2])) {
-				return true;
-			}
+		
+		Date currDate = new GregorianCalendar(Integer.parseInt(curr[2]), Integer.parseInt(curr[1]) - 1, Integer.parseInt(curr[0])).getTime();
+		Date initialDate = new GregorianCalendar(Integer.parseInt(datefinal[2]), Integer.parseInt(datefinal[1]) - 1, Integer.parseInt(datefinal[0])).getTime();
+		
+		long currMillis = currDate.getTime();
+		long initialMillis = initialDate.getTime();
+		
+		long dateDifference = Math.abs(initialMillis - currMillis);
+		long days = 259200000;
+		
+		if(dateDifference <= days) {
+			return true;
 		}
 
 		return false;
 	}
+	
 
 
 	@PUT
