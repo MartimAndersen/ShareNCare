@@ -55,6 +55,7 @@ import pt.unl.fct.di.apdc.sharencare.util.EditEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
 import pt.unl.fct.di.apdc.sharencare.util.FinishEvent;
+import pt.unl.fct.di.apdc.sharencare.util.GetEventsByLocationData;
 import pt.unl.fct.di.apdc.sharencare.resources.RakingUserResource;
 
 @Path("/event")
@@ -967,6 +968,28 @@ public class EventResource {
 			return Response.status(Status.BAD_REQUEST).entity("Event with id: " + eventId + " doesn't exist").build();
 
 		return Response.ok(g.toJson(event.getProperties().values())).build();
+
+	}
+
+	
+	@GET
+	@Path("/getEventsByLocation")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getEventByLocation(GetEventsByLocationData data) {
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> events = new ArrayList<>();
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			if(data.coordinates.contains(e.getString("coordinates"))) {
+				String event = g.toJson(eventsQuery.next().getProperties().values());
+				events.add(event);
+			}
+		}
+
+		return Response.ok(g.toJson(events)).build();
 
 	}
 
