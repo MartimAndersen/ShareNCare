@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.EventLog;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,10 +36,11 @@ import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
+import pt.unl.fct.di.example.sharencare.common.events.EventData;
+import pt.unl.fct.di.example.sharencare.common.events.EventMethods;
 import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.institution.login.InstitutionInfo;
-import pt.unl.fct.di.example.sharencare.institution.main_menu.ui.new_event.EventData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -135,37 +137,12 @@ public class EventsFragment extends Fragment {
         String institutionInfo = sharedpreferences.getString("USER", null);
         InstitutionInfo ins = gson.fromJson(institutionInfo, InstitutionInfo.class);
 
-        eventsRepository.getEventsService().getUserEvents(ins.getTokenId()).enqueue(new Callback<ResponseBody>() {
+        eventsRepository.getEventsService().getUserEvents(ins.getToken()).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful()) {
-                    try {
-                        List<EventData> events = new ArrayList<>();
-                        JSONArray array = new JSONArray(r.body().string());
-                        for (int i = 0; i < array.length(); i++) {
-                            List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
-                            List<String> event = new ArrayList<>();
-
-                            for (int j = 0; j < list.size(); j++) {
-                                event.add(list.get(j).get("value").toString());
-                            }
-
-                            EventData e = new EventData(
-                                    event.get(7),
-                                    event.get(1),
-                                    event.get(6),
-                                    event.get(5),
-                                    event.get(3),
-                                    event.get(9),
-                                    event.get(4),
-                                    event.get(2),
-                                    getTags(event.get(8)),
-                                    getLatLon(event.get(0)).first,
-                                    getLatLon(event.get(0)).second
-                            );
-
-                            events.add(e);
-                        }
+                        List<EventData> events;
+                        events = EventMethods.getMultipleEvents(r);
 
                         SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
                         String json = gson.toJson(events);
@@ -193,14 +170,9 @@ public class EventsFragment extends Fragment {
 
                         MyAdapter myAdapter = new MyAdapter(getContext(), names, dates, hours, locations);
                         listView.setAdapter(myAdapter);
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
-                    }
                 }
-                else{
+                else
                     Toast.makeText(getActivity(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override
@@ -219,5 +191,14 @@ public class EventsFragment extends Fragment {
     private List<Integer> getTags(String tags){
         return gson.fromJson(tags, List.class);
     }
+
+    private List<Integer> getRating(String rating){
+        return gson.fromJson(rating, List.class);
+    }
+
+    private List<String> getMembers(String members){
+        return gson.fromJson(members, List.class);
+    }
+
 
 }

@@ -3,7 +3,6 @@ package pt.unl.fct.di.example.sharencare.user.main_menu.ui.events;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 
@@ -18,30 +17,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Time;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
+import pt.unl.fct.di.example.sharencare.common.events.EventData;
+import pt.unl.fct.di.example.sharencare.common.events.EventMethods;
 import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -139,89 +138,63 @@ public class EventsFragment extends Fragment {
         String userInfo = sharedpreferences.getString("USER", null);
         UserInfo user = gson.fromJson(userInfo, UserInfo.class);
 
-        eventsRepository.getEventsService().getUserEvents(user.getTokenId()).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
-                if(r.isSuccessful()) {
-                    try {
-                        List<EventData> events = new ArrayList<>();
-                        JSONArray array = new JSONArray(r.body().string());
-                        for (int i = 0; i < array.length(); i++) {
-                            List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
-                            List<String> event = new ArrayList<>();
+        String e = sharedpreferences.getString("EVENTS", null);
+        List<EventData> events;
 
-                            for (int j = 0; j < list.size(); j++) {
-                                event.add(list.get(j).get("value").toString());
-                            }
+        if(e != null) {
+            Type listType = new TypeToken<ArrayList<EventData>>(){}.getType();
+            events = gson.fromJson(e, listType);
+            listEvents(events);
+        } else {
+            eventsRepository.getEventsService().getUserEvents(user.getToken()).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                    if (r.isSuccessful()) {
+                            List<EventData> events = new ArrayList<>();
+                            events = EventMethods.getMultipleEvents(r);
 
-                            EventData e = new EventData(
-                                    event.get(7),
-                                    event.get(1),
-                                    event.get(6),
-                                    event.get(5),
-                                    event.get(3),
-                                    event.get(9),
-                                    event.get(4),
-                                    event.get(2),
-                                    getTags(event.get(8)),
-                                    getLatLon(event.get(0)).first,
-                                    getLatLon(event.get(0)).second
-                            );
+                            SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                            String json = gson.toJson(events);
+                            prefsEditor.putString("EVENTS", json);
+                            prefsEditor.apply();
 
-                            events.add(e);
-                        }
+                            listEvents(events);
 
-                        SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
-                        String json = gson.toJson(events);
-                        prefsEditor.putString("EVENTS", json);
-                        prefsEditor.apply();
-
-                        Geocoder geocoder;
-                        geocoder = new Geocoder(getContext(), Locale.getDefault());
-
-                        names = new String[events.size()];
-                        dates = new String[events.size()];
-                        hours = new String[events.size()];
-                        locations = new String[events.size()];
-
-                        for(int i = 0; i < events.size(); i++){
-                            names[i] = events.get(i).getName();
-                            dates[i] = events.get(i).getInitialDate();
-                            hours[i] = events.get(i).getTime();
-                            try {
-                                locations[i] = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0).getLocality();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        MyAdapter myAdapter = new MyAdapter(getContext(), names, dates, hours, locations);
-                        listView.setAdapter(myAdapter);
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
+                    } else {
+                        Toast.makeText(getActivity(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
-                else{
-                    Toast.makeText(getActivity(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
                 }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }
     }
 
-    private Pair<Double, Double> getLatLon(String coordinates){
-        String[] c = coordinates.split(" ");
-        Pair<Double, Double> latLon = new Pair<Double, Double>(new Double(c[0]), new Double(c[1]));
-        return latLon;
-    }
+    private void listEvents(List<EventData> events){
+        Geocoder geocoder;
+        geocoder = new Geocoder(getContext(), Locale.getDefault());
 
-    private List<Integer> getTags(String tags){
-        return gson.fromJson(tags, List.class);
+        names = new String[events.size()];
+        dates = new String[events.size()];
+        hours = new String[events.size()];
+        locations = new String[events.size()];
+
+        for (int i = 0; i < events.size(); i++) {
+            names[i] = events.get(i).getName();
+            dates[i] = events.get(i).getInitialDate();
+            hours[i] = events.get(i).getTime();
+            try {
+                locations[i] = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0).getLocality();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        MyAdapter myAdapter = new MyAdapter(getContext(), names, dates, hours, locations);
+        listView.setAdapter(myAdapter);
     }
 
 }

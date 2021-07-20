@@ -31,6 +31,10 @@ android {
     }
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -53,4 +57,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.6.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.github.yesidlazaro:GmailBackground:1.2.0'
+    implementation 'com.wefika:horizontal-picker:1.1.1'
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.github.jd-alexander:library:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0'
 }

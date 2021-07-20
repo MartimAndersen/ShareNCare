@@ -7,10 +7,12 @@ public class LoginUser {
     @SerializedName("usernameLogin")
     private String usernameLogin;
     private String passwordLogin;
+    private boolean expirable;
 
-    public LoginUser(String usernameLogin, String passwordLogin){
+    public LoginUser(String usernameLogin, String passwordLogin, boolean expirable){
         this.usernameLogin = usernameLogin;
         this.passwordLogin = passwordLogin;
+        this.expirable = expirable;
     }
 
     public String getUsername() {

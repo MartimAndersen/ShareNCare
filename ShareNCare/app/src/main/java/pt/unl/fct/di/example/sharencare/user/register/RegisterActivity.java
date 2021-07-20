@@ -9,9 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
+
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerRepository = registerRepository.getInstance();
 
         send.setOnClickListener(v -> {
+          //  sendEmail();
             String name = username.getText().toString();
             findViewById(R.id.loading_register).setVisibility(View.VISIBLE);
             RegisterUser u = new RegisterUser(
@@ -88,5 +91,28 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         });
+    }
+
+    protected void sendEmail(String email, String password) {
+        BackgroundMail.newBuilder(this)
+                .withUsername("username@gmail.com")
+                .withPassword("password12345")
+                .withMailto("to-email@gmail.com")
+                .withSubject("Code to Share&Care")
+                .withType(BackgroundMail.TYPE_PLAIN)
+                .withBody("Your Share&Care registration code: ")
+                .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT);
+                    }
+                })
+                .withOnFailCallback(new BackgroundMail.OnFailCallback() {
+                    @Override
+                    public void onFail() {
+                        Toast.makeText(getApplicationContext(), ":(((", Toast.LENGTH_SHORT);
+                    }
+                })
+                .send();
     }
 }

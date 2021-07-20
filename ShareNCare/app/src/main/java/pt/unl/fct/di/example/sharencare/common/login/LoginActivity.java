@@ -16,26 +16,30 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.common.register.RegisterOptionsActivity;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.institution.login.InstitutionInfo;
 import pt.unl.fct.di.example.sharencare.institution.main_menu.MainMenuInstitutionActivity;
 import pt.unl.fct.di.example.sharencare.institution.login.LoginInstitution;
 import pt.unl.fct.di.example.sharencare.user.login.LoginUser;
+import pt.unl.fct.di.example.sharencare.user.login.PointsData;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import pt.unl.fct.di.example.sharencare.user.main_menu.MainMenuUserActivity;
 
+import pt.unl.fct.di.example.sharencare.user.main_menu.SettingsActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
         super.onCreate(savedInstanceState);
         MainMenuUserActivity.updateActivity(this);
         MainMenuInstitutionActivity.updateActivity(this);
+        SettingsActivity.updateActivity(this);
 
         sharedpreferences = getApplicationContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         String login = sharedpreferences.getString("LOGIN", null);
@@ -153,7 +158,8 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                 findViewById(R.id.loading).setVisibility(View.VISIBLE);
                 LoginUser u = new LoginUser(
                         username.getText().toString(),
-                        password.getText().toString()
+                        password.getText().toString(),
+                        false
                 );
 
                 loginRepository.getLoginService().loginUser(u).enqueue(new Callback<ResponseBody>() {
@@ -191,7 +197,8 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                 findViewById(R.id.loading).setVisibility(View.VISIBLE);
                 LoginInstitution i = new LoginInstitution(
                         nif.getText().toString(),
-                        password.getText().toString()
+                        password.getText().toString(),
+                        false
                 );
 
                 loginRepository.getLoginService().loginInstitution(i).enqueue(new Callback<ResponseBody>() {
@@ -257,19 +264,23 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                 for(int i = 0; i < list.size(); i++)
                     values.add(list.get(i).get("value").toString());
 
+                String profileType = values.get(9);
+
                 UserInfo u = new UserInfo(
-                        values.get(13),
-                        values.get(1),
-                        values.get(4),
-                        values.get(3),
                         values.get(0),
-                        values.get(6),
-                        values.get(8),
-                        values.get(10),
-                        getTags(values.get(12)),
-                        null,//getProfilePic(values.get(7)),
-                        getEvents(values.get(2)),
-                        getToken(r.headers().values("Set-Cookie"))
+                        values.get(1),
+                        values.get(2),
+                        getEvents(values.get(3)),
+                        values.get(4),
+                        values.get(5),
+                        getTracks(values.get(6)),
+                        getPoints(values.get(8)),
+                        values.get(9),
+                        values.get(11),
+                        getTags(values.get(13)),
+                        r.headers().values("Set-Cookie"),
+                        values.get(14),
+                        values.get(15)
                 );
 
                         SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
@@ -283,7 +294,7 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                         e.printStackTrace();
                     }
                 } else
-                    Toast.makeText(this, "FAILED: " + r.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
     }
 
     public void saveInstitution(Response<ResponseBody> r){
@@ -296,22 +307,23 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                     values.add(list.get(i).get("value").toString());
 
                 InstitutionInfo ins = new InstitutionInfo(
-                        values.get(15),
-                        values.get(8),
-                        values.get(1),
-                        values.get(7),
-                        values.get(6),
                         values.get(0),
-                        values.get(10),
-                        getEvents(values.get(2)),
-                        null,
-                        values.get(16),
-                        values.get(5),
-                        values.get(14),
+                        values.get(1),
+                        values.get(2),
                         values.get(3),
+                        getEvents(values.get(4)),
+                        values.get(5),
+                        values.get(6),
+                        values.get(7),
+                        values.get(8),
+                        values.get(9),
+                        values.get(10),
+                        values.get(14),
+                        values.get(15),
+                        values.get(16),
                         values.get(17),
-                        values.get(4),
-                        getToken(r.headers().values("Set-Cookie"))
+                        values.get(18),
+                        r.headers().values("Set-Cookie")
                 );
 
                 SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
@@ -329,29 +341,20 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
     }
 
     private List<Integer> getTags(String tags){
-        if(tags.equals("[]") || tags.equals(""))
-            return new ArrayList<>();
         return gson.fromJson(tags, List.class);
     }
 
     private List<String> getEvents(String events){
-        if(events.equals("[]") || events.equals(""))
-            return null;
         return gson.fromJson(events, List.class);
     }
 
-    private List<String> getMembers(String members){
-        if(members.equals("[]") || members.equals(""))
-            return null;
-        return gson.fromJson(members, List.class);
+    private List<String> getTracks(String tracks){
+        return gson.fromJson(tracks, List.class);
     }
 
-    private byte[] getProfilePic(String profilePic){
-        return gson.fromJson(profilePic, byte[].class);
-    }
-
-    private String getToken(List<String> cookie) {
-        return cookie.get(0).split("=|\\;")[1];
+    private PointsData getPoints(String points){
+        Type t = new TypeToken<PointsData>(){}.getType();
+        return gson.fromJson(points, t);
     }
 
 }

@@ -23,26 +23,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.institution.login.InstitutionInfo;
 import pt.unl.fct.di.example.sharencare.institution.main_menu.MainMenuInstitutionActivity;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
-import pt.unl.fct.di.example.sharencare.user.main_menu.MainMenuUserActivity;
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
 import retrofit2.Call;
@@ -60,9 +56,9 @@ public class ProfileFragment extends Fragment {
     private byte[] image;
 
     private TextView username, email, mobile, landline, address,
-            zipCode, website, instagram, youtube, twitter, facebook, fax;
+            zipCode, website, instagram, youtube, twitter, facebook, fax, bio;
     private EditText editedEmail, editedMobile, editedLandline, editedAddress,
-            editedZipCode, editedWebsite, editedInstagram, editedYoutube, editedTwitter, editedFacebook, editedFax;
+            editedZipCode, editedWebsite, editedInstagram, editedYoutube, editedTwitter, editedFacebook, editedFax, editedBio;
 
     private ImageView profilePic, editedProfilePic;
 
@@ -115,6 +111,7 @@ public class ProfileFragment extends Fragment {
         twitter = getView().findViewById(R.id.fragment_profile_institution_twitter);
         facebook = getView().findViewById(R.id.fragment_profile_institution_facebook);
         fax = getView().findViewById(R.id.fragment_profile_institution_fax);
+        bio = getView().findViewById(R.id.fragment_profile_institution_bio);
 
         editedEmail = getView().findViewById(R.id.fragment_profile_institution_edit_email);
         editedAddress = getView().findViewById(R.id.fragment_profile_institution_edit_address);
@@ -127,10 +124,11 @@ public class ProfileFragment extends Fragment {
         editedYoutube = getView().findViewById(R.id.fragment_profile_institution_edit_youtube);
         editedWebsite = getView().findViewById(R.id.fragment_profile_institution_edit_website);
         editedFax = getView().findViewById(R.id.fragment_profile_institution_edit_fax);
+        editedBio = getView().findViewById(R.id.fragment_profile_institution_edit_bio);
 
         changeAttributes = getView().findViewById(R.id.fragment_profile_institution_edit_attributes);
 
-       // setAttributes();
+        setAttributes();
 
         editedProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +151,9 @@ public class ProfileFragment extends Fragment {
 
                 address.setVisibility(View.INVISIBLE);
                 editedAddress.setVisibility(View.VISIBLE);
+
+                bio.setVisibility(View.INVISIBLE);
+                editedBio.setVisibility(View.VISIBLE);
 
                 mobile.setVisibility(View.INVISIBLE);
                 editedMobile.setVisibility(View.VISIBLE);
@@ -201,25 +202,26 @@ public class ProfileFragment extends Fragment {
                 String newYoutube = editedYoutube.getText().toString();
                 String newWebsite = editedWebsite.getText().toString();
                 String newFax = editedFax.getText().toString();
+                String newBio = editedBio.getText().toString();
 
                ProfileInstitution ins = new ProfileInstitution(
-                    newEmail,
-                    newMobile,
-                    newLandLine,
                     newAddress,
-                    newZipCode,
-                    image,
+                    newBio,
+                    newEmail,
                     null,
-                    user.getTokenId(),
-                    newWebsite,
-                    newInstagram,
-                    newTwitter,
                     newFacebook,
+                    newFax,
+                    newInstagram,
+                    newLandLine,
+                    newMobile,
+                    image,
+                    newTwitter,
+                    newWebsite,
                     newYoutube,
-                    newFax
+                    newZipCode
                );
 
-                profileRepository.getProfileService().changeProfileInstitution(ins).enqueue(new Callback<ResponseBody>() {
+                profileRepository.getProfileService().changeProfileInstitution(user.getToken(), ins).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                         if(r.isSuccessful()){
@@ -228,85 +230,90 @@ public class ProfileFragment extends Fragment {
                             String json = sharedpreferences.getString("USER", null);
                             UserInfo user = gson.fromJson(json, UserInfo.class);
 
-                            if(!newEmail.equals("")) {
+
                                 user.setEmail(newEmail);
                                 email.setText(newEmail);
                                 editedEmail.setText(newEmail);
-                            }
+
                             editedEmail.setVisibility(View.INVISIBLE);
                             email.setVisibility(View.VISIBLE);
 
-                            if(!newAddress.equals("")){
                                 user.setAddress(newAddress);
                                 address.setText(newAddress);
                                 editedAddress.setText(newAddress);
-                            }
+
                             editedAddress.setVisibility(View.INVISIBLE);
                             address.setVisibility(View.VISIBLE);
 
-                            if(!newMobile.equals("")){
                                 user.setMobile(newMobile);
                                 mobile.setText(newMobile);
                                 editedMobile.setText(newMobile);
-                            }
+
                             editedMobile.setVisibility(View.INVISIBLE);
                             mobile.setVisibility(View.VISIBLE);
 
-                            if(!newLandLine.equals("")){
                                 user.setLandLine(newLandLine);
                                 landline.setText(newLandLine);
                                 editedLandline.setText(newLandLine);
-                            }
+
                             editedLandline.setVisibility(View.INVISIBLE);
                             landline.setVisibility(View.VISIBLE);
 
-                            if(!newZipCode.equals("")){
                                 user.setZipCode(newZipCode);
                                 zipCode.setText(newZipCode);
                                 editedZipCode.setText(newZipCode);
-                            }
+
                             editedZipCode.setVisibility(View.INVISIBLE);
                             zipCode.setVisibility(View.VISIBLE);
 
-                            if(!newInstagram.equals("")){
                                 user.setZipCode(newInstagram);
                                 instagram.setText(newInstagram);
                                 editedInstagram.setText(newInstagram);
-                            }
+
                             editedInstagram.setVisibility(View.INVISIBLE);
                             instagram.setVisibility(View.VISIBLE);
 
-                            if(!newFacebook.equals("")){
                                 user.setZipCode(newFacebook);
                                 facebook.setText(newFacebook);
                                 editedFacebook.setText(newFacebook);
-                            }
+
                             editedFacebook.setVisibility(View.INVISIBLE);
                             facebook.setVisibility(View.VISIBLE);
 
-                            if(!newTwitter.equals("")){
                                 user.setZipCode(newTwitter);
                                 twitter.setText(newTwitter);
                                 editedTwitter.setText(newTwitter);
-                            }
+
                             editedTwitter.setVisibility(View.INVISIBLE);
                             twitter.setVisibility(View.VISIBLE);
 
-                            if(!newYoutube.equals("")){
                                 user.setZipCode(newYoutube);
                                 youtube.setText(newYoutube);
                                 editedYoutube.setText(newYoutube);
-                            }
+
                             editedYoutube.setVisibility(View.INVISIBLE);
                             youtube.setVisibility(View.VISIBLE);
 
-                            if(!newWebsite.equals("")){
                                 user.setZipCode(newWebsite);
                                 website.setText(newWebsite);
                                 editedWebsite.setText(newWebsite);
-                            }
+
                             editedWebsite.setVisibility(View.INVISIBLE);
                             website.setVisibility(View.VISIBLE);
+
+                                user.setZipCode(newFax);
+                                fax.setText(newFax);
+                                editedFax.setText(newFax);
+
+                            editedFax.setVisibility(View.INVISIBLE);
+                            fax.setVisibility(View.VISIBLE);
+
+                                user.setZipCode(newBio);
+                                bio.setText(newBio);
+                                editedBio.setText(newBio);
+
+                            editedBio.setVisibility(View.INVISIBLE);
+                            bio.setVisibility(View.VISIBLE);
 
                             editedProfilePic.setVisibility(View.INVISIBLE);
                             profilePic.setVisibility(View.VISIBLE);
@@ -401,14 +408,17 @@ public class ProfileFragment extends Fragment {
         }if(!user.getFax().equals("")) {
             fax.setText(user.getFax());
             editedFax.setText(user.getFax());
+        }if(!user.getBio().equals("")){
+            bio.setText(user.getBio());
+            editedBio.setText(user.getBio());
         }
 
-        getProfilePic(user.getTokenId());
+        getProfilePic(user.getToken());
 
     }
 
-    private void getProfilePic(String tokenId){
-        profileRepository.getProfileService().getProfilePic(tokenId).enqueue(new Callback<ResponseBody>() {
+    private void getProfilePic(List<String> token){
+        profileRepository.getProfileService().getProfilePic(token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful()){

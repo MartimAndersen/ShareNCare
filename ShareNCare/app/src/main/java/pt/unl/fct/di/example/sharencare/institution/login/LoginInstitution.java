@@ -7,10 +7,12 @@ public class LoginInstitution {
     @SerializedName("nifLogin")
     private String nifLogin;
     private String passwordLogin;
+    private boolean expirable;
 
-    public LoginInstitution(String nifLogin, String passwordLogin){
+    public LoginInstitution(String nifLogin, String passwordLogin, boolean expirable){
         this.nifLogin = nifLogin;
         this.passwordLogin = passwordLogin;
+        this.expirable = expirable;
     }
 
     public String getNifLogin() {

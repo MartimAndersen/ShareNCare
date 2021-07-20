@@ -5,8 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
 import pt.unl.fct.di.example.sharencare.common.login.LoginActivity;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
-import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -18,8 +17,12 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TagsActivity extends AppCompatActivity {
 
@@ -55,7 +58,7 @@ public class TagsActivity extends AppCompatActivity {
         next.setOnClickListener(v ->{
             ProfileDataTags u = new ProfileDataTags(
                     username,
-                    tags.getCheckedChipIds()
+                    getTags()
 
             );
 
@@ -76,4 +79,14 @@ public class TagsActivity extends AppCompatActivity {
 
         });
     }
+    private List<Integer> getTags(){
+        List<Integer> t = new ArrayList<>();
+        for(int i = 0; i < tags.getChildCount(); i++) {
+            Chip chip = (Chip) tags.getChildAt(i);
+            if (chip.isChecked())
+                t.add(i);
+        }
+        return t;
+    }
+
 }

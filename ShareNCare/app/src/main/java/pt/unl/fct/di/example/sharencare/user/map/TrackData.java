@@ -1,25 +1,24 @@
 package pt.unl.fct.di.example.sharencare.user.map;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
+
 public class TrackData {
-    public String title, description, tokenId, origin, destination, distance, difficulty;
+    public String description;
+    public int difficulty;
+    public String distance;
+    public String solidarityPoints;
+    public String title;
+    public String type;
 
-
-    public TrackData(String title, String description, String origin, String destination, String tokenId, String distance, String difficulty){
-        this.title = title;
+    public TrackData(String description, int difficulty, String distance, String solidarityPoints, String title, String type) {
         this.description = description;
-        this.tokenId = tokenId;
-        this.origin = origin;
-        this.destination = destination;
-        this.distance = distance;
         this.difficulty = difficulty;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
+        this.distance = distance;
+        this.solidarityPoints = solidarityPoints;
         this.title = title;
+        this.type = type;
     }
 
     public String getDescription() {
@@ -30,28 +29,12 @@ public class TrackData {
         this.description = description;
     }
 
-    public String getTokenId() {
-        return tokenId;
+    public int getDifficulty() {
+        return difficulty;
     }
 
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId;
-    }
-
-    public String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public String getDistance() {
@@ -62,11 +45,27 @@ public class TrackData {
         this.distance = distance;
     }
 
-    public String getDifficulty() {
-        return difficulty;
+    public String getSolidarityPoints() {
+        return solidarityPoints;
     }
 
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
+    public void setSolidarityPoints(String solidarityPoints) {
+        this.solidarityPoints = solidarityPoints;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

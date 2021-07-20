@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +34,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import pt.unl.fct.di.example.sharencare.user.main_menu.MainMenuUserActivity;
 import pt.unl.fct.di.example.sharencare.R;
@@ -182,22 +182,23 @@ public class ProfileFragment extends Fragment {
                 String newAddress = editedAddress.getText().toString();
                 String newSecondAddress = editedSecondAddress.getText().toString();
                 String newZipCode = editedZipCode.getText().toString();
+                String newBio = "";
 
             ProfileUser u = new ProfileUser(
-                    newEmail,
-                    newMobile,
-                    newLandLine,
                     newAddress,
-                    newZipCode,
+                    newBio,
+                    newEmail,
+                    null,
+                    newLandLine,
+                    newMobile,
+                    image,
                     profileType,
                     newSecondAddress,
                     tags.getCheckedChipIds(),
-                    image,
-                    null,
-                    user.getTokenId()
+                    newZipCode
             );
 
-            profileRepository.getProfileService().changeProfile(u).enqueue(new Callback<ResponseBody>() {
+            profileRepository.getProfileService().changeProfile(user.getToken(), u).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                     if(r.isSuccessful()){
@@ -254,7 +255,6 @@ public class ProfileFragment extends Fragment {
                         editedZipCode.setVisibility(View.INVISIBLE);
                         zipCode.setVisibility(View.VISIBLE);
 
-
                         editedProfilePic.setVisibility(View.INVISIBLE);
                         profilePic.setVisibility(View.VISIBLE);
 
@@ -282,21 +282,6 @@ public class ProfileFragment extends Fragment {
             });
 
         }});
-
-        logout = getView().findViewById(R.id.logout);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Activity act = getActivity();
-                if (act instanceof MainMenuUserActivity)
-                    ((MainMenuUserActivity) act).logoutUser();
-
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-              //  intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -310,7 +295,15 @@ public class ProfileFragment extends Fragment {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 editedProfilePic.setImageBitmap(bitmap);
                 profilePic.setImageBitmap(bitmap);
+                user.setProfilePic(bitmap);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+                String headimg = new String(Base64.encodeToString(out.toByteArray(),Base64.DEFAULT));
+
+                SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                prefsEditor.putString("PIC",headimg);
+                prefsEditor.apply();
+
                 image = out.toByteArray();
             } catch (IOException e){
                 e.printStackTrace();
@@ -350,12 +343,22 @@ public class ProfileFragment extends Fragment {
         if(user.profileType.equals("public"))
             publicProfile.setChecked(true);
 
-        getProfilePic(user.getTokenId());
+        String profilePicString = sharedpreferences.getString("PIC", null);
+
+        if(profilePicString == null)
+            getProfilePic(user.getToken());
+       else {
+            byte[] decode = Base64.decode(profilePicString.getBytes(), 1);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+            profilePic.setImageBitmap(bitmap);
+            editedProfilePic.setImageBitmap(bitmap);
+        }
 
     }
 
-    private void getProfilePic(String tokenId){
-        profileRepository.getProfileService().getProfilePic(tokenId).enqueue(new Callback<ResponseBody>() {
+    private void getProfilePic(List<String> token){
+
+        profileRepository.getProfileService().getProfilePic(token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful()){
@@ -365,6 +368,15 @@ public class ProfileFragment extends Fragment {
                             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                             profilePic.setImageBitmap(bitmap);
                             editedProfilePic.setImageBitmap(bitmap);
+
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+                            String headimg = new String(Base64.encodeToString(byteArrayOutputStream.toByteArray(),Base64.DEFAULT));
+
+                            SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                            prefsEditor.putString("PIC",headimg);
+                            prefsEditor.apply();
+
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

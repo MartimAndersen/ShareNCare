@@ -4,38 +4,35 @@ import java.util.List;
 
 public class ProfileInstitution {
 
-    public String email;
-    public String mobile;
-    public String landLine;
     public String address;
-    public String zipCode;
-    public String tokenId;
+    public String bio;
+    public String email;
     public List<String> events;
-    public byte[] profilePic;
-    public String website;
-    public String instagram;
-    public String twitter;
     public String facebook;
-    public String youtube;
     public String fax;
+    public String instagram;
+    public String landLine;
+    public String mobile;
+    public byte[] profilePic;
+    public String twitter;
+    public String website;
+    public String youtube;
+    public String zipCode;
 
-    public ProfileInstitution(String email, String mobile, String landLine, String address, String zipCode, byte[] profilePic,
-                                  List<String> events, String tokenId, String website, String instagram, String twitter, String facebook, String youtube,
-                                  String fax) {
-        this.email = email;
-        this.mobile = mobile;
+    public ProfileInstitution(String address, String bio, String email, List<String> events, String facebook, String fax, String instagram, String landLine, String mobile, byte[] profilePic, String twitter, String website, String youtube, String zipCode) {
         this.address = address;
-        this.zipCode = zipCode;
-        this.landLine = landLine;
-        this.profilePic = profilePic;
+        this.bio = bio;
+        this.email = email;
         this.events = events;
-        this.website = website;
-        this.instagram = instagram;
-        this.twitter = twitter;
         this.facebook = facebook;
-        this.youtube = youtube;
         this.fax = fax;
-        this.tokenId = tokenId;
+        this.instagram = instagram;
+        this.landLine = landLine;
+        this.mobile = mobile;
+        this.profilePic = profilePic;
+        this.twitter = twitter;
+        this.website = website;
+        this.youtube = youtube;
+        this.zipCode = zipCode;
     }
-
 }

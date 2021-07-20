@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -34,12 +33,11 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
+import pt.unl.fct.di.example.sharencare.common.events.EventMethods;
 import pt.unl.fct.di.example.sharencare.common.events.EventsInfoActivity;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
-import pt.unl.fct.di.example.sharencare.databinding.FragmentHomeBinding;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.institution.login.InstitutionInfo;
-import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
-import pt.unl.fct.di.example.sharencare.user.main_menu.ui.events.EventData;
+import pt.unl.fct.di.example.sharencare.common.events.EventData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,54 +76,26 @@ public class HomeFragment extends Fragment {
         String institutionInfo = sharedpreferences.getString("USER", null);
         InstitutionInfo ins = gson.fromJson(institutionInfo, InstitutionInfo.class);
 
-        eventsRepository.getEventsService().getUserEvents(ins.getTokenId()).enqueue(new Callback<ResponseBody>() {
+        eventsRepository.getEventsService().getUserEvents(ins.getToken()).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful()) {
-                    try {
                         List<EventData> events = new ArrayList<>();
-                        JSONArray array = new JSONArray(r.body().string());
-                        for (int i = 0; i < array.length(); i++) {
-                            List<LinkedTreeMap> list = gson.fromJson(array.get(i).toString(), List.class);
-                            List<String> event = new ArrayList<>();
+                        events = EventMethods.getMultipleEvents(r);
 
-                            for (int j = 0; j < list.size(); j++) {
-                                event.add(list.get(j).get("value").toString());
-                            }
-
-                            EventData e = new EventData(
-                                    event.get(7),
-                                    event.get(1),
-                                    event.get(6),
-                                    event.get(5),
-                                    event.get(3),
-                                    event.get(9),
-                                    event.get(4),
-                                    event.get(2),
-                                    getTags(event.get(8)),
-                                    getLatLon(event.get(0)).first,
-                                    getLatLon(event.get(0)).second
-                            );
-
+                        for(EventData e : events)
                             showEvents(e);
-
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
-                        else{
-                            Toast.makeText(getActivity(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                else
+                    Toast.makeText(getActivity(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
                     }
-                });
+        });
 
     }
 
@@ -143,16 +113,6 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
-    }
-
-    private Pair<Double, Double> getLatLon(String coordinates){
-        String[] c = coordinates.split(" ");
-        Pair<Double, Double> latLon = new Pair<Double, Double>(new Double(c[0]), new Double(c[1]));
-        return latLon;
-    }
-
-    private List<Integer> getTags(String tags){
-        return gson.fromJson(tags, List.class);
     }
 
 

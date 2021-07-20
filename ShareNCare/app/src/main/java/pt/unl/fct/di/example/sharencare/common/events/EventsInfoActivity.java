@@ -6,38 +6,36 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import okhttp3.ResponseBody;
 import pt.unl.fct.di.example.sharencare.R;
-import pt.unl.fct.di.example.sharencare.common.register.Repository;
+import pt.unl.fct.di.example.sharencare.common.Repository;
 import pt.unl.fct.di.example.sharencare.user.login.UserInfo;
 import pt.unl.fct.di.example.sharencare.user.main_menu.ui.events.AddEventData;
-import pt.unl.fct.di.example.sharencare.user.main_menu.ui.events.EventData;
-import pt.unl.fct.di.example.sharencare.user.main_menu.ui.events.EventsFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.fonts.FontStyle;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,11 +43,10 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,9 +62,11 @@ public class EventsInfoActivity extends AppCompatActivity {
     private SharedPreferences sharedpreferences;
     private String[] texts;
     private String[] tagNames = {"Animals", "Environment", "Children", "Elderly", "Supplies", "Homeless"};
-    private int[] images = {R.drawable.event_black, R.drawable.description_black, R.drawable.location_black, R.drawable.person_black};
+    private int[] images = {R.drawable.event_black, R.drawable.description_black, R.drawable.location_black, R.drawable.person_black, R.drawable.heart_black};
     private int[] tagIcons = {R.drawable.animals_black, R.drawable.environment_black, R.drawable.children_black, R.drawable.elderly_black, R.drawable.supplies_black, R.drawable.homeless_black};
     private ChipGroup chipGroup;
+    private boolean expandable;
+    private EventData e;
 
     private Repository eventsRepository;
     private Gson gson;
@@ -80,6 +79,8 @@ public class EventsInfoActivity extends AppCompatActivity {
         sharedpreferences = getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         eventsRepository = eventsRepository.getInstance();
         gson = new Gson();
+
+        expandable = false;
 
         nameEvent = new TextView(this);
         customizeName();
@@ -95,22 +96,38 @@ public class EventsInfoActivity extends AppCompatActivity {
             addEvent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String eventName = sharedpreferences.getString("EVENT", null);
+                    String e = sharedpreferences.getString("EVENT", null);
+                    Type listType = new TypeToken<EventData>(){}.getType();
+                    EventData event = gson.fromJson(e, listType);
 
                     String userInfo = sharedpreferences.getString("USER", null);
                     UserInfo user = gson.fromJson(userInfo, UserInfo.class);
 
                     AddEventData add = new AddEventData(
-                            user.getTokenId(),
-                            eventName
+                            event.getName()
                     );
 
-                    eventsRepository.getEventsService().addEventToUser(add).enqueue(new Callback<ResponseBody>() {
+                    eventsRepository.getEventsService().joinEventUser(user.getToken(), add).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
-                            if (r.isSuccessful())
+                            if (r.isSuccessful()) {
+                                String e = sharedpreferences.getString("EVENTS", null);
+                                List<EventData> events = new ArrayList<EventData>();
+
+                                if(e != null) {
+                                    Type listType = new TypeToken<ArrayList<EventData>>() {
+                                    }.getType();
+                                    events = gson.fromJson(e, listType);
+                                }
+                                events.add(event);
+
+                                SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                                String json = gson.toJson(events);
+                                prefsEditor.putString("EVENTS", json);
+                                prefsEditor.apply();
+
                                 Toast.makeText(getApplicationContext(), "Event Added!", Toast.LENGTH_SHORT).show();
-                            else
+                            } else
                                 Toast.makeText(getApplicationContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
                         }
 
@@ -147,10 +164,24 @@ public class EventsInfoActivity extends AppCompatActivity {
             View info = layoutInflater.inflate(R.layout.info_box, parent, false);
 
             ImageView image = info.findViewById(R.id.info_box_image);
-            TextView text = info.findViewById(R.id.info_box_text);
+            TextView textView = info.findViewById(R.id.info_box_text);
 
             image.setImageResource(images[position]);
-            text.setText(texts[position]);
+            textView.setText(texts[position]);
+            textView.setMaxLines(5);
+            textView.setEllipsize(TextUtils.TruncateAt.END);
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!expandable) {
+                        textView.setMaxLines(texts[position].length());
+                        expandable = true;
+                    }else {
+                        textView.setMaxLines(5);
+                        expandable = false;
+                    }
+                }
+            });
 
             return info;
         }
@@ -161,40 +192,33 @@ public class EventsInfoActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if (r.isSuccessful()) {
-                    try {
-                        List<LinkedTreeMap> list = gson.fromJson(r.body().string(), List.class);
-                        List<String> event = new ArrayList<>();
-                        texts = new String[4];
+                    EventData e = EventMethods.getEvent(r);
+                    texts = new String[5];
 
-                        for (int j = 0; j < list.size(); j++) {
-                            event.add(list.get(j).get("value").toString());
-                        }
+                    String eventName = e.getName();
+                    String institutionName = e.getInstitutionName();
 
-                        String eventName = event.get(7);
+                    SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                    prefsEditor.putString("EVENT", gson.toJson(e));
+                    prefsEditor.apply();
 
-                        SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
-                        prefsEditor.putString("EVENT", eventName);
-                        prefsEditor.apply();
-
-                        nameEvent.setText(eventName);
-                        texts[0] = getDate(event.get(4), event.get(2), event.get(3), event.get(9));
-                        texts[1] = event.get(1);
-                        texts[2] = getLocation(event.get(0));
-                        texts[3] = getParticipants(event.get(6), event.get(5));
-                        List<Double> tags = gson.fromJson(event.get(8), List.class);
-                        chipGroup = footer.findViewById(R.id.activity_events_info_chip_group);
-                        for(int i = 0; i < tags.size(); i++) {
-                            setChip(tags.get(i).intValue());
-                        }
-
-                        EventsInfoActivity.MyAdapter myAdapter = new EventsInfoActivity.MyAdapter(getApplicationContext(), texts, images);
-                        listView.addHeaderView(nameEvent);
-                        listView.addFooterView(footer);
-                        listView.setAdapter(myAdapter);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    header(eventName, institutionName);
+                    texts[0] = getDate(e.getInitialDate(), e.getEndingDate(), e.getTime(), e.getDurability());
+                    texts[1] = e.getDescription();
+                    texts[2] = getLocation(e.getLat(), e.getLon());
+                    texts[3] = getParticipants(e.getMinParticipants(), e.getMaxParticipants());
+                    texts[4] = institutionName;
+                    List<Integer> tags = e.getTags();
+                    chipGroup = footer.findViewById(R.id.activity_events_info_chip_group);
+                    for(int i = 0; i < tags.size(); i++) {
+                        setChip(tags.get(i));
                     }
+
+                    MyAdapter myAdapter = new MyAdapter(getApplicationContext(), texts, images);
+                    listView.addHeaderView(nameEvent);
+                    listView.addFooterView(footer);
+                    listView.setAdapter(myAdapter);
+
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "CODE: "+r.code(), Toast.LENGTH_SHORT).show();
@@ -226,7 +250,7 @@ public class EventsInfoActivity extends AppCompatActivity {
 
     private String getDate(String initialDate, String endingDate, String time, String durability) {
         String date;
-        SimpleDateFormat sdfStart = new SimpleDateFormat("dd/MM/yy", Locale.UK);
+        SimpleDateFormat sdfStart = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
         SimpleDateFormat sdfEnd = new SimpleDateFormat("EEE, d MMM yyyy", Locale.UK);
         try {
 
@@ -246,21 +270,39 @@ public class EventsInfoActivity extends AppCompatActivity {
         return null;
     }
 
-    private String getLocation(String coordinates){
-        String[] c = coordinates.split(" ");
-        Pair<Double, Double> latLon = new Pair<Double, Double>(new Double(c[0]), new Double(c[1]));
+    private String getLocation(Double lat, Double lon){
+        Pair<Double, Double> latLon = new Pair<Double, Double>(lat, lon);
         try {
             Geocoder geocoder;
             geocoder = new Geocoder(this, Locale.getDefault());
             Address address = geocoder.getFromLocation(latLon.first, latLon.second, 1).get(0);
-            String location = address.getThoroughfare() +
-                    "\n" + address.getPostalCode() + " " + address.getLocality() +
-                    "\n" + address.getAdminArea() + ", " + address.getCountryName();
+
+            String thoroughfare = address.getThoroughfare();
+            String location = "location";
+            if(thoroughfare != null) {
+                location = address.getThoroughfare() +
+                        "\n" + address.getPostalCode() + " " + address.getLocality() +
+                        "\n" + address.getAdminArea() + ", " + address.getCountryName();
+            }
+            else{
+                location = address.getPostalCode() + " " + address.getLocality() +
+                        "\n" + address.getAdminArea() + ", " + address.getCountryName();
+            }
             return location;
         } catch (IOException e) {
             e.printStackTrace();
         }
      return null;
+    }
+
+    private void header(String eventName, String institutionName){
+        String ss1 = "\n" + "by " + institutionName;
+        SpannableString ss2 = new SpannableString(ss1);
+        ss2.setSpan(new AbsoluteSizeSpan(50), 0, ss1.length(), 0);
+        nameEvent.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT));
+        nameEvent.setPadding(0,40,0,40);
+        nameEvent.setText(TextUtils.concat(eventName, ss2));
     }
 
     private String getParticipants(String min, String max){
@@ -274,18 +316,5 @@ public class EventsInfoActivity extends AppCompatActivity {
         chip.setChipIcon(getResources().getDrawable(tagIcons[position-1], getTheme()));
         chip.setText(tagNames[position-1]);
         chipGroup.addView(chip);
-
     }
-
-    private Pair<Double, Double> getLatLon(String coordinates){
-        String[] c = coordinates.split(" ");
-        Pair<Double, Double> latLon = new Pair<Double, Double>(new Double(c[0]), new Double(c[1]));
-        return latLon;
-    }
-
-    private List<Integer> getTags(String tags){
-        return gson.fromJson(tags, List.class);
-    }
-
-
 }

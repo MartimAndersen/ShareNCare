@@ -2,34 +2,34 @@ package pt.unl.fct.di.example.sharencare.user.main_menu.ui.profile;
 
 import java.util.List;
 
+import okhttp3.Cookie;
+
 public class ProfileUser {
 
-    public String email;
-    public String mobile;
-    public String landLine;
     public String address;
-    public String secondAddress;
-    public String zipCode;
-    public String profileType;
-    public String tokenId;
-    public List<Integer> tags;
+    public String bio;
+    public String email;
     public List<String> events;
+    public String landLine;
+    public String mobile;
     public byte[] profilePic;
+    public String profileType;
+    public String secondAddress;
+    public List<Integer> tags;
+    public String zipCode;
 
-    public ProfileUser(String email, String mobile, String landLine, String address, String zipCode, String profileType, String secondAddress, List<Integer> tags, byte[] profilePic,
-                       List<String> events,
-                       String tokenId){
-        this.email = email;
+    public ProfileUser(String address, String bio, String email, List<String> events, String landLine, String mobile, byte[] profilePic, String profileType, String secondAddress, List<Integer> tags, String zipCode) {
         this.address = address;
-        this.secondAddress = secondAddress;
-        this.mobile = mobile;
-        this.landLine = landLine;
-        this.zipCode = zipCode;
-        this.tags = tags;
-        this.profileType = profileType;
+        this.bio = bio;
+        this.email = email;
         this.events = events;
-        this.tokenId = tokenId;
+        this.landLine = landLine;
+        this.mobile = mobile;
         this.profilePic = profilePic;
+        this.profileType = profileType;
+        this.secondAddress = secondAddress;
+        this.tags = tags;
+        this.zipCode = zipCode;
     }
 
     public String getEmail() {
