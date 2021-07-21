@@ -1,6 +1,52 @@
 function goToPageBefore(){
     window.location.href = "../../afterLoginPage.html";
 }
+function userAttributes(jsonResponse) {
+    data = jsonResponse;
+    console.log(data);
+  document.getElementById("newEmail").value = data.email;
+  //document.getElementById("newEmail").value = localStorage.getItem(obj[3].value);
+  document.getElementById("newLandLine").value = data.landLine;
+  document.getElementById("newMobile").value = data.mobile;
+  document.getElementById("newAddress").value = data.address;
+  document.getElementById("newSecondAddress").value = data.secondAddress;
+  document.getElementById("newPostal").value = data.zipCode;
+  document.getElementById("description").value = data.bio;
+
+
+}
+function callUserAttributes() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            let a = this.responseText;
+            switch (this.status) {
+                case 200:
+                    alert("Properties changed.");
+                    jsonResponse = JSON.parse(xhttp.responseText);
+                    console.log(jsonResponse );
+                    userAttributes(jsonResponse);
+
+                    break;
+                case 401:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+                case 404:
+                    alert("Token does not exist.");
+                    break;
+                case 403:
+                    alert("The user with the given token does not exist.");
+                    break;
+                default:
+                    alert("Wrong parameters.");
+                    break;
+            }
+        }
+    };
+    xhttp.open("GET", "/rest/loggedIn/getCurrentUser", true);
+    xhttp.send();
+}
+
 
 function callChangeAttributes(data) {
     let xhttp = new XMLHttpRequest();
@@ -73,6 +119,7 @@ changeAttributesForm.onsubmit = () => {
     handleChangeAttributes();
     return false;
 }
+
 
 /**
 

@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.api.gax.paging.Page;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -250,7 +252,7 @@ public class InsideLoginResource {
 					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 		}
 		
-		if(user.getString("role").equals("USER")) {
+		if(!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 		
@@ -723,5 +725,49 @@ public class InsideLoginResource {
 
 		return pic;
 	}
+	
+	@GET
+	@Path("/getCurrentUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCurrentUser(@CookieParam("Token") NewCookie cookie) {
+		System.out.println("cheguei aqui");
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist")
+					.build();
+
+        Type listString = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        List<String> events = new Gson().fromJson(user.getString("events"), listString);
+        
+        Type listInt = new TypeToken<ArrayList<Integer>>() {
+        }.getType();
+        List<Integer> tags = new Gson().fromJson(user.getString("tags"), listInt);
+        
+        byte[] profilePic = null;
+		ProfileData data = new ProfileData(user.getString("address"), user.getString("bio"), user.getString("email"), events, user.getString("landLine"), user.getString("mobile"),
+				profilePic, user.getString("profileType"), user.getString("secondAddress"),tags , user.getString("zipCode"));
+		System.out.println(g.toJson(data));
+		return Response.ok(g.toJson(data)).cookie(cookie).build();
+		
+
+	}
+
 
 }
