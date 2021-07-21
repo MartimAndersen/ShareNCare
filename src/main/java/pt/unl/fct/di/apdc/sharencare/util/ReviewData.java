@@ -35,7 +35,7 @@ public class ReviewData {
 	}
 	
 	public boolean ratingIsValid() {
-		if(Integer.parseInt(rating) >= 1 && Integer.parseInt(rating) <= 5) {
+		if(Float.parseFloat(rating) >= 0 && Float.parseFloat(rating) <= 5) {
 			return true;
 		}else {
 			return false;
