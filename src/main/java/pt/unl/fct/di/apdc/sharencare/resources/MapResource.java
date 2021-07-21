@@ -235,7 +235,8 @@ public class MapResource {
 					.set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
 					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
-					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers")).build();
+					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
+					.set("type", track.getString("type")).build();
 
 			txn.update(track);
 			txn.commit();
@@ -401,7 +402,8 @@ public class MapResource {
 				.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
 				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment))
 				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
-				.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers")).build();
+				.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
+				.set("type", track.getString("type")).build();
 
 		datastore.update(track);
 
