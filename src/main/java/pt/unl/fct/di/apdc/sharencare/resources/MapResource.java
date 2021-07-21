@@ -292,9 +292,9 @@ public class MapResource {
 			Entity track = txn.get(mapKey);
 
 			String media = track.getString("trackMedia");
-			String notes = track.getString("trackMedia");
+			String notes = track.getString("trackNotes");
 			String marker = track.getString("markers");
-			String zones = track.getString("trackdangerZones");
+			String zones = track.getString("trackDangerZones");
 
 			Type trackMedia = new TypeToken<ArrayList<String>>() {
 			}.getType();
