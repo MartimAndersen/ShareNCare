@@ -1,21 +1,50 @@
+var currUser;
+
 function goToPageBefore(){
     window.location.href = "../../afterLoginPage.html";
 }
-function userAttributes(jsonResponse) {
-    data = jsonResponse;
-    console.log(data);
-  document.getElementById("newEmail").value = data.email;
-  //document.getElementById("newEmail").value = localStorage.getItem(obj[3].value);
-  document.getElementById("newLandLine").value = data.landLine;
-  document.getElementById("newMobile").value = data.mobile;
-  document.getElementById("newAddress").value = data.address;
-  document.getElementById("newSecondAddress").value = data.secondAddress;
-  document.getElementById("newPostal").value = data.zipCode;
-  document.getElementById("description").value = data.bio;
+
+function fillTagsList(jsonResponse) {
+
+   	let tags = jsonResponse.tags;
+    var arrayLength = tags.length;
+    for (var i = 0; i < arrayLength; i++) {
+     s = tags[i];
+     currTagId = "tag" + s;
+
+     document.getElementById(currTagId).checked = true;
+}
 
 
 }
-function callUserAttributes() {
+
+
+function userAttributes(jsonResponse) {
+    currUser = jsonResponse;
+
+
+  document.getElementById("newEmail").value = currUser.email;
+  //document.getElementById("newEmail").value = localStorage.getItem(obj[3].value);
+  document.getElementById("newLandLine").value = currUser.landLine;
+  document.getElementById("newMobile").value = currUser.mobile;
+  document.getElementById("newAddress").value = currUser.address;
+  document.getElementById("newSecondAddress").value = currUser.secondAddress;
+  document.getElementById("newPostal").value = currUser.zipCode;
+  document.getElementById("description").value = currUser.bio;
+
+   profile = currUser.profileType;
+   if(profile == "public"){
+       document.getElementById('newProfile').checked = true;
+   }
+   if(profile == "private"){
+    document.getElementById('newProfile1').checked = true;
+   }
+
+  fillTagsList(jsonResponse);
+
+
+}
+function callUserAttributes(){
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
@@ -24,8 +53,9 @@ function callUserAttributes() {
                 case 200:
                     alert("Properties changed.");
                     jsonResponse = JSON.parse(xhttp.responseText);
-                    console.log(jsonResponse );
+
                     userAttributes(jsonResponse);
+
 
                     break;
                 case 401:
@@ -87,9 +117,21 @@ function callChangeAttributes(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
+    xhttp.open("POST", "/rest/loggedIn/changeAttributes", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
+}
+function fillTagsListToSend(inputs) {
+    let tagsList = [];
+    let currTagId = "";
+    for (let counter = 0; counter <=5; counter++) {
+        currTagId = "tag" + counter;
+        if (document.getElementById(currTagId).checked) {
+            // tagsList.push(inputs[t].value);
+            tagsList.push(counter);
+        }
+    }
+    return tagsList;
 }
 
 function handleChangeAttributes() {
@@ -102,14 +144,17 @@ function handleChangeAttributes() {
         radioButton = inputs[2].value
     }
     let data = {
-        newEmail: inputs[0].value,
-        newProfileType: radioButton,
-        newLandLine: inputs[3].value,
-        newMobile: inputs[4].value,
-        newAddress: inputs[5].value,
-        newSecondAddress: inputs[6].value,
-        newPostal: inputs[7].value,
-        newBio: inputs[8].value
+        email: inputs[0].value,
+        profileType: radioButton,
+        landLine: inputs[3].value,
+        mobile: inputs[4].value,
+        address: inputs[5].value,
+        secondAddress: inputs[6].value,
+        zipCode: inputs[7].value,
+        bio: inputs[8].value,
+        tags: fillTagsListToSend(inputs),
+        events: currUser.events,
+        profilePic: currUser.profilePic
     }
     callChangeAttributes(JSON.stringify(data));
 }

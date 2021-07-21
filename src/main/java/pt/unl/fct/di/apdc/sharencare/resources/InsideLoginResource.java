@@ -161,7 +161,7 @@ public class InsideLoginResource {
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		
-		if(user.getString("role").equals("USER")) {
+		if(!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
@@ -200,7 +200,7 @@ public class InsideLoginResource {
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("bio", bio).set("email", email)
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
-				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", g.toJson(tags))
+				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", tags)
 				.set("events", user.getString("events")).set("role", user.getString("role"))
 				.set("state", user.getString("state")).set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
 
@@ -730,7 +730,7 @@ public class InsideLoginResource {
 	@Path("/getCurrentUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCurrentUser(@CookieParam("Token") NewCookie cookie) {
-		System.out.println("cheguei aqui");
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
@@ -763,7 +763,7 @@ public class InsideLoginResource {
         byte[] profilePic = null;
 		ProfileData data = new ProfileData(user.getString("address"), user.getString("bio"), user.getString("email"), events, user.getString("landLine"), user.getString("mobile"),
 				profilePic, user.getString("profileType"), user.getString("secondAddress"),tags , user.getString("zipCode"));
-		System.out.println(g.toJson(data));
+	
 		return Response.ok(g.toJson(data)).cookie(cookie).build();
 		
 
