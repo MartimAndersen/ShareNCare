@@ -185,7 +185,7 @@ public class MapResource {
 			return Response.status(Status.CONFLICT).build();
 		}
 
-		if (data.ratingIsValid()) {
+		if (!data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		
