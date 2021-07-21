@@ -33,14 +33,14 @@ function stringToIndex(id) {
     return attributes.indexOf(id);
 }
 
-function getNrMembers(membersString){
+function getNrMembers(membersString) {
     // [b,g] comes looking like "[\"b\",\"g\"]"
     let nrMembers = 0;
-    if(membersString !== "[]"){
+    if (membersString !== "[]") {
         let nrMembersAux = (membersString.match(/,/g) || []).length;
-        if(membersString === 0){
+        if (membersString === 0) {
             nrMembers = 1;
-        } else{
+        } else {
             nrMembers = nrMembersAux + 1;
         }
     }
@@ -59,8 +59,8 @@ function fillLocationsArray(obj) {
         description: obj[stringToIndex(description)].value,
         tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
         nrMembers: getNrMembers(obj[stringToIndex(members)].value),
-        latitude:  obj[stringToIndex(coordinates)].value.split(" ")[0],
-        longitude:  obj[stringToIndex(coordinates)].value.split(" ")[1],
+        latitude: obj[stringToIndex(coordinates)].value.split(" ")[0],
+        longitude: obj[stringToIndex(coordinates)].value.split(" ")[1],
         ended: obj[stringToIndex(ended)].value,
         points: obj[stringToIndex(points)].value,
         rating: obj[stringToIndex(rating)].value
@@ -179,12 +179,12 @@ function addMarkers() {
     }
 }
 
-function goToPageBefore(){
+function goToPageBefore() {
     window.location.href = "../../afterLoginPage.html";
 }
 
 function populateMap(jsonResponse) {
-    for(let i = 0; i < jsonResponse.length; i++) {
+    for (let i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         obj = JSON.parse(jsonResponse[i]);
 
@@ -193,7 +193,7 @@ function populateMap(jsonResponse) {
     addMarkers();
 }
 
-function callSeeEvents(){
+function callSeeEvents() {
     var jsonResponse = []
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -211,24 +211,45 @@ function callRemoveUserFromEvent(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
-                case 200: alert(this.responseText);  break;
-                case 404: alert("Token does not exist."); break;
-                case 403: alert("The user does not exist."); break;
-                case 417: alert("The event does not exist."); break;
-                case 409: alert("The user is not a member of the event."); break;
-                default: alert("Wrong parameters."); break;
+                case 200:
+                    alert("You are no longer a member of this event.");
+                    location.reload();
+                    break;
+                case 401:
+                    alert("You must be logged in to execute this operation.");
+                    break;
+                case 411:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+                case 404:
+                    alert("Token doesn't exist.");
+                    break;
+                case 403:
+                    alert("The user does not exist.");
+                    break;
+                case 406:
+                    alert("The user with the given token is disabled.");
+                    break;
+                case 400:
+                    alert("The event does not exist.");
+                    break;
+                case 412:
+                    alert("You are not a member of the event.");
+                    break;
+                default:
+                    alert("Wrong parameters.");
+                    break;
             }
         }
     };
-    xhttp.open("POST", "/rest/event/removeUserFromEvent", true);
+    xhttp.open("POST", "/rest/event/leaveEvent", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
 
-function cancelParticipation(eventName){
+function cancelParticipation(eventName) {
     let data = {
-        eventsId: [eventName],
-        username: localStorage.getItem("currUser")
+        eventId: eventName
     }
     callRemoveUserFromEvent(JSON.stringify(data));
 }

@@ -474,12 +474,12 @@ public class EventResource {
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		}
-		
-		if(user.getString("role").equals("USER")) {
+
+		if(user.getString("role").equals("INSTITUTION")) {
 			return Response.status(Status.CONFLICT).build();
 		}
-		
-		
+
+
 
 		/*
 		 * END OF VERIFICATIONS
@@ -503,8 +503,8 @@ public class EventResource {
 		if (members.size() == Integer.parseInt(event.getString("maxParticipants")))
 			return Response.status(Status.EXPECTATION_FAILED).entity("Event has max participants").build();
 
-		if (members.contains(user.getString("username")) || events.contains(data.eventId))
-			return Response.status(Status.CONFLICT).entity("User is already a member of the event").build();
+		if (!members.contains(user.getString("username")) || !events.contains(data.eventId))
+			return Response.status(Status.PRECONDITION_FAILED).entity("User is not a member of the event").build();
 		
 		if(is3DaysBefore(event.getString("initial_date"))) {
 			RakingUserResource r = new RakingUserResource();
@@ -538,7 +538,7 @@ public class EventResource {
 		datastore.update(user);
 		datastore.update(event);
 
-		return Response.ok("Joined successfully.").cookie(cookie).build();
+		return Response.ok("You are no longer a member of this event.").cookie(cookie).build();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -369,6 +369,7 @@ function callJoinEvents(data) {
             switch (this.status) {
                 case 200:
                     alert("Joined successfully.");
+                    location.reload();
                     break;
                 case 411:
                     alert("You need to give a name of an event.");
