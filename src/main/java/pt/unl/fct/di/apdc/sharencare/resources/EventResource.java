@@ -202,9 +202,9 @@ public class EventResource {
             return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
                     .build();
 
-        if (institution.getString("role").equals("INSTITUTION")) {
-            return Response.status(Status.CONFLICT).build();
-        }
+//        if (institution.getString("role").equals("INSTITUTION")) {
+//            return Response.status(Status.CONFLICT).build();
+//        }
 
 
         String m = event.getString("members");
