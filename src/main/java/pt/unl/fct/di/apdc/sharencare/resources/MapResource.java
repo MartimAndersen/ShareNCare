@@ -27,10 +27,13 @@ import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
+import pt.unl.fct.di.apdc.sharencare.util.TrackDangerZones;
 import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
+import pt.unl.fct.di.apdc.sharencare.util.TrackMedia;
+import pt.unl.fct.di.apdc.sharencare.util.TrackNotes;
 
 @Path("/map")
 public class MapResource {
@@ -74,9 +77,13 @@ public class MapResource {
 						.build();
 			} else {
 				List<ReviewData> l = new ArrayList<ReviewData>();
+				List<TrackMedia> trackMedia = new ArrayList<TrackMedia>();
+				List<TrackNotes> trackNotes = new ArrayList<TrackNotes>();
+				List<TrackDangerZones> trackDangerZones = new ArrayList<TrackDangerZones>();
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("type", data.type)
-						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l)).build();
+						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
+						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes)).set("trackDangerZones", g.toJson(trackDangerZones)).build();
 
 				txn.add(track);
 				
@@ -219,7 +226,8 @@ public class MapResource {
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
 					.set("description", track.getString("description")).set("origin", track.getString("origin"))
 					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
-					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments)).build();
+					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
+					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes")).set("trackDangerZones", track.getString("trackDangerZones")).build();
 
 			txn.update(track);
 			txn.commit();
@@ -232,6 +240,214 @@ public class MapResource {
 			}
 		}
 	}
+	
+	@POST
+	@Path("/trackmedia")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response trackMedia(@CookieParam("Token") NewCookie cookie, TrackMedia data) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		
+		String username = token.getString("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
+		Transaction txn = datastore.newTransaction();
+
+		try {
+			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
+			Entity track = txn.get(mapKey);
+
+			String trackMediaList = track.getString("trackMedia");
+
+			Type trackMedia = new TypeToken<ArrayList<TrackMedia>>() {
+			}.getType();
+			List<TrackMedia> listTrackMedia = new Gson().fromJson(trackMediaList, trackMedia);
+
+			listTrackMedia.add(data);
+
+			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("description", track.getString("description")).set("origin", track.getString("origin"))
+					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
+					.set("trackMedia", g.toJson(listTrackMedia)).set("trackNotes", track.getString("trackNotes")).set("trackDangerZones", track.getString("trackDangerZones")).build();
+
+			txn.update(track);
+			txn.commit();
+
+			return Response.ok("Track media added.").cookie(cookie).build();
+
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	@POST
+	@Path("/tracknotes")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response trackNotes(@CookieParam("Token") NewCookie cookie, TrackNotes data) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		
+		String username = token.getString("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
+		Transaction txn = datastore.newTransaction();
+
+		try {
+			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
+			Entity track = txn.get(mapKey);
+
+			String trackNotesList = track.getString("trackNotes");
+
+			Type trackNotes = new TypeToken<ArrayList<TrackNotes>>() {
+			}.getType();
+			List<TrackNotes> listTrackNotes = new Gson().fromJson(trackNotesList, trackNotes);
+
+			listTrackNotes.add(data);
+
+			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("description", track.getString("description")).set("origin", track.getString("origin"))
+					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
+					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", g.toJson(listTrackNotes)).set("trackDangerZones", track.getString("trackDangerZones")).build();
+
+			txn.update(track);
+			txn.commit();
+
+			return Response.ok("Track notes added.").cookie(cookie).build();
+
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	@POST
+	@Path("/trackdangerzones")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response trackDangerZones(@CookieParam("Token") NewCookie cookie, TrackDangerZones data) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		
+		String username = token.getString("username");
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
+					.build();
+		
+		if(user.getString("role").equals("INSTITUTION")) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
+		Transaction txn = datastore.newTransaction();
+
+		try {
+			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
+			Entity track = txn.get(mapKey);
+
+			String trackDangerZonesList = track.getString("trackDangerZones");
+
+			Type trackDangerZones = new TypeToken<ArrayList<TrackDangerZones>>() {
+			}.getType();
+			List<TrackDangerZones> listTrackDangerZones = new Gson().fromJson(trackDangerZonesList, trackDangerZones);
+
+			listTrackDangerZones.add(data);
+
+			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("description", track.getString("description")).set("origin", track.getString("origin"))
+					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
+					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes")).set("trackDangerZones", g.toJson(listTrackDangerZones)).build();
+
+			txn.update(track);
+			txn.commit();
+
+			return Response.ok("Track trackDangerZones added.").cookie(cookie).build();
+
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	
+	
+	
 
 	@POST
 	@Path("/deleteComment")
@@ -279,7 +495,8 @@ public class MapResource {
 		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
 				.set("description", track.getString("description")).set("origin", track.getString("origin"))
 				.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
-				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment)).build();
+				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment))
+				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes")).set("trackDangerZones", track.getString("trackDangerZones")).build();
 
 		datastore.update(track);
 
