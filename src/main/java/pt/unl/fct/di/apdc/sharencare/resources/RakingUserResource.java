@@ -389,6 +389,45 @@ public class RakingUserResource {
 	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
 	}
 	
+	@GET
+	@Path("/userRatings")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response userRatings(@CookieParam("Token") NewCookie cookie) {
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+
+
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		
+		String pointsString = user.getString("points");
+		//PointsData userPoints = new Gson().fromJson(pointsString, points);
+		
+		return Response.ok(pointsString).cookie(cookie).build();
+		
+	}
+	
+	
 
 	
 	

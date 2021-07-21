@@ -15,10 +15,8 @@ function populate_table(jsonResponse) {
     let table = document.getElementById('demo_table');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
-        console.log(jsonResponse);
-        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
-        console.log(obj);
 
+        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
@@ -58,10 +56,8 @@ function populate_table_event(jsonResponse) {
     let table = document.getElementById('demo_table2');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
-        console.log(jsonResponse);
-        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
-        console.log(obj);
 
+        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
@@ -101,10 +97,8 @@ function populate_table_track(jsonResponse) {
     let table = document.getElementById('demo_table3');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
-        console.log(jsonResponse);
-        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
-        console.log(obj);
 
+        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
@@ -145,10 +139,8 @@ function populate_table_comments(jsonResponse) {
     let table = document.getElementById('demo_table4');
     for(var i = 0; i < jsonResponse.length; i++) {
         let obj = [];
-        console.log(jsonResponse);
-        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
-        console.log(obj);
 
+        obj = JSON.parse(JSON.stringify(jsonResponse[i]));
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
