@@ -249,7 +249,7 @@ public class MapResource {
 	}
 	
 	@POST
-	@Path("/finishedtrack")
+	@Path("/finishedTrack")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response finishedTrack(@CookieParam("Token") NewCookie cookie, FinishedTrack data) {
 

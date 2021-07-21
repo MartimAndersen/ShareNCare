@@ -10,16 +10,16 @@ public class ReviewData {
     -time
 	 */
 	
-	public String username;
-	public String routeName;
 	public String comment;
 	public String rating;
+	public String routeName;
+	public String username;
 	
 	public ReviewData() {
 		
 	}
 	
-	public ReviewData(String username, String routeName, String comment, String rating) {
+	public ReviewData(String comment, String rating, String routeName, String username) {
 		this.username = username;
 		this.routeName = routeName;
 		this.comment = comment;
@@ -30,16 +30,16 @@ public class ReviewData {
 		return !comment.isEmpty();
 	}
 	
+	public String getUsername() {
+		return username;
+	}
+	
 	public boolean ratingIsValid() {
 		if(Integer.parseInt(rating) >= 1 && Integer.parseInt(rating) <= 5) {
 			return true;
 		}else {
 			return false;
 		}
-	}
-	
-	public String getUsername() {
-		return username;
 	}
 	
 	
