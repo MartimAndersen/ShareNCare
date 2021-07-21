@@ -281,9 +281,8 @@ public class MapResource {
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
 		
-		if(user.getString("role").equals("INSTITUTION")) {
+		if(user.getString("role").equals("INSTITUTION"))
 			return Response.status(Status.CONFLICT).build();
-		}
 
 		Transaction txn = datastore.newTransaction();
 
