@@ -296,42 +296,42 @@ public class MapResource {
 			String marker = track.getString("markers");
 			String zones = track.getString("trackdangerZones");
 
-			Type trackMedia = new TypeToken<ArrayList<TrackMedia>>() {
+			Type trackMedia = new TypeToken<ArrayList<String>>() {
 			}.getType();
-			List<TrackMedia> listTrackMedia = new Gson().fromJson(media, trackMedia);
+			List<String> listTrackMedia = new Gson().fromJson(media, trackMedia);
 			
-			Type trackNotes = new TypeToken<ArrayList<TrackNotes>>() {
+			Type trackNotes = new TypeToken<ArrayList<String>>() {
 			}.getType();
-			List<TrackNotes> listTrackNotes = new Gson().fromJson(notes, trackNotes);
+			List<String> listTrackNotes = new Gson().fromJson(notes, trackNotes);
 			
-			Type trackZones = new TypeToken<ArrayList<TrackDangerZones>>() {
+			Type trackZones = new TypeToken<ArrayList<String>>() {
 			}.getType();
-			List<TrackDangerZones> listTrackZones = new Gson().fromJson(zones, trackZones);
+			List<String> listTrackZones = new Gson().fromJson(zones, trackZones);
 			
-			Type trackMarker = new TypeToken<ArrayList<TrackMarkers>>() {
+			Type trackMarker = new TypeToken<ArrayList<String>>() {
 			}.getType();
-			List<TrackMarkers> listTrackMarker = new Gson().fromJson(marker, trackMarker);
+			List<String> listTrackMarker = new Gson().fromJson(marker, trackMarker);
 			
 			if(!data.media.isEmpty()) {
-				for(TrackMedia m: data.media) {
+				for(String m: data.media) {
 					listTrackMedia.add(m);
 				}
 			}
 			
 			if(!data.notes.isEmpty()) {
-				for(TrackNotes n: data.notes) {
+				for(String n: data.notes) {
 					listTrackNotes.add(n);
 				}
 			}
 			
 			if(!data.zones.isEmpty()) {
-				for(TrackDangerZones n: data.zones) {
+				for(String n: data.zones) {
 					listTrackZones.add(n);
 				}
 			}
 			
 			if(!data.markers.isEmpty()) {
-				for(TrackMarkers n: data.markers) {
+				for(String n: data.markers) {
 					listTrackMarker.add(n);
 				}
 			}

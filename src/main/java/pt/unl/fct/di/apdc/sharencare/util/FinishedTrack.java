@@ -4,18 +4,18 @@ import java.util.List;
 
 public class FinishedTrack {
 
-	public List<TrackMarkers> markers;
-    public List<TrackMedia> media;
-    public List<TrackNotes> notes;
+	public List<String> markers;
+    public List<String> media;
+    public List<String> notes;
     public String routeName;
-    public List<TrackDangerZones> zones;
+    public List<String> zones;
     
     public FinishedTrack() {
     	
     }
     
     
-    public FinishedTrack(List<TrackMarkers> markers, List<TrackMedia> media, List<TrackNotes> notes, String routeName, List<TrackDangerZones> zones) {
+    public FinishedTrack(List<String> markers, List<String> media, List<String> notes, String routeName, List<String> zones) {
     	this.markers = markers;
         this.media = media;
         this.notes = notes;
