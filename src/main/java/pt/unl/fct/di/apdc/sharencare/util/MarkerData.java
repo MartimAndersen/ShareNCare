@@ -10,6 +10,7 @@ public class MarkerData {
     public MarkerData() {
 
     }
+    
     public MarkerData(Long lat, Long lon, String description){
         this.coordinates = lat + " " + lon;
         this.description = description;

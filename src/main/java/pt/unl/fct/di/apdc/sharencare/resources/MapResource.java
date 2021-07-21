@@ -33,6 +33,7 @@ import pt.unl.fct.di.apdc.sharencare.util.FinishedTrack;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
+import pt.unl.fct.di.apdc.sharencare.util.TrackMarkers;
 import pt.unl.fct.di.apdc.sharencare.util.TrackMedia;
 import pt.unl.fct.di.apdc.sharencare.util.TrackNotes;
 
@@ -81,7 +82,7 @@ public class MapResource {
 				List<TrackMedia> trackMedia = new ArrayList<TrackMedia>();
 				List<TrackNotes> trackNotes = new ArrayList<TrackNotes>();
 				List<TrackDangerZones> trackDangerZones = new ArrayList<TrackDangerZones>();
-				List<MarkerData> markers = new ArrayList<MarkerData>();
+				List<TrackMarkers> markers = new ArrayList<TrackMarkers>();
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("type", data.type)
 						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
@@ -307,9 +308,9 @@ public class MapResource {
 			}.getType();
 			List<TrackDangerZones> listTrackZones = new Gson().fromJson(zones, trackZones);
 			
-			Type trackMarker = new TypeToken<ArrayList<MarkerData>>() {
+			Type trackMarker = new TypeToken<ArrayList<TrackMarkers>>() {
 			}.getType();
-			List<MarkerData> listTrackMarker = new Gson().fromJson(marker, trackMarker);
+			List<TrackMarkers> listTrackMarker = new Gson().fromJson(marker, trackMarker);
 			
 			if(!data.media.isEmpty()) {
 				for(TrackMedia m: data.media) {
@@ -330,7 +331,7 @@ public class MapResource {
 			}
 			
 			if(!data.markers.isEmpty()) {
-				for(MarkerData n: data.markers) {
+				for(TrackMarkers n: data.markers) {
 					listTrackMarker.add(n);
 				}
 			}
