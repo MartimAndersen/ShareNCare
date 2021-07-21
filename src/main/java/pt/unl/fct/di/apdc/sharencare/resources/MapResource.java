@@ -208,7 +208,7 @@ public class MapResource {
 			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
 			Entity track = txn.get(mapKey);
 			
-			String commentList = track.getString("comment");
+			String commentList = track.getString("comments");
 			
 			Type comment = new TypeToken<ArrayList<ReviewData>>() {
 			}.getType();
@@ -231,8 +231,8 @@ public class MapResource {
 
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
-					.set("description", track.getString("description")).set("origin", track.getString("origin"))
-					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("description", track.getString("description"))
+					.set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
 					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers")).build();
