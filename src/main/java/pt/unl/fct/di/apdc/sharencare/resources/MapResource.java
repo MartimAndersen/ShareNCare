@@ -337,11 +337,11 @@ public class MapResource {
 			}
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
-					.set("description", track.getString("description")).set("origin", track.getString("origin"))
-					.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+					.set("description", track.getString("description")).set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
 					.set("trackMedia", g.toJson(listTrackMedia)).set("trackNotes", g.toJson(listTrackNotes))
-					.set("trackDangerZones", g.toJson(listTrackZones)).set("markers", g.toJson(listTrackMarker)).build();
+					.set("trackDangerZones", g.toJson(listTrackZones)).set("markers", g.toJson(listTrackMarker))
+					.set("solidarity_points", track.getString("solidarity_points")).set("type", track.getString("type")).build();
 			txn.update(track);
 			txn.commit();
 
@@ -398,11 +398,12 @@ public class MapResource {
 		}
 
 		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
-				.set("description", track.getString("description")).set("origin", track.getString("origin"))
-				.set("destination", track.getString("destination")).set("difficulty", track.getString("difficulty"))
+				.set("description", track.getString("description"))
+				.set("difficulty", track.getString("difficulty"))
 				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment))
 				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 				.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
+				.set("solidarity_points", track.getString("solidarity_points"))
 				.set("type", track.getString("type")).build();
 
 		datastore.update(track);
