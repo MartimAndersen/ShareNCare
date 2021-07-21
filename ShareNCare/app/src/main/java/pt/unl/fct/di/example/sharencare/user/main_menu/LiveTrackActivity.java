@@ -121,8 +121,8 @@ public class LiveTrackActivity extends FragmentActivity implements
             requestingLocationUpdates = false;
 
             locationRequest = LocationRequest.create();
-            locationRequest.setInterval(5000);
-            locationRequest.setFastestInterval(1000);
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             points = new ArrayList<>();

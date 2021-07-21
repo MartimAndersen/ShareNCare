@@ -134,7 +134,6 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         eventsRepository = eventsRepository.getInstance();
         gson = new Gson();
-        getLocation = view.findViewById(R.id.fragment_home_get_location);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
         mapFragment.getMapAsync(googleMap -> {
@@ -184,80 +183,12 @@ public class HomeFragment extends Fragment {
                     });
         }
 
-        getLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    getLocation();
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 100 && (grantResults.length > 0) && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
-            getLocation();
-        } else {
-            Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @SuppressLint("MissingPermission")
-    public void getLocation() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            fusedLocationClient.getLastLocation().addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(@NonNull @NotNull Task<Location> task) {
-                    Location location = task.getResult();
-                    lat = 38.66115666594457;
-                    lon = -9.205866646456688;
-                    title = "Nova School of Science & Technology";
-                    if (location != null) {
-                        lat = location.getLatitude();
-                        lon = location.getLongitude();
-                        title = "Current Location";
-                    } else {
-                        LocationRequest locationRequest = new LocationRequest()
-                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                                .setInterval(10000)
-                                .setFastestInterval(1000)
-                                .setNumUpdates(1);
-
-                        LocationCallback locationCallback = new LocationCallback() {
-                            @Override
-                            public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
-                                Location location1 = locationResult.getLastLocation();
-
-                                lat = location1.getLatitude();
-                                lon = location1.getLongitude();
-                                title = "Current Location";
-                            }
-                        };
-                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-                    }
-
-                    LatLng loc = new LatLng(lat, lon);
-                    map.addMarker(new MarkerOptions().position(loc).title(title));
-                    map.moveCamera(CameraUpdateFactory.newLatLng(loc));
-                }
-            });
-        } else {
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        }
     }
 
     private void getEvents(Response<ResponseBody> r) {
