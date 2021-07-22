@@ -768,6 +768,46 @@ public class InsideLoginResource {
 		
 
 	}
+	
+	@GET
+    @Path("/getAllUsers")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllUsers(@CookieParam("Token") NewCookie cookie) {
+
+        /*
+         * MAKE ALL VERIFICATIONS BEFORE METHOD START
+         */
+
+        if (cookie.getName().equals(""))
+            return Response.status(Status.UNAUTHORIZED).build();
+
+        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+        Entity token = datastore.get(tokenKey);
+
+        if (token == null)
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+                    .build();
+
+        /*
+         * END OF VERIFICATIONS
+         */
+
+        Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+
+        QueryResults<Entity> usersQuery = datastore.run(query);
+        List<String> users = new ArrayList<>();
+        while (usersQuery.hasNext()) {
+            Entity e = usersQuery.next();
+            if(e.getString("profileType").equals("public")) {
+            	String user = g.toJson(e.getProperties().values());
+            	users.add(user);
+            }
+        }
+
+        return Response.ok(g.toJson(users)).cookie(cookie).build();
+    }
+
 
 
 }
