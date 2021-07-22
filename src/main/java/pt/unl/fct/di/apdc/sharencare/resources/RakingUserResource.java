@@ -256,8 +256,14 @@ public class RakingUserResource {
 		}
 
 		pointsList.sort(Comparator.comparing(PointsData::getLeaderBoard));
+		
+		List<PointsData> top10Users = new ArrayList<PointsData>();
+		
+		for(int i = 0; i < 10; i++) {
+			top10Users.add(pointsList.get(i));
+		}
 
-		return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+		return Response.ok(g.toJson(top10Users)).cookie(cookie).build();
 	}
 
 	@GET
