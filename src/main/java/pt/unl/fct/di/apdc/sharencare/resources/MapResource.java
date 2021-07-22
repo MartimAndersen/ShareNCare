@@ -87,14 +87,13 @@ public class MapResource {
 				List<TrackDangerZones> trackDangerZones = new ArrayList<TrackDangerZones>();
 				List<TrackMarkers> markers = new ArrayList<TrackMarkers>();
 				
-				float rating = 0;
 				
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
 						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("type", data.type)
 						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
 						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes))
 						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers))
-						.set("average_rating", g.toJson(rating)).set("username", data.username).build();
+						.set("average_rating", String.valueOf(0)).set("username", data.username).build();
 
 				txn.add(track);
 				
