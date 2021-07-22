@@ -135,7 +135,7 @@ public class EventResource {
                 event = Entity.newBuilder(eventKey).set("name", data.name).set("description", data.description)
                         .set("minParticipants", data.minParticipants).set("maxParticipants", data.maxParticipants)
                         .set("time", data.time).set("coordinates", coordinates).set("durability", data.durability)
-                        .set("institutionName", data.institutionName).set("initial_date", data.initialDate)
+                        .set("institutionName", user.getString("username")).set("initial_date", data.initialDate)
                         .set("ending_date", data.endingDate).set("members", g.toJson(new ArrayList<String>()))
                         .set("points", points).set("tags", g.toJson(data.tags)).set("rating", g.toJson(l))
                         .set("ended", "false").build();

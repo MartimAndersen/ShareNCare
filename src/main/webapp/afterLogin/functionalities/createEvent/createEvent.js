@@ -136,6 +136,9 @@ function fillTagsList(inputs) {
     return tagsList;
 }
 
+
+
+//const attributes = username;
 function handleCreateEvent() {
     let inputs = document.getElementsByName("createEventInput");
 
@@ -166,7 +169,6 @@ function handleCreateEvent() {
         durability: radioButtonResult,
         tags: fillTagsList(inputs),
         members: [],
-        institutionName: localStorage.getItem("currUser"),
         points: 0
     }
     callCreateEvent(JSON.stringify(data));

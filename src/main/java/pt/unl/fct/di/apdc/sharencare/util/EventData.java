@@ -20,7 +20,6 @@ public class EventData {
 	public String durability;
 	public String endingDate;
 	public String initialDate;
-	public String institutionName;
 	public Double lat;
 	public Double lon;
 	public String maxParticipants;
@@ -36,7 +35,7 @@ public class EventData {
 	}
 
 	public EventData(String description, String durability, String endingDate, String initialDate,
-			String institutionName, Double lat, Double lon, String maxParticipants, List<String> members,
+			Double lat, Double lon, String maxParticipants, List<String> members,
 			String minParticipants, String name, List<Integer> tags, String time) {
 		this.name = name;
 		this.description = description;
@@ -49,7 +48,6 @@ public class EventData {
 		this.initialDate = initialDate;
 		this.endingDate = endingDate;
 		this.tags = tags;
-		this.institutionName = institutionName;
 		this.members = members;
 		this.points = calculatePoints();
 	}
@@ -66,7 +64,7 @@ public class EventData {
 	public boolean atLeastOneEmptyParameter() {
 		return name.equals("") || description.equals("") || minParticipants.equals("") || maxParticipants.equals("")
 				|| time.equals("") || durability.equals("") || initialDate.equals("") || endingDate.equals("")
-				|| lat == null || lon == null || tags.size() == 0 || institutionName.equals("");
+				|| lat == null || lon == null || tags.size() == 0;
 	}
 
 	public boolean isHourValid() {
