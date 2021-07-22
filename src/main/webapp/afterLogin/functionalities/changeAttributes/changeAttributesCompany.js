@@ -9,7 +9,6 @@ function userAttributes(jsonResponse) {
   document.getElementById("newLandLine").value = currUser.landLine;
   document.getElementById("newMobile").value = currUser.mobile;
   document.getElementById("newAddress").value = currUser.address;
-  document.getElementById("newSecondAddress").value = currUser.secondAddress;
   document.getElementById("newPostal").value = currUser.zipCode;
   document.getElementById("fax").value = currUser.fax;
   document.getElementById("website").value = currUser.website;
@@ -63,14 +62,15 @@ function callChangeAttributes(data) {
                 case 404: alert("Token does not exist."); break;
                 case 403: alert("The user with the given token does not exist."); break;
                 case 406: alert("The user with the given token is disabled."); break;
+                case 405: alert("Invalid Postal Code."); break;
                 case 412: alert("Invalid email."); break;
-                case 409: alert("Invalid postal code."); break;
+                case 409: alert("Invalid fax."); break;
                 case 417: alert("Invalid mobile phone."); break;
                 default: alert("Wrong parameters."); break;
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedInInstitution/changeAttributesWeb", true);
+    xhttp.open("POST", "/rest/loggedInInstitution/changeAttributes", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 

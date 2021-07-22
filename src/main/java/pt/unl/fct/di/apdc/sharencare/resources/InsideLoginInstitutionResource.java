@@ -116,6 +116,7 @@ public class InsideLoginInstitutionResource {
 			return Response.status(Status.CONFLICT).build();
 
 		bucket.create(token.getString("username"), profilePic);
+		
 
 		user = Entity.newBuilder(userKey).set("username", user.getString("username"))
 				.set("nif", token.getString("username")).set("password", user.getString("password")).set("email", email)
