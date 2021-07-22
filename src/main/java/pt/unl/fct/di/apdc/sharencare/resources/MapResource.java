@@ -88,7 +88,7 @@ public class MapResource {
 						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
 						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes))
 						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers))
-						.set("rating", g.toJson(0)).build();
+						.set("average_rating", g.toJson(0)).build();
 
 				txn.add(track);
 				
@@ -241,7 +241,7 @@ public class MapResource {
 					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
 					.set("type", track.getString("type"))
-					.set("rating", rating).build();
+					.set("average_rating", rating).build();
 
 			txn.update(track);
 			txn.commit();
@@ -346,7 +346,8 @@ public class MapResource {
 					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
 					.set("trackMedia", g.toJson(listTrackMedia)).set("trackNotes", g.toJson(listTrackNotes))
 					.set("trackDangerZones", g.toJson(listTrackZones)).set("markers", g.toJson(listTrackMarker))
-					.set("solidarity_points", track.getString("solidarity_points")).set("type", track.getString("type")).build();
+					.set("solidarity_points", track.getString("solidarity_points")).set("type", track.getString("type"))
+					.set("average_rating", track.getString("average_rating")).build();
 			txn.update(track);
 			txn.commit();
 
@@ -409,7 +410,7 @@ public class MapResource {
 				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 				.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
 				.set("solidarity_points", track.getString("solidarity_points"))
-				.set("type", track.getString("type")).build();
+				.set("type", track.getString("type")).set("average_rating", track.getString("average_rating")).build();
 
 		datastore.update(track);
 
