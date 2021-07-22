@@ -135,7 +135,10 @@ function fillTagsList(inputs) {
     }
     return tagsList;
 }
-
+function ChangeFormateDate(oldDate)
+{
+   return oldDate.toString().split("-").reverse().join("/");
+}
 
 
 //const attributes = username;
@@ -156,6 +159,10 @@ function handleCreateEvent() {
         radioButtonResult = inputs[10].value
     }
 
+    date1 = ChangeFormateDate(inputs[4].value);
+    date2 = ChangeFormateDate(inputs[5].value);
+
+
     let data = {
         name: inputs[0].value,
         description: inputs[1].value,
@@ -163,8 +170,8 @@ function handleCreateEvent() {
         maxParticipants: inputs[3].value,
         lat: latitude,
         lon: longitude,
-        initialDate: inputs[4].value,
-        endingDate: inputs[5].value,
+        initialDate: date1,
+        endingDate: date2,
         time: inputs[6].value,
         durability: radioButtonResult,
         tags: fillTagsList(inputs),
