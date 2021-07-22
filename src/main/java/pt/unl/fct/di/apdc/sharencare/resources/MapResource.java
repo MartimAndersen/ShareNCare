@@ -230,7 +230,7 @@ public class MapResource {
 			}
 			
 			
-			float rating = getAverageRating(Float.parseFloat(data.rating), Float.parseFloat(track.getString("rating")));
+			float rating = getAverageRating(Float.parseFloat(data.rating), Float.parseFloat(track.getString("average_rating")));
 
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
