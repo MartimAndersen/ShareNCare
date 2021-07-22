@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +35,7 @@ import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.sharencare.util.LikeDislikeData;
 import pt.unl.fct.di.apdc.sharencare.util.PointsData;
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 
@@ -186,7 +188,7 @@ public class RakingUserResource {
 				.set("points", g.toJson(userPoints)).set("my_tracks", user.getString("my_tracks")).build();
 		datastore.put(user);
 	}
-	
+
 	public void addDislikedComments(String username) {
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
@@ -436,6 +438,64 @@ public class RakingUserResource {
 		// PointsData userPoints = new Gson().fromJson(pointsString, points);
 
 		return Response.ok(pointsString).cookie(cookie).build();
+
+	}
+
+	@POST
+	@Path("/commentLikeDislike")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response commentLikeDislike(@CookieParam("Token") NewCookie cookie, LikeDislikeData data) {
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+		if(!user.getString("role").equals("USER")) {
+			return Response.status(Status.METHOD_NOT_ALLOWED).build();
+		}
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(data.title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + data.title + " doesn't exist")
+					.build();
+
+		String review = track.getString("comments");
+
+		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
+		
+		for(ReviewData r: reviewsList) {
+			if(r.username.equals(data.username)) {
+				if(data.isLike) {
+					r.addLike();
+				}else {
+					r.addDislike();
+				}
+			}
+		}
+
+		return Response.ok().cookie(cookie).build();
 
 	}
 
