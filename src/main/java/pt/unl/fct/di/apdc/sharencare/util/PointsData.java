@@ -12,6 +12,7 @@ public class PointsData {
 	int dislikedComents;
 	int commentsRank;
 	int total;
+	byte[] pic;
 	
 	public PointsData() {
 		
@@ -29,6 +30,7 @@ public class PointsData {
 		this.dislikedComents = 0;
 		this.commentsRank = 0;
 		this.total = 0;
+		this.pic = null;
 	}
 	
 	public void addEvents() {
@@ -63,7 +65,13 @@ public class PointsData {
 		commentsRank = 2*comments + likedComents - 2*badComments -dislikedComents;
 	}
 	
+	public String getUsername() {
+		return username;
+	}
 	
+	public void setPic(byte[] pic) {
+		this.pic = pic;
+	}
 	
 	public int getEvents() {
 		return events;

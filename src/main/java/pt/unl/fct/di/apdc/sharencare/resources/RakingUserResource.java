@@ -22,6 +22,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.gax.paging.Page;
 import com.google.appengine.api.search.SortExpression;
 import com.google.appengine.api.search.SortOptions;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
@@ -33,6 +34,10 @@ import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.LikeDislikeData;
@@ -46,6 +51,11 @@ public class RakingUserResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Gson g = new Gson();
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build()
+			.getService();
+	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
+			Storage.BucketGetOption.fields(Storage.BucketField.values()));
+
 
 	public RakingUserResource() {
 
@@ -260,6 +270,14 @@ public class RakingUserResource {
 		List<PointsData> top10Users = new ArrayList<PointsData>();
 		
 		for(int i = 0; i < 10; i++) {
+			byte[] pic = null;
+			Page<Blob> blobs = bucket.list();
+			for (Blob blob : blobs.getValues()) {
+				if (pointsList.get(i).getUsername().equals(blob.getName())) {
+					pic = blob.getContent();
+				}
+			}
+			pointsList.get(i).setPic(pic);
 			top10Users.add(pointsList.get(i));
 		}
 
