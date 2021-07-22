@@ -98,7 +98,7 @@ public class MapResource {
 				List<TrackMarkers> markers = new ArrayList<TrackMarkers>();
 
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
-						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance)
+						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("time", data.time)
 						.set("type", data.type).set("solidarity_points", data.solidarityPoints)
 						.set("comments", g.toJson(l)).set("trackMedia", g.toJson(trackMedia))
 						.set("trackNotes", g.toJson(trackNotes)).set("trackDangerZones", g.toJson(trackDangerZones))
@@ -695,6 +695,72 @@ public class MapResource {
 		}
 
 		return Response.ok(g.toJson(picture)).cookie(cookie).build();
+	}
+
+	@GET
+	@Path("/getTrackProperties")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTrackProperties(@CookieParam("Token") NewCookie cookie, @QueryParam("trackId") String trackId) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(trackId);
+		Entity track = datastore.get(trackKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with id: " + trackId + " doesn't exist").build();
+
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		List<String> res = new ArrayList<>();
+
+		//FAZER DISTANCIA
+		String u = g.toJson(track.getString("time"));
+		res.add(u);
+
+		//FAZER NUMERO DE PARTICIPANTES DA TRACK E A SUA PONTUACAO
+
+		Query<Entity> UserQuery = Query.newEntityQueryBuilder().setKind("User").build();
+		QueryResults<Entity> UsersQuery = datastore.run(UserQuery);
+		while (UsersQuery.hasNext()) {
+			Entity user = UsersQuery.next();
+			if(user.getString("my_tracks").contains(trackId)) {
+				//ADICIONA NOME DO USER A RESPOSTA
+				u = g.toJson(user.getString("name"));
+				res.add(u);
+				//ADICIONA PONTUACAOA RESPOSTA MAS ESTA MAL
+				u = g.toJson(user.getString("points"));
+				res.add(u);
+			}
+		}
+
+		/*
+        Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+
+        QueryResults<Entity> eventsQuery = datastore.run(query);
+        List<String> events = new ArrayList<>();
+        while (eventsQuery.hasNext()) {
+            String event = g.toJson(eventsQuery.next().getProperties().values());
+            events.add(event);
+        }
+*/
+		return Response.ok(g.toJson(res)).cookie(cookie).build();
 	}
 
 	/*
