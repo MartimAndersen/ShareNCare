@@ -130,7 +130,6 @@ public class MapResource {
 	@Path("/registerMarker")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerMarker(MarkerData data) {
-
 		Transaction txn = datastore.newTransaction();
 
 		try {
@@ -232,6 +231,7 @@ public class MapResource {
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
 					.set("description", track.getString("description"))
+					.set("solidarity_points", track.getString("solidarity_points"))
 					.set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
 					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))

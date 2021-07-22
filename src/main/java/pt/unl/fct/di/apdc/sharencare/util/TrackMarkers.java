@@ -1,15 +1,13 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-import com.google.cloud.datastore.LatLng;
-
 public class TrackMarkers {
 
     public int likes;
-    public LatLng location;
+    public String location;
     public String type;
     public String username;
 
-    public TrackMarkers(int likes, LatLng location, String type, String username) {
+    public TrackMarkers(int likes, String location, String type, String username) {
         this.likes = likes;
         this.location = location;
         this.type = type;
@@ -22,14 +20,6 @@ public class TrackMarkers {
 
     public void setLikes(int likes) {
         this.likes = likes;
-    }
-
-    public LatLng getLocation() {
-        return location;
-    }
-
-    public void setLocation(LatLng location) {
-        this.location = location;
     }
 
     public String getType() {

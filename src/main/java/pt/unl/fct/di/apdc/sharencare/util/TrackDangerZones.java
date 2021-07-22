@@ -1,11 +1,9 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-import com.google.cloud.datastore.LatLng;
-
 public class TrackDangerZones {
 
     public String username;
-    public LatLng location;
+    public String location;
     public String note;
     public int likes;
     
@@ -13,7 +11,7 @@ public class TrackDangerZones {
     	
     }
 
-    public TrackDangerZones(String username, String note, LatLng location, int likes) {
+    public TrackDangerZones(String username, String note, String location, int likes) {
         this.username = username;
         this.location = location;
         this.note = note;
@@ -26,14 +24,6 @@ public class TrackDangerZones {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public LatLng getLocation() {
-        return location;
-    }
-
-    public void setLocation(LatLng location) {
-        this.location = location;
     }
 
     public String getNote() {
