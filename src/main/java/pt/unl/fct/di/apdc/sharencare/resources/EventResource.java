@@ -1000,7 +1000,7 @@ public class EventResource {
         while (eventsQuery.hasNext()) {
             Entity e = eventsQuery.next();
             if (data.coordinates.contains(e.getString("coordinates"))) {
-                String event = g.toJson(eventsQuery.next().getProperties().values());
+                String event = g.toJson(e.getProperties().values());
                 events.add(event);
             }
         }
