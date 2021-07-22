@@ -91,7 +91,7 @@ public class MapResource {
 						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
 						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes))
 						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers))
-						.set("average_rating", g.toJson(0)).set("username", data.username).build();
+						.set("average_rating", 0).set("username", data.username).build();
 
 				txn.add(track);
 				
