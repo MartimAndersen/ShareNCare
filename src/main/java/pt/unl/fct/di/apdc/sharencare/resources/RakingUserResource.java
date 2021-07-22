@@ -257,19 +257,22 @@ public class RakingUserResource {
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER"))
 				.build();
 		QueryResults<Entity> eventsQuery = datastore.run(query);
+		
+		int counter = 0;
 
-		while (eventsQuery.hasNext()) {
+		while (eventsQuery.hasNext() && counter < 10) {
 			Entity e = eventsQuery.next();
 			String pointsString = e.getString("points");
 			PointsData userPoints = new Gson().fromJson(pointsString, points);
 			pointsList.add(userPoints);
+			counter++;
 		}
 
 		pointsList.sort(Comparator.comparing(PointsData::getLeaderBoard));
 		
 		List<PointsData> top10Users = new ArrayList<PointsData>();
 		
-		for(int i = 0; i < 10; i++) {
+		for(int i = 0; i < counter; i++) {
 			byte[] pic = null;
 			Page<Blob> blobs = bucket.list();
 			for (Blob blob : blobs.getValues()) {
