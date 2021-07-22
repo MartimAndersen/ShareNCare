@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.sharencare.util;
 
-public class ReviewData {
+public class ReviewData  implements Comparable<ReviewData>{
 	
 	/*
 	 * nome de quem comentou
@@ -14,6 +14,7 @@ public class ReviewData {
 	public String rating;
 	public String routeName;
 	public String username;
+	public int likes;
 	
 	public ReviewData() {
 		
@@ -40,6 +41,28 @@ public class ReviewData {
 		}else {
 			return false;
 		}
+	}
+	
+	public void addLike() {
+		likes++;
+	}
+	
+	public void addDislike() {
+		likes--;
+	}
+	
+	public int returnLikes() {
+		return likes;
+	}
+
+	@Override
+	public int compareTo(ReviewData o) {
+		if (likes == o.likes)
+            return 0;
+        else if (likes > o.likes)
+            return 1;
+        else
+            return -1;
 	}
 	
 	

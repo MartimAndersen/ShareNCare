@@ -3,6 +3,8 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
@@ -31,6 +33,7 @@ import pt.unl.fct.di.apdc.sharencare.util.TrackDangerZones;
 import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
 import pt.unl.fct.di.apdc.sharencare.util.FinishedTrack;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
+import pt.unl.fct.di.apdc.sharencare.util.PointsData;
 import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackMarkers;
@@ -535,7 +538,7 @@ public class MapResource {
     @Path("/getAllComments")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
+    public Response getAllComments(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
 
         /*
          * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -551,7 +554,7 @@ public class MapResource {
             return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
                     .build();
         
-        Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
+        Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
 		Entity track = datastore.get(trackKey);
 
 		if (track == null)
@@ -567,6 +570,47 @@ public class MapResource {
 		}.getType();
 		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
 
+        return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
+    }
+	
+	@GET
+    @Path("/getAllCommentsByLikes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllCommentsByLikes(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
+
+        /*
+         * MAKE ALL VERIFICATIONS BEFORE METHOD START
+         */
+
+        if (cookie.getName().equals(""))
+            return Response.status(Status.UNAUTHORIZED).build();
+
+        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+        Entity token = datastore.get(tokenKey);
+
+        if (token == null)
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+                    .build();
+        
+        Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+
+        /*
+         * END OF VERIFICATIONS
+         */
+
+		String review = track.getString("comments");
+		
+		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
+		
+		Collections.sort(reviewsList);
+		
         return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
     }
 
