@@ -24,16 +24,24 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.gax.paging.Page;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackDangerZones;
 import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
 import pt.unl.fct.di.apdc.sharencare.util.FinishedTrack;
+import pt.unl.fct.di.apdc.sharencare.util.GetMediaPic;
 import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
 import pt.unl.fct.di.apdc.sharencare.util.PointsData;
+import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
 import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackData;
 import pt.unl.fct.di.apdc.sharencare.util.TrackMarkers;
@@ -47,6 +55,8 @@ public class MapResource {
 	private final RakingUserResource raking = new RakingUserResource();
 	private final Gson g = new Gson();
 	final ObjectMapper objectMapper = new ObjectMapper();
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("capable-sphinx-312419").build()
+			.getService();
 
 	@SuppressWarnings("unchecked")
 	@POST
@@ -69,7 +79,7 @@ public class MapResource {
 		 * 
 		 */
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-		Entity token= datastore.get(tokenKey);
+		Entity token = datastore.get(tokenKey);
 
 		Transaction txn = datastore.newTransaction();
 
@@ -86,17 +96,16 @@ public class MapResource {
 				List<TrackNotes> trackNotes = new ArrayList<TrackNotes>();
 				List<TrackDangerZones> trackDangerZones = new ArrayList<TrackDangerZones>();
 				List<TrackMarkers> markers = new ArrayList<TrackMarkers>();
-				
-				
+
 				track = Entity.newBuilder(mapKey).set("title", data.title).set("description", data.description)
-						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("type", data.type)
-						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
-						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes))
-						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers))
-						.set("average_rating", String.valueOf(0)).set("username", data.username).build();
+						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance)
+						.set("type", data.type).set("solidarity_points", data.solidarityPoints)
+						.set("comments", g.toJson(l)).set("trackMedia", g.toJson(trackMedia))
+						.set("trackNotes", g.toJson(trackNotes)).set("trackDangerZones", g.toJson(trackDangerZones))
+						.set("markers", g.toJson(markers)).set("average_rating", String.valueOf(0))
+						.set("username", data.username).build();
 
 				txn.add(track);
-				
 
 				Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 				Entity user = datastore.get(userKey);
@@ -109,19 +118,17 @@ public class MapResource {
 				tracks.add(data.title);
 
 				user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-						.set("password", user.getString("password"))
-						.set("email", user.getString("email")).set("bio", user.getString("bio"))
-						.set("profileType", user.getString("profileType"))
+						.set("password", user.getString("password")).set("email", user.getString("email"))
+						.set("bio", user.getString("bio")).set("profileType", user.getString("profileType"))
 						.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-						.set("address", user.getString("address"))
-						.set("secondAddress", user.getString("secondAddress"))
+						.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
 						.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
-						.set("state", user.getString("state"))
-						.set("tags", user.getString("tags")).set("events", user.getString("events"))
-						.set("points", user.getString("points")).set("my_tracks", g.toJson(tracks)).build();
+						.set("state", user.getString("state")).set("tags", user.getString("tags"))
+						.set("events", user.getString("events")).set("points", user.getString("points"))
+						.set("my_tracks", g.toJson(tracks)).build();
 
 				txn.update(user);
-				
+
 				txn.commit();
 				return Response.ok("Track " + data.title + " registered.").cookie(cookie).build();
 			}
@@ -168,7 +175,7 @@ public class MapResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -178,7 +185,6 @@ public class MapResource {
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
@@ -193,7 +199,7 @@ public class MapResource {
 		if (!data.ratingIsValid()) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		
+
 		String username = token.getString("username");
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
@@ -201,31 +207,30 @@ public class MapResource {
 		if (user == null)
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
-		
-		if(user.getString("role").equals("INSTITUTION")) {
+
+		if (user.getString("role").equals("INSTITUTION")) {
 			return Response.status(Status.CONFLICT).build();
 		}
-
 
 		Transaction txn = datastore.newTransaction();
 
 		try {
 			Key mapKey = datastore.newKeyFactory().setKind("Track").newKey(data.routeName);
 			Entity track = txn.get(mapKey);
-			
+
 			String commentList = track.getString("comments");
-			
+
 			Type comment = new TypeToken<ArrayList<ReviewData>>() {
 			}.getType();
 			List<ReviewData> comments = new Gson().fromJson(commentList, comment);
 			List<ReviewData> newComments = new ArrayList<ReviewData>();
-			
+
 			for (int i = 0; i < comments.size(); i++)
 				newComments.add(comments.get(i));
-			
-			if(data != null) {
+
+			if (data != null) {
 				raking.addPointsComents(data.username);
-				
+
 				BadWordsUtil swears = new BadWordsUtil();
 				if (swears.hasBadWords(data.comment) && !data.comment.equals("")) {
 					return Response.status(Status.METHOD_NOT_ALLOWED).build();
@@ -233,20 +238,19 @@ public class MapResource {
 
 				newComments.add(data);
 			}
-			
-			
-			float rating = getAverageRating(Float.parseFloat(data.rating), Float.parseFloat(track.getString("average_rating")));
 
+			float rating = getAverageRating(Float.parseFloat(data.rating),
+					Float.parseFloat(track.getString("average_rating")));
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
 					.set("description", track.getString("description"))
 					.set("solidarity_points", track.getString("solidarity_points"))
-					.set("difficulty", track.getString("difficulty"))
-					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
-					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
-					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
-					.set("type", track.getString("type")).set("username", track.getString("username"))
-					.set("average_rating", rating).build();
+					.set("difficulty", track.getString("difficulty")).set("distance", track.getString("distance"))
+					.set("comments", g.toJson(newComments)).set("trackMedia", track.getString("trackMedia"))
+					.set("trackNotes", track.getString("trackNotes"))
+					.set("trackDangerZones", track.getString("trackDangerZones"))
+					.set("markers", track.getString("markers")).set("type", track.getString("type"))
+					.set("username", track.getString("username")).set("average_rating", rating).build();
 
 			txn.update(track);
 			txn.commit();
@@ -259,7 +263,7 @@ public class MapResource {
 			}
 		}
 	}
-	
+
 	@POST
 	@Path("/finishedTrack")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -268,7 +272,7 @@ public class MapResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -279,11 +283,9 @@ public class MapResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
-		
 		String username = token.getString("username");
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 		Entity user = datastore.get(userKey);
@@ -291,8 +293,8 @@ public class MapResource {
 		if (user == null)
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + username + " doesn't exist")
 					.build();
-		
-		if(user.getString("role").equals("INSTITUTION"))
+
+		if (user.getString("role").equals("INSTITUTION"))
 			return Response.status(Status.CONFLICT).build();
 
 		Transaction txn = datastore.newTransaction();
@@ -309,50 +311,68 @@ public class MapResource {
 			Type trackMedia = new TypeToken<ArrayList<String>>() {
 			}.getType();
 			List<String> listTrackMedia = new Gson().fromJson(media, trackMedia);
-			
+
 			Type trackNotes = new TypeToken<ArrayList<String>>() {
 			}.getType();
 			List<String> listTrackNotes = new Gson().fromJson(notes, trackNotes);
-			
+
 			Type trackZones = new TypeToken<ArrayList<String>>() {
 			}.getType();
 			List<String> listTrackZones = new Gson().fromJson(zones, trackZones);
-			
+
 			Type trackMarker = new TypeToken<ArrayList<String>>() {
 			}.getType();
 			List<String> listTrackMarker = new Gson().fromJson(marker, trackMarker);
-			
-			if(!data.media.isEmpty()) {
-				for(String m: data.media) {
+
+			if (!data.media.isEmpty()) {
+				for (String m : data.media) {
 					listTrackMedia.add(m);
 				}
 			}
-			
-			if(!data.notes.isEmpty()) {
-				for(String n: data.notes) {
+
+			if (!data.notes.isEmpty()) {
+				for (String n : data.notes) {
 					listTrackNotes.add(n);
 				}
 			}
-			
-			if(!data.zones.isEmpty()) {
-				for(String n: data.zones) {
+
+			if (!data.zones.isEmpty()) {
+				for (String n : data.zones) {
 					listTrackZones.add(n);
 				}
 			}
-			
-			if(!data.markers.isEmpty()) {
-				for(String n: data.markers) {
+
+			if (!data.markers.isEmpty()) {
+				for (String n : data.markers) {
 					listTrackMarker.add(n);
 				}
 			}
-
+			
+			List<TrackMedia> mediaList = getMedia(media);
+			
+			String bucketName = "capable-sphinx-312419" + "-" + track.getString("title");
+			Bucket bucket = null;
+			if(storage.get(bucketName,Storage.BucketGetOption.fields(Storage.BucketField.values())) == null) {
+				bucket = storage.create(BucketInfo.of(bucketName));
+			}else {
+				bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
+						Storage.BucketGetOption.fields(Storage.BucketField.values()));
+			}
+			
+			for(TrackMedia t: mediaList) {
+				if(t.image.length != 0) {
+					bucket.create(t.imageName, t.image);
+				}
+			}
+			
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
 					.set("description", track.getString("description")).set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
 					.set("trackMedia", g.toJson(listTrackMedia)).set("trackNotes", g.toJson(listTrackNotes))
 					.set("trackDangerZones", g.toJson(listTrackZones)).set("markers", g.toJson(listTrackMarker))
 					.set("solidarity_points", track.getString("solidarity_points")).set("type", track.getString("type"))
-					.set("average_rating", track.getString("average_rating")).set("username", track.getString("username")).build();
+					.set("average_rating", track.getString("average_rating"))
+					.set("username", track.getString("username")).build();
 			txn.update(track);
 			txn.commit();
 
@@ -409,14 +429,13 @@ public class MapResource {
 		}
 
 		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
-				.set("description", track.getString("description"))
-				.set("difficulty", track.getString("difficulty"))
+				.set("description", track.getString("description")).set("difficulty", track.getString("difficulty"))
 				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment))
 				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 				.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
-				.set("solidarity_points", track.getString("solidarity_points"))
-				.set("type", track.getString("type")).set("average_rating", track.getString("average_rating"))
-				.set("username", track.getString("username")).build();
+				.set("solidarity_points", track.getString("solidarity_points")).set("type", track.getString("type"))
+				.set("average_rating", track.getString("average_rating")).set("username", track.getString("username"))
+				.build();
 
 		datastore.update(track);
 
@@ -448,12 +467,11 @@ public class MapResource {
 
 	}
 
-	
 	@GET
 	@Path("/listAllTrack")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listAllTrack(@CookieParam("Token") NewCookie cookie) {
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -478,15 +496,15 @@ public class MapResource {
 		}
 
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("/listUserTrack")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listUserTrack(@CookieParam("Token") NewCookie cookie) {
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -496,14 +514,13 @@ public class MapResource {
 		if (token == null)
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
-		
+
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
 
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		
 
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Track").build();
 
@@ -527,95 +544,158 @@ public class MapResource {
 		}
 
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
-		
+
 	}
-	
+
 	private float getAverageRating(float newRating, float oldRating) {
-		if(oldRating == 0)
+		if (oldRating == 0)
 			return newRating;
-		return (newRating + oldRating)/2;
+		return (newRating + oldRating) / 2;
+	}
+
+	@GET
+	@Path("/getAllComments")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllComments(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		String review = track.getString("comments");
+
+		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
+
+		return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
+	}
+
+	@GET
+	@Path("/getAllCommentsByLikes")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllCommentsByLikes(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+
+		String review = track.getString("comments");
+
+		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
+
+		Collections.sort(reviewsList);
+
+		return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
+	}
+	
+	
+	private List<TrackMedia> getMedia(String media) {
+		Type t = new TypeToken<List<String>>() {
+		}.getType();
+		Type t1 = new TypeToken<TrackMedia>() {
+		}.getType();
+		List<TrackMedia> mediaList = new ArrayList<>();
+
+		if (media.equals("[]"))
+			return mediaList;
+
+		List<String> strings = g.fromJson(media, t);
+
+		for (String s : strings)
+			mediaList.add(g.fromJson(s, t1));
+		return mediaList;
 	}
 	
 	@GET
-    @Path("/getAllComments")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllComments(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
-
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
-
-        if (cookie.getName().equals(""))
-            return Response.status(Status.UNAUTHORIZED).build();
-
-        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-        Entity token = datastore.get(tokenKey);
-
-        if (token == null)
-            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
-                    .build();
-        
-        Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
-		Entity track = datastore.get(trackKey);
-
-		if (track == null)
-			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
-
-        /*
-         * END OF VERIFICATIONS
-         */
-
-		String review = track.getString("comments");
+	@Path("/getMediaPic")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMediaPic(@CookieParam("Token") NewCookie cookie, GetMediaPic data) {
 		
-		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
-		}.getType();
-		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
-
-        return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
-    }
-	
-	@GET
-    @Path("/getAllCommentsByLikes")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllCommentsByLikes(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
-
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
-
-        if (cookie.getName().equals(""))
-            return Response.status(Status.UNAUTHORIZED).build();
-
-        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-        Entity token = datastore.get(tokenKey);
-
-        if (token == null)
-            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
-                    .build();
-        
-        Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
-		Entity track = datastore.get(trackKey);
-
-		if (track == null)
-			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
-
-        /*
-         * END OF VERIFICATIONS
-         */
-
-		String review = track.getString("comments");
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
 		
-		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
-		}.getType();
-		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
-		
-		Collections.sort(reviewsList);
-		
-        return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
-    }
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
 
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+		String bucketName = "capable-sphinx-312419" + "-" + data.title;
+		Bucket bucket = null;
+		if(storage.get(bucketName,Storage.BucketGetOption.fields(Storage.BucketField.values())) == null) {
+			return Response.status(Status.NOT_ACCEPTABLE).build();
+		}else {
+			bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
+					Storage.BucketGetOption.fields(Storage.BucketField.values()));
+		}
+		
+		byte[] picture = null;
+		Page<Blob> blobs = bucket.list();
+		for (Blob blob : blobs.getValues()) {
+			if (data.pic.equals(blob.getName())) {
+				picture = blob.getContent();
+			}
+		}
+
+		return Response.ok(g.toJson(picture)).cookie(cookie).build();
+	}
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData
