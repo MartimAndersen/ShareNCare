@@ -732,12 +732,15 @@ public class EventResource {
         /*
          * END OF VERIFICATIONS
          */
+        Builder query = Query.newEntityQueryBuilder().setKind("Event");
 
-        Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+        query = query.setOrderBy(OrderBy.desc("initial_date"));
+     
+        Query<Entity> q = query.build();
 
-        QueryResults<Entity> eventsQuery = datastore.run(query);
+        QueryResults<Entity> eventsQuery = datastore.run(q);
         List<String> events = new ArrayList<>();
-
+        
         ObjectMapper mapper = new ObjectMapper();
         List<String> userEvents = new ArrayList<String>();
 

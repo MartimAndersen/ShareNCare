@@ -530,6 +530,46 @@ public class MapResource {
 			return newRating;
 		return (newRating + oldRating)/2;
 	}
+	
+	@GET
+    @Path("/getAllComments")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllUsers(@CookieParam("Token") NewCookie cookie, @QueryParam("title") String title) {
+
+        /*
+         * MAKE ALL VERIFICATIONS BEFORE METHOD START
+         */
+
+        if (cookie.getName().equals(""))
+            return Response.status(Status.UNAUTHORIZED).build();
+
+        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+        Entity token = datastore.get(tokenKey);
+
+        if (token == null)
+            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+                    .build();
+        
+        Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+
+        /*
+         * END OF VERIFICATIONS
+         */
+
+		String review = track.getString("comments");
+		
+		Type reviewList = new TypeToken<ArrayList<ReviewData>>() {
+		}.getType();
+		List<ReviewData> reviewsList = new Gson().fromJson(review, reviewList);
+
+        return Response.ok(g.toJson(reviewsList)).cookie(cookie).build();
+    }
+
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData
