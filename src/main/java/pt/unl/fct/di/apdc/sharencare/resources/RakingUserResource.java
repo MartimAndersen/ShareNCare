@@ -487,10 +487,16 @@ public class RakingUserResource {
 		
 		for(ReviewData r: reviewsList) {
 			if(r.username.equals(data.username)) {
-				if(data.isLike) {
+				if(data.like == 1) {
 					r.addLike();
-				}else {
+				}else if(data.like == -1) {
 					r.addDislike();
+				}else if(data.like == 0) {
+					if(data.isLike) {
+						r.addDislike();
+					}else {
+						r.addLike();
+					}
 				}
 			}
 		}
