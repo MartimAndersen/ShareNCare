@@ -87,7 +87,8 @@ public class MapResource {
 						.set("difficulty", g.toJson(data.difficulty)).set("distance", data.distance).set("type", data.type)
 						.set("solidarity_points", data.solidarityPoints).set("comments", g.toJson(l))
 						.set("trackMedia", g.toJson(trackMedia)).set("trackNotes", g.toJson(trackNotes))
-						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers)).build();
+						.set("trackDangerZones", g.toJson(trackDangerZones)).set("markers", g.toJson(markers))
+						.set("rating", g.toJson(0)).build();
 
 				txn.add(track);
 				
@@ -227,6 +228,9 @@ public class MapResource {
 
 				newComments.add(data);
 			}
+			
+			
+			float rating = getAverageRating(Float.parseFloat(data.rating), Float.parseFloat(track.getString("rating")));
 
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
@@ -236,7 +240,8 @@ public class MapResource {
 					.set("distance", track.getString("distance")).set("comments", g.toJson(newComments))
 					.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
 					.set("trackDangerZones", track.getString("trackDangerZones")).set("markers", track.getString("markers"))
-					.set("type", track.getString("type")).build();
+					.set("type", track.getString("type"))
+					.set("rating", rating).build();
 
 			txn.update(track);
 			txn.commit();
@@ -517,10 +522,12 @@ public class MapResource {
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
 		
 	}
-
-
 	
-	
+	private float getAverageRating(float newRating, float oldRating) {
+		if(oldRating == 0)
+			return newRating;
+		return (newRating + oldRating)/2;
+	}
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData
