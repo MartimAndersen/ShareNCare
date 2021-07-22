@@ -8,6 +8,9 @@ public class PointsData {
 	int comments;
 	int quitEvents;
 	int badComments;
+	int likedComents;
+	int dislikedComents;
+	int commentsRank;
 	int total;
 	
 	public PointsData() {
@@ -22,6 +25,9 @@ public class PointsData {
 		this.comments = 0;
 		this.quitEvents = 0;
 		this.badComments = 0;
+		this.likedComents = 0;
+		this.dislikedComents = 0;
+		this.commentsRank = 0;
 		this.total = 0;
 	}
 	
@@ -35,6 +41,7 @@ public class PointsData {
 	
 	public void addComments() {
 		comments++;
+		commentsRank = 2*comments + likedComents - 2*badComments -dislikedComents;
 	}
 	
 	public void addQuitEvents() {
@@ -43,7 +50,20 @@ public class PointsData {
 	
 	public void addBadComents() {
 		badComments++;
+		commentsRank = 2*comments + likedComents - 2*badComments -dislikedComents;
 	}
+	
+	public void addLikedComents() {
+		likedComents++;
+		commentsRank = 2*comments + likedComents - 2*badComments -dislikedComents;
+	}
+	
+	public void addDislikedComents() {
+		dislikedComents++;
+		commentsRank = 2*comments + likedComents - 2*badComments -dislikedComents;
+	}
+	
+	
 	
 	public int getEvents() {
 		return events;
@@ -57,8 +77,12 @@ public class PointsData {
 		return comments;
 	}
 	
+	public int getCommentsRank() {
+		return commentsRank;
+	}
+	
 	public int getLeaderBoard() {
-		this.total = events + tracks + comments - quitEvents - badComments;
+		this.total = events + tracks + commentsRank - quitEvents ;
 		return total;
 	}
 }
