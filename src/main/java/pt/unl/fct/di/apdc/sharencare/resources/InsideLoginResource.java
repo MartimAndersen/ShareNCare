@@ -194,8 +194,13 @@ public class InsideLoginResource {
 
 		if (!data.validProfileType())
 			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+		
+		if(profilePic.length != 0) {
+			bucket.create(user.getString("username"), profilePic);
+		}else {
+			profilePic = null;
+		}
 
-		bucket.create(user.getString("username"), profilePic);
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("bio", bio).set("email", email)
