@@ -51,12 +51,8 @@ function callUserAttributes(){
             let a = this.responseText;
             switch (this.status) {
                 case 200:
-                    alert("Properties changed.");
                     jsonResponse = JSON.parse(xhttp.responseText);
-
                     userAttributes(jsonResponse);
-
-
                     break;
                 case 401:
                     alert("You need to be logged in to execute this operation.");

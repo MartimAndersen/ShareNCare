@@ -1,7 +1,12 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -13,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.google.api.gax.paging.Page;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -25,6 +31,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.filters.Secured;
 import pt.unl.fct.di.apdc.sharencare.util.ChangePasswordData;
+import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileInstitutionData;
 
 @Path("/loggedInInstitution")
@@ -341,6 +348,47 @@ public class InsideLoginInstitutionResource {
 		}
 
 		return pic;
+	}
+	
+	@GET
+	@Path("/getCurrentUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCurrentUser(@CookieParam("Token") NewCookie cookie) {
+
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist")
+					.build();
+
+        Type listString = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        List<String> events = new Gson().fromJson(user.getString("events"), listString);
+        
+
+        
+        byte[] profilePic = null;
+        ProfileInstitutionData data = new ProfileInstitutionData(user.getString("address"), user.getString("bio"), user.getString("email"), events, user.getString("facebook"), user.getString("fax"), 
+				user.getString("instagram"),user.getString("landLine"), user.getString("mobile"),profilePic, user.getString("twitter"), user.getString("website"), user.getString("youtube"), user.getString("zipCode"));
+	
+		return Response.ok(g.toJson(data)).cookie(cookie).build();
+		
+
 	}
 
 }
