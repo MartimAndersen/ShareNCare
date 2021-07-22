@@ -23,6 +23,9 @@ import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.Query;
+import com.google.cloud.datastore.QueryResults;
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
@@ -30,6 +33,7 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.sharencare.filters.Secured;
+import pt.unl.fct.di.apdc.sharencare.util.ChangeEmailData;
 import pt.unl.fct.di.apdc.sharencare.util.ChangePasswordData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
 import pt.unl.fct.di.apdc.sharencare.util.ProfileInstitutionData;
@@ -349,6 +353,66 @@ public class InsideLoginInstitutionResource {
 		}
 
 		return pic;
+	}
+	
+	@POST
+	@Path("/changeEmailInstitution")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response changeEmail(@CookieParam("Token") NewCookie cookie, ChangeEmailData data) {
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (data.emptyParameters() || data.cantBeSameEmail())
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("nif"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).build();
+
+		if (user.getString("state").equals("DISABLED"))
+			return Response.status(Status.NOT_ACCEPTABLE).build();
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+		
+		String hashedPWD = user.getString("password");
+		if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			if (data.validEmail()) {
+				Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
+    					.setFilter(PropertyFilter.eq("email", data.newEmail)).build();
+    			QueryResults<Entity> results = datastore.run(query);
+    			if(results.hasNext()) {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity("Email " + data.newEmail + " already exists.").build();
+    			}else {		
+    				user = Entity.newBuilder(userKey).set("nif", user.getString("nif"))
+							.set("username", user.getString("username")).set("email", data.newEmail)
+							.set("bio", user.getString("bio")).set("password", user.getString("password"))
+							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+							.set("address", user.getString("address")).set("zipCode", user.getString("zipCode"))
+							.set("role", user.getString("role")).set("state", user.getString("state"))
+							.set("website", user.getString("website")).set("twitter", user.getString("twitter"))
+							.set("instagram", user.getString("instagram")).set("youtube", user.getString("youtube"))
+							.set("facebook", user.getString("facebook")).set("fax", user.getString("fax"))
+							.set("events", user.getString("events")).set("coordinates", user.getString("coordinates")).build();
+    				datastore.put(user);
+    				return Response.ok("Email was changed").cookie(cookie).build();  				
+    			}
+			}
+			return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+		}
+		return Response.status(Status.CONFLICT).entity("Old password is incorrect.").build();
 	}
 	
 	@GET
