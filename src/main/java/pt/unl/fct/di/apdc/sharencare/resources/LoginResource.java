@@ -110,5 +110,43 @@ public class LoginResource {
 		} else
 			return Response.status(Status.NOT_FOUND).build();
 	}
+	
+	
+	@POST
+	@Path("/backOfficega")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response loginBackOffice(LoginData data) {
+
+		if (data.emptyParameters())
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.usernameLogin);
+		Entity user = datastore.get(userKey);
+
+		if (user != null) {
+			if (!user.getString("role").equals("INSTITUTION") && !user.getString("role").equals("USER")) {
+				String hashedPWD = user.getString("password");
+
+				if (hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
+					AuthToken t = new AuthToken(data.usernameLogin, user.getString("role"), data.expirable);
+
+					Cookie cookiee = new Cookie("Token", t.tokenID, "/", null);
+					NewCookie cookie = new NewCookie(cookiee, null, -1, null, true, true);
+
+					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(t.tokenID);
+					Entity token = Entity.newBuilder(tokenKey).set("tokenId", t.tokenID).set("username", t.username)
+							.set("role", t.role).set("creationData", t.creationData)
+							.set("expirable", t.expirable)
+							.set("expirationData", t.expirationData).build();
+
+					datastore.add(token);
+					return Response.ok(g.toJson(user.getProperties().values())).cookie(cookie).build();
+				} else
+					return Response.status(Status.EXPECTATION_FAILED).build();
+			} else
+				return Response.status(Status.FORBIDDEN).build();
+		} else
+			return Response.status(Status.NOT_FOUND).build();
+	}
 
 }
