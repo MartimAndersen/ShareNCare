@@ -113,7 +113,7 @@ function callChangeAttributes(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/changeAttributes", true);
+    xhttp.open("POST", "/rest/loggedIn/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
@@ -130,7 +130,60 @@ function fillTagsListToSend(inputs) {
     return tagsList;
 }
 
-function handleChangeAttributes() {
+function fileToByteArray(file) {
+    return new Promise((resolve, reject) => {
+        try {
+            let reader = new FileReader();
+            let fileByteArray = [];
+            reader.readAsArrayBuffer(file);
+            reader.onloadend = (evt) => {
+                if (evt.target.readyState == FileReader.DONE) {
+                    let arrayBuffer = evt.target.result,
+                        array = new Uint8Array(arrayBuffer);
+                    for (byte of array) {
+                        fileByteArray.push(byte);
+                    }
+                }
+                resolve(fileByteArray);
+            }
+        }
+        catch (e) {
+            reject(e);
+        }
+    })
+}
+/*
+var bytes;
+async function getByteArray() {
+    //Get file from your input element
+    let myFile = document.getElementById('image').files[0];
+
+    //Wait for the file to be converted to a byteArray
+    let byteArray = await fileToByteArray(myFile);
+
+    //Do something with the byteArray
+    return byteArray;
+    console.log(byteArray);
+
+}
+
+//atob(decodeURIComponent(dataToBeDecoded)
+function base64ToArrayBuffer(base64) {
+    var binary_string = window.atob(btoa((base64)));
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+*/
+var change;
+function transform(base){
+console.log(base);
+    change = base;
+}
+function handleChangeAttributes(bytesPic) {
     let inputs = document.getElementsByName("changeAttributesInput")
     let radioButton = ""
     if (document.getElementById('newProfile').checked) {
@@ -139,6 +192,24 @@ function handleChangeAttributes() {
     if (document.getElementById('newProfile1').checked) {
         radioButton = inputs[2].value
     }
+   // const inputNode = inputs[0].value
+    url = document.getElementById('image');
+    console.log(url);
+
+    var bytes = bytesPic;
+    /*
+      var files = document.getElementById('image').files;
+      if (files.length > 0) {
+        getBase64(files[0]);
+
+*/
+
+  //getByteArray();
+  console.log(bytes);
+b = JSON.stringify(bytes);
+console.log(b);
+   //bytes = base64ToArrayBuffer(fileContent);
+   // const byteFile = getAsByteArray(inputNode)
     let data = {
         email: inputs[0].value,
         profileType: radioButton,
@@ -150,19 +221,34 @@ function handleChangeAttributes() {
         bio: inputs[8].value,
         tags: fillTagsListToSend(inputs),
         events: currUser.events,
-        profilePic: currUser.profilePic
+        profilePic: b
     }
     callChangeAttributes(JSON.stringify(data));
+}
+function handleChangeAttributesPic(){
+    var fileInput = document.getElementById('image');
+
+    var reader = new FileReader();
+    reader.readAsDataURL(fileInput.files[0]);
+
+    reader.onload = function () {
+        transform(reader.result);
+        handleChangeAttributes(reader.result)
+    	console.log(reader.result);//base64encoded string
+    };
+    reader.onerror = function (error) {
+    	console.log('Error: ', error);
+    };
 }
 
 let changeAttributesForm = document.getElementById("changeAttributesFormId");
 changeAttributesForm.onsubmit = () => {
-    handleChangeAttributes();
+    handleChangeAttributesPic();
     return false;
 }
 
 
-/**
+
 
 document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
     const dropZoneElement = inputElement.closest(".drop-zone");
@@ -238,16 +324,8 @@ function updateThumbnail(dropZoneElement, file) {
 
 }
 
-function base64ToArrayBuffer(base64) {
-    var binary_string = window.atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
-}
 
+/*
 document.addEventListener("DOMContentLoaded", () => {
     const recentImageDataUrl = localStorage.getItem("userPic");
     if (recentImageDataUrl) {
@@ -259,5 +337,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 });
-
 */
+
+

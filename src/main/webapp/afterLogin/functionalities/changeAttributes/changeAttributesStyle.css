@@ -41,6 +41,13 @@ li a:hover {
   padding: 10px;
   vertical-align: middle ;
 }
+.left {
+  margin: auto;
+  width: 50%;
+  border: 3px ;
+  padding: 10px;
+  vertical-align: left ;
+}
 
 input[type=text], select {
   width: 100%;
@@ -89,7 +96,9 @@ div {
   cursor: pointer;
 }
 
-
+img {
+  border-radius: 50%;
+}
 
 
 

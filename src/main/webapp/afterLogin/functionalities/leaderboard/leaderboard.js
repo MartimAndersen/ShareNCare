@@ -45,7 +45,7 @@ function callRank(){
 
            };
 
-    xhttp.open("GET", "/rest/ranking/rankUsers", true);
+    xhttp.open("GET", "/rest/ranking/rankUsersWeb", true);
     xhttp.send();
     
 

@@ -286,6 +286,57 @@ public class RakingUserResource {
 
 		return Response.ok(g.toJson(top10Users)).cookie(cookie).build();
 	}
+	
+	@GET
+	@Path("/rankUsersWeb")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response rankUsersWeb(@CookieParam("Token") NewCookie cookie) {
+	
+		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null) {
+			System.out.println("The given token does not exist.");
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+
+		}
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));   
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+		
+
+
+		Type points = new TypeToken<PointsData>() {
+		}.getType();
+		
+		List<PointsData> pointsList = new ArrayList<PointsData>();
+
+
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(PropertyFilter.eq("role", "USER")).build();
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String pointsString = e.getString("points");
+			PointsData userPoints = new Gson().fromJson(pointsString, points);
+				pointsList.add(userPoints);
+			}
+		
+		pointsList.sort(Comparator.comparing(PointsData::getLeaderBoard));
+		
+		
+	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+	}
 
 	@GET
 	@Path("/rankEventUsers")
@@ -471,7 +522,7 @@ public class RakingUserResource {
 	@POST
 	@Path("/commentLikeDislike")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response commentLikeDislike(@CookieParam("Token") NewCookie cookie, LikeDislikeData data) {
+	public Response commentLikeDislike(@CookieParam("Token") NewCookie cookie, LikeDislikeData data) { 
 
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();

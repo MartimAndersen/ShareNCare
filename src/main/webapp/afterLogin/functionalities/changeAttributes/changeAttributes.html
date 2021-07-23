@@ -13,18 +13,24 @@
 
 <ul>
     <img src="../../images/logo" height="5%" width="5%">
-    <!--    &nbsp;&nbsp;-->
-    <!--    <img id="imgPreview" src="" alt="Preview" height="5%" width="5%" style="border-radius: 20px">-->
+       &nbsp;&nbsp;
+       <img id="imgPreview" src="" alt="Preview" height="5%" width="5%" style="border-radius: 20px">
     <li><a class="active" href="../aboutUs/aboutUs.html">About Us</a></li>
     <li><a class="active" onclick="goToPageBefore()" style="cursor: pointer">Go Back</a></li>
 </ul>
-
-
+<div class="left">
+<img src="../../images/logo" alt="Paris" width="300" height="300">
+</div>
 <div class="center">
 
     <form id="changeAttributesFormId" action="#" method="post">
         <h1>Update Personal Info</h1>
+<!--
+        <label class="header">Change Profile Photo:</label>
 
+        <input id="image" type="file" name="profile_photo" placeholder="Photo" required="" capture accept="image/png, image/jpeg">
+
+-->
         <p>
             <label for="newEmail" class="floatLabel">Email</label>
             <input id="newEmail" name="changeAttributesInput" type="text" placeholder="Email">
@@ -64,12 +70,12 @@
         <textarea id="description" name="changeAttributesInput" type="text" placeholder="User bio"></textarea>
 
 
-        <!--    <p>-->
-        <!--    <div class="drop-zone">-->
-        <!--        <span class="drop-zone__prompt">Drop photo here or click to upload a profile picture</span>-->
-        <!--        <input type="file" name="myFile" class="drop-zone__input">-->
-        <!--    </div>-->
-        <!--    </p>-->
+            <p>
+            <div class="drop-zone">
+                <span class="drop-zone__prompt">Drop photo here or click to upload a profile picture</span>
+               <input id="image" type="file" name="myFile" class="drop-zone__input">
+            </div>
+           </p>
         <p>
             Tags (select at least one):
         <p>&nbsp;
