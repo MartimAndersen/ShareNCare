@@ -234,7 +234,7 @@ public class InsideLoginResource {
 		if (!data.validProfileType())
 			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 		System.out.println(profilePic);
-		if(profilePic == null) {
+		if(profilePic != null) {
 			bucket.create(user.getString("username"), profilePic);
 		}else {
 			profilePic = null;
