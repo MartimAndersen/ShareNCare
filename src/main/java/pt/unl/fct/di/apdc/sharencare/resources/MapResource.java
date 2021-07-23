@@ -243,6 +243,7 @@ public class MapResource {
 					Float.parseFloat(track.getString("average_rating")));
 
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("time", track.getString("time"))
 					.set("description", track.getString("description"))
 					.set("solidarity_points", track.getString("solidarity_points"))
 					.set("difficulty", track.getString("difficulty")).set("distance", track.getString("distance"))
@@ -366,6 +367,7 @@ public class MapResource {
 			}
 			
 			track = Entity.newBuilder(mapKey).set("title", track.getString("title"))
+					.set("time", track.getString("time"))
 					.set("description", track.getString("description")).set("difficulty", track.getString("difficulty"))
 					.set("distance", track.getString("distance")).set("comments", track.getString("comments"))
 					.set("trackMedia", g.toJson(listTrackMedia)).set("trackNotes", g.toJson(listTrackNotes))
@@ -429,6 +431,7 @@ public class MapResource {
 		}
 
 		track = Entity.newBuilder(trackKey).set("title", track.getString("title"))
+				.set("time", track.getString("time"))
 				.set("description", track.getString("description")).set("difficulty", track.getString("difficulty"))
 				.set("distance", track.getString("distance")).set("comments", g.toJson(newComment))
 				.set("trackMedia", track.getString("trackMedia")).set("trackNotes", track.getString("trackNotes"))
