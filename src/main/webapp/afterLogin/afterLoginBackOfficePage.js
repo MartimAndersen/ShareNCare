@@ -297,3 +297,19 @@ changeAttributesForm.onsubmit = () => {
     handleDeleteUser();
     return false;
 }
+
+function logout() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); window.location.href = "../welcomePage/welcomePage.html";; break;
+                default: alert("You need to be logged in to execute this operation."); break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/loggedIn/logout", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    xhttp.send("");
+}
