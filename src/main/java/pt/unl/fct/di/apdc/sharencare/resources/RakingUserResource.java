@@ -280,7 +280,12 @@ public class RakingUserResource {
 					pic = blob.getContent();
 				}
 			}
-			pointsList.get(i).setPic(pic);
+			if(pic.length != 0) {
+				pointsList.get(i).setPic(pic);				
+			}else {
+				pic = null;
+				pointsList.get(i).setPic(pic);	
+			}
 			top10Users.add(pointsList.get(i));
 		}
 
