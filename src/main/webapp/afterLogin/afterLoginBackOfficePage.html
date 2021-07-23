@@ -4,28 +4,41 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./afterLoginPageStyle.css">
+    <link rel="stylesheet" href="./afterLoginBackOfficePage.css">
 </head>
-<body>
+<body onload="callSeeEvents()">
 
 <ul>
     <li><a class="active" onclick="logout()" style="cursor: pointer">Logout</a></li>
     <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>
-    <li><a class="active" href="../initialPageCompany/initialPageCompany.html">Back to Initial Page</a></li>
+    <li><a class="active" href="../initialPageBackOffice/initialPageBackOffice.html">Back to Initial Page</a></li>
     <li><a class="active" href="../welcomePage/welcomePage.html">Back to Welcome Page</a></li>
     <img src="../afterLogin/images/logo" height="5%" width="5%">
 </ul>
 
-<div class="header2" id="header2Id">
-    <h2>Welcome GA</h2>
-</div>
-
-<div class="row">
 
 
+<div id="map" style="border-radius: 20px"></div>
 
+<br>
+<br>
+<div class="form-popup" id="myForm">
+    <form action="/action_page.php" class="form-container">
+        <h1>Remove User from Event</h1>
+
+        <label for="user" class="floatLabel">User</label>
+        <input id="user" name="deleteUserInput" type="text" placeholder="User">
+
+        <button type="submit" class="btn">Delete</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
 </div>
 
 <script src="afterLoginBackOfficePage.js"></script>
+
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCswsWteMRuc4U3LJngGKdSIYbTASbvgCs&callback=initMap&libraries=places&v=weekly"
+        async
+></script>
 </body>
 </html>

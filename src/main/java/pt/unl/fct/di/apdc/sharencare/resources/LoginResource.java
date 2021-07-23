@@ -45,7 +45,7 @@ public class LoginResource {
 		Entity user = datastore.get(userKey);
 
 		if (user != null) {
-			if (!user.getString("role").equals("INSTITUTION")) {
+			if (!user.getString("role").equals("INSTITUTION") && !user.getString("role").equals("GA")) {
 				String hashedPWD = user.getString("password");
 
 				if (hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
@@ -82,7 +82,7 @@ public class LoginResource {
 		Entity user = datastore.get(userKey);
 
 		if (user != null) {
-			if (user.getString("role").equals("INSTITUTION")) {
+			if (user.getString("role").equals("INSTITUTION") && !user.getString("role").equals("GA")) {
 				String hashedPWD = user.getString("password");
 
 				if (hashedPWD.equals(DigestUtils.sha512Hex(data.passwordLogin))) {
