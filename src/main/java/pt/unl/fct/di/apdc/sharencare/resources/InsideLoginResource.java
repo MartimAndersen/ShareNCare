@@ -2,6 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.resources;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.*;
@@ -26,7 +27,7 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.sharencare.filters.Secured;
+
 import pt.unl.fct.di.apdc.sharencare.util.*;
 
 import javax.ws.rs.core.Response.Status;
@@ -44,24 +45,27 @@ public class InsideLoginResource {
 			Storage.BucketGetOption.fields(Storage.BucketField.values()));
 
 	private final Gson g = new Gson();
+	private Entity event;
 
 	@POST
 	@Path("/removeUser")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response removeUser(@QueryParam("tokenId") String tokenId, RemoveUserData data) {
+	public Response removeUser(@CookieParam("Token") NewCookie cookie, RemoveUserData data) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
-		 */
+		 */		
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.userToDelete);
 		Entity user = datastore.get(userKey);
 
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(tokenId);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
 		Key currentUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
@@ -96,6 +100,40 @@ public class InsideLoginResource {
 		 */
 
 		datastore.delete(userKey);
+		
+		 Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
+
+	        QueryResults<Entity> eventsQuery = datastore.run(query);
+	        List<String> members = new ArrayList<>();
+	        Type stringList = new TypeToken<ArrayList<String>>() {
+	        }.getType();
+	        
+
+	        while (eventsQuery.hasNext()) {
+	                Entity e = eventsQuery.next();
+	                String m = e.getString("members");
+	                members = g.fromJson(m, stringList);
+	               if( members.contains(data.userToDelete)) {
+	            	   members.remove(data.userToDelete);
+	            	   System.out.println(members);
+	                   Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(e.getString("name"));
+	                   Entity event = datastore.get(eventKey);
+	                   
+	                   
+	            	   event = Entity.newBuilder(eventKey).set("name", e.getString("name"))
+	                           .set("description", e.getString("description"))
+	                           .set("minParticipants", e.getString("minParticipants"))
+	                           .set("maxParticipants", e.getString("maxParticipants")).set("time", e.getString("time"))
+	                           .set("coordinates", e.getString("coordinates")).set("durability", e.getString("durability"))
+	                           .set("institutionName", e.getString("institutionName"))
+	                           .set("initial_date", e.getString("initial_date"))
+	                           .set("ending_date", e.getString("ending_date")).set("members", g.toJson(members))
+	                           .set("points", e.getString("points")).set("tags", e.getString("tags"))
+	                           .set("rating", e.getString("rating")).set("ended", e.getString("ended")).build();
+	            	   datastore.update(event);
+	               }
+	            }
+	     
 		return Response.ok(data.userToDelete + " was successfully removed").build();
 
 	}

@@ -74,7 +74,7 @@ html, body {
 .form-container {
   max-width: 300px;
   padding: 10px;
-  background-color: white;
+  background-color: rgba(144, 238, 144, 0.80);
 }
 
 /* Full-width input fields */

@@ -206,19 +206,22 @@ function callSeeEvents() {
     xhttp.open("GET", "/rest/event/getAllEvents", true);
     xhttp.send();
 }
+function openFormDeleteUser() {
 
-function removeUser(eventName) {
-
-    window.location.href = "../../functionalities/deleteUserEvent/deleteUserEvent.html";
+  document.getElementById("deleteUser").style.display = "block";
 }
+
 function openForm(eventName) {
-console.log("here");
+
     localStorage.setItem("eventName", eventName);
   document.getElementById("myForm").style.display = "block";
 }
 
 function closeForm() {
   document.getElementById("myForm").style.display = "none";
+}
+function closeFormDeleteUser() {
+  document.getElementById("deleteUser").style.display = "none";
 }
 function callDeleteUserFromEvent(data) {
     let xhttp = new XMLHttpRequest();
@@ -254,8 +257,43 @@ function handleDeleteUserFromEvent() {
     callDeleteUserFromEvent(JSON.stringify(data));
 }
 
-let changeAttributesForm = document.getElementById("myForm");
-changeAttributesForm.onsubmit = () => {
+let deleteUserFromEventForm = document.getElementById("myForm");
+deleteUserFromEventForm.onsubmit = () => {
     handleDeleteUserFromEvent();
+    return false;
+}
+function callDeleteUser(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200: alert(this.responseText); break;
+                case 401: alert("You need to be logged in to execute this operation."); break;
+                case 404: alert("Token does not exist."); break;
+                case 403: alert("The user with the given token does not exist."); break;
+                case 406: alert("The user with the given token is disabled."); break;
+                default: alert("Wrong parameters."); break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/loggedIn/removeUser", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+
+
+}
+
+function handleDeleteUser() {
+    let inputs = document.getElementsByName("deleteInput")
+    let data = {
+        userToDelete: inputs[0].value
+
+    }
+    callDeleteUser(JSON.stringify(data));
+}
+
+let changeAttributesForm = document.getElementById("deleteUser");
+changeAttributesForm.onsubmit = () => {
+    handleDeleteUser();
     return false;
 }

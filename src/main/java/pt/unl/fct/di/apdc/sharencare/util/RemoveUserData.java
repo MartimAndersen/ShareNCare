@@ -5,7 +5,7 @@ public class RemoveUserData{
 	    
 	  public RemoveUserData() {}
 
-	  public RemoveUserData(String userToDelete, String tokenId) {
+	  public RemoveUserData(String userToDelete) {
 	    this.userToDelete = userToDelete;     
 	  }
 	}

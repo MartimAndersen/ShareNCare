@@ -11,6 +11,7 @@
 <ul>
     <li><a class="active" onclick="logout()" style="cursor: pointer">Logout</a></li>
     <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>
+    <li><a class="active" onclick="openFormDeleteUser()" style="cursor: pointer">Delete User</a></li>
     <li><a class="active" href="../initialPageBackOffice/initialPageBackOffice.html">Back to Initial Page</a></li>
     <li><a class="active" href="../welcomePage/welcomePage.html">Back to Welcome Page</a></li>
     <img src="../afterLogin/images/logo" height="5%" width="5%">
@@ -31,6 +32,18 @@
 
         <button type="submit" class="btn">Delete</button>
         <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+</div>
+
+<div class="form-popup" id="deleteUser">
+    <form action="/action_page.php" class="form-container">
+        <h1>Delete User</h1>
+
+        <label for="delete" class="floatLabel">User to delete</label>
+        <input id="delete" name="deleteInput" type="text" placeholder="User To delete">
+
+        <button type="submit" class="btn">Delete</button>
+        <button type="button" class="btn cancel" onclick="closeFormDeleteUser()">Close</button>
     </form>
 </div>
 
