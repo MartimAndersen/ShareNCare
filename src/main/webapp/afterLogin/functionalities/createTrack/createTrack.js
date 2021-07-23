@@ -95,13 +95,12 @@ class AutocompleteDirectionsHandler {
             if (!place.place_id) {
                 window.alert("Please select an option from the dropdown list.");
                 return;
-            } else{
+            } else {
                 solidarityPoints.push(new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng()));
             }
 
             this.originPlaceId = place.place_id;
             currOriginPlaceId = this.originPlaceId;
-
 
 
             this.route(firstMarker, changeTransitMode);
@@ -380,15 +379,13 @@ function addToTrack(i, latitude, longitude) {
 }
 
 
-
-
 function callCreateTrack(data) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200:
-                    alert(this.responseText);
+                    openModal();
                     break;
                 case 400:
                     alert("Initial date needs to be in the future");
@@ -425,34 +422,177 @@ function callCreateTrack(data) {
     xhttp.send(data);
 }
 
+function callRegisterComment(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200:
+                    alert("Track " + trackTitle + " registered.")
+                    break;
+                case 405:
+                    alert("Your comment is inappropriate.");
+                    break;
+                default:
+                    alert("Something went wrong.");
+                    break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/map/comment", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
+
+
+let trackTitle;
+
 function handleSubmitTrack() {
     let inputs = document.getElementsByName("createTrack");
 
-    // let gson = new Gson();
-    //
-    // let aux2 = gson.toJson(solidarityPoints);
-
-    let auxString = "";
     let solidarityPointsString = JSON.stringify(solidarityPoints).toString();
     solidarityPointsString = solidarityPointsString.replace(/lat/g, 'latitude');
     solidarityPointsString = solidarityPointsString.replace(/lng/g, 'longitude');
 
+    trackTitle = inputs[0].value;
+
     let data = {
-        title: inputs[0].value,
+        title: trackTitle,
         description: inputs[1].value,
         distance: dist.toString(),
         difficulty: document.getElementById("sliderOutput").value,
         solidarityPoints: solidarityPointsString,
-        type: "live",
+        type: "pre-made",
         username: localStorage.getItem("currUser"),
         time: "0"
     }
     callCreateTrack(JSON.stringify(data));
 }
 
+function isChecked(element) {
+    return document.getElementById(element).checked;
+}
+
+function getStarsRating() {
+    let res = 5;
+    if (isChecked("star1")) {
+        res = 1;
+    } else if (isChecked("star2")) {
+        res = 2;
+    } else if (isChecked("star3")) {
+        res = 3;
+    } else if (isChecked("star4")) {
+        res = 4;
+    }
+    return res;
+}
 
 let submitTrackForm = document.getElementById("TrackFormId");
 submitTrackForm.onsubmit = () => {
     handleSubmitTrack();
     return false;
+}
+
+/* ====================== Review Form ====================== */
+
+let focusedElementBeforeModal;
+const modal = document.getElementById('modal');
+const modalOverlay = document.querySelector('.modal-overlay');
+
+// function callAddReview() {
+//     const addReview = document.getElementById('submitButton');
+//     addReview.id = 'submitButton';
+//     addReview.innerHTML = '+';
+//     addReview.setAttribute('aria-label', 'add review');
+//     addReview.title = 'Add Review';
+//     addReview.addEventListener('click', openModal);
+//     addReview.click();
+// }
+
+function openModal() {
+    // Save current focus
+    focusedElementBeforeModal = document.activeElement;
+
+    // Listen for and trap the keyboard
+    modal.addEventListener('keydown', trapTabKey);
+
+    // Listen for indicators to close the modal
+    modalOverlay.addEventListener('click', closeModal);
+    // Close btn
+    const closeBtn = document.querySelector('.close-btn');
+    closeBtn.addEventListener('click', closeModal);
+
+    // submit form
+    const form = document.getElementById('review-form');
+    form.addEventListener('submit', submitAddReview, false);
+
+    // Find all focusable children
+    let focusableElementsString = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], [contenteditable]';
+    let focusableElements = modal.querySelectorAll(focusableElementsString);
+    // Convert NodeList to Array
+    focusableElements = Array.prototype.slice.call(focusableElements);
+
+    let firstTabStop = focusableElements[0];
+    let lastTabStop = focusableElements[focusableElements.length - 1];
+
+    // Show the modal and overlay
+    modal.classList.add('show');
+    modalOverlay.classList.add('show');
+
+    function trapTabKey(e) {
+        // Check for TAB key press
+        if (e.keyCode === 9) {
+            // SHIFT + TAB
+            if (e.shiftKey) {
+                if (document.activeElement === firstTabStop) {
+                    e.preventDefault();
+                    lastTabStop.focus();
+                }
+                // TAB
+            } else {
+                if (document.activeElement === lastTabStop) {
+                    e.preventDefault();
+                    firstTabStop.focus();
+                }
+            }
+        }
+        // ESCAPE
+        if (e.keyCode === 27) {
+            closeModal();
+        }
+    }
+};
+
+const submitAddReview = (e) => {
+    let comment = document.getElementById("reviewComments").value;
+    let starsRating = getStarsRating();
+    handleSubmitComment(comment, starsRating);
+    e.preventDefault();
+    closeModal();
+};
+
+const closeModal = () => {
+    // Hide the modal and overlay
+    modal.classList.remove('show');
+    modalOverlay.classList.remove('show');
+
+    const form = document.getElementById('review-form');
+    form.reset();
+    // Set focus back to element that had it before the modal was opened
+    focusedElementBeforeModal.focus();
+};
+
+/* ====================== Review Form End ====================== */
+
+
+function handleSubmitComment(comment, starsRating) {
+
+    let data = {
+        comment: comment,
+        rating: starsRating,
+        routeName: trackTitle,
+        username: localStorage.getItem("currUser"),
+        likes: 0
+    }
+    callRegisterComment(JSON.stringify(data));
 }

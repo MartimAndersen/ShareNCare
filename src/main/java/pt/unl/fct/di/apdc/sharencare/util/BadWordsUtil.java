@@ -2,6 +2,7 @@ package pt.unl.fct.di.apdc.sharencare.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class BadWordsUtil {
 
@@ -15,18 +16,13 @@ public class BadWordsUtil {
 	}
 
 	public boolean hasBadWords(String comment) {
-		String[] words = comment.split("\\s+");
-		boolean hasBadWords = false;
-		for(int l = 0; l < words.length; l++) {
-			for (int i = 0; i < swear.size(); i++) {
-				if (swear.get(i).equalsIgnoreCase(words[l])) {
-					hasBadWords =  true;
-					break;
-				}
+		boolean res = false;
+		for (String badWord : swear) {
+			if(comment.toLowerCase().contains(badWord.toLowerCase())){
+				res = true;
 			}
 		}
-		return hasBadWords;
-
+		return res;
 	}
 
 }
