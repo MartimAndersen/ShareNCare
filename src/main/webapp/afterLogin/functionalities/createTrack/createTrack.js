@@ -1,171 +1,324 @@
-document.getElementById("submitButton").style.visibility = "hidden";
+let map;
+let eventLat;
+let eventLon;
+let currTravelMode = "WALKING";
+let currOriginPlaceId = "";
+let place = "";
+let directionsRenderer;
+let directionsService;
 
-var map;
+let emptyOrigin = true;
+
+var locations = [];
+
+const coordinates = "coordinates";
+const description = "description";
+const ended = "ended";
+const durability = "durability";
+const ending_date = "ending_date";
+const initial_date = "initial_date";
+const institutionName = "institutionName";
+const maxParticipants = "maxParticipants";
+const members = "members";
+const minParticipants = "minParticipants";
+const name = "name";
+const points = "points";
+const rating = "rating";
+const tags = "tags";
+const time = "time";
+
+let solidarityPoints = [];
+
+const attributes = [coordinates, description, durability, ended, ending_date, initial_date, institutionName,
+    maxParticipants, members, minParticipants, name, points, rating, tags, time];
+
+function stringToIndex(id) {
+    return attributes.indexOf(id);
+}
 
 function initMap() {
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsService = new google.maps.DirectionsService();
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
         center: {lat: 38.659784, lng: -9.202765},
         zoom: 9
     });
-    new AutocompleteDirectionsHandler(map);
+    new AutocompleteDirectionsHandler(map, true, false);
 }
+
+let originInput;
 
 let dist = 0;
 
-class AutocompleteDirectionsHandler {
-    constructor(map) {
-        this.map = map;
-        this.originPlaceId = "";
-        this.destinationPlaceId = "";
-        this.travelMode = google.maps.TravelMode.WALKING;
-        this.directionsService = new google.maps.DirectionsService();
-        this.directionsRenderer = new google.maps.DirectionsRenderer();
-        this.directionsRenderer.setMap(map);
-        const originInput = document.getElementById("origin-input");
-        const destinationInput = document.getElementById("destination-input");
-        const modeSelector = document.getElementById("mode-selector");
-        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
-        // Specify just the place data fields that you need.
-        originAutocomplete.setFields(["place_id"]);
-        const destinationAutocomplete = new google.maps.places.Autocomplete(
-            destinationInput
-        );
-        // Specify just the place data fields that you need.
-        destinationAutocomplete.setFields(["place_id"]);
-        this.setupPlaceChangedListener(originAutocomplete, "ORIG");
-        this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
-        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
-        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(
-            destinationInput
-        );
-        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
-
-        // new google.maps.Marker({
-        //     position: new google.maps.LatLng(38.736946, -9.142685),
-        //     map: map
-        // })
+function clearDirections() {
+    emptyOrigin = true;
+    document.getElementById("clearMapButton").style.visibility = "hidden";
+    document.getElementById("distanceBox").style.visibility = "hidden";
+    document.getElementById("submitButton").style.visibility = "hidden";
+    directionsRenderer.setMap(null);
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+    while (waypts.length) {
+        waypts.pop();
+    }
+    while (solidarityPoints.length) {
+        solidarityPoints.pop();
     }
 
-    setupPlaceChangedListener(autocomplete, mode) {
+}
+
+const waypts = [];
+
+let originAux;
+let trackInfo;
+let lastDestinationLat;
+let lastDestinationLon;
+
+class AutocompleteDirectionsHandler {
+    constructor(map, firstMarker, changeTransitMode) {
+        this.map = map;
+        this.originPlaceId = "";
+        directionsRenderer.setMap(map);
+        originInput = document.getElementById("eventOrigin");
+        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+        originAutocomplete.setFields(["place_id", 'geometry']);
+
+        firstMarker ? this.setupPlaceChangedListener(originAutocomplete, firstMarker, changeTransitMode) : this.route(firstMarker, changeTransitMode);
+    }
+
+    setupPlaceChangedListener(autocomplete, firstMarker, changeTransitMode) {
         autocomplete.bindTo("bounds", this.map);
         autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
+            place = autocomplete.getPlace();
 
             if (!place.place_id) {
                 window.alert("Please select an option from the dropdown list.");
                 return;
+            } else{
+                solidarityPoints.push(new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng()));
             }
 
-            if (mode === "ORIG") {
-                this.originPlaceId = place.place_id;
-            } else {
-                this.destinationPlaceId = place.place_id;
-            }
-            this.route();
+            this.originPlaceId = place.place_id;
+            currOriginPlaceId = this.originPlaceId;
+
+
+
+            this.route(firstMarker, changeTransitMode);
         });
     }
 
-    route() {
-        if (!this.originPlaceId || !this.destinationPlaceId) {
-            return;
+    route(firstMarker, changeTransitMode) {
+        document.getElementById("eventOrigin").style.visibility = "hidden";
+        document.getElementById("clearMapButton").style.visibility = "visible";
+
+        if (firstMarker) {
+            if (!this.originPlaceId && currOriginPlaceId === "") {
+                return;
+            }
+            originAux = {placeId: currOriginPlaceId};
         }
-        const me = this;
-        this.directionsService.route(
-            {
-                origin: {placeId: this.originPlaceId},
-                destination: {placeId: this.destinationPlaceId},
-                travelMode: this.travelMode,
-            },
+
+        if (firstMarker) {
+            trackInfo = {
+                origin: originAux,
+                destination: {
+                    "lat": eventLat,
+                    "lng": eventLon
+                },
+                travelMode: google.maps.TravelMode[currTravelMode]
+            };
+        } else {
+            trackInfo = {
+                origin: originAux,
+                destination: {
+                    "lat": eventLat,
+                    "lng": eventLon
+                },
+                waypoints: waypts,
+                travelMode: google.maps.TravelMode[currTravelMode]
+            };
+            if (!changeTransitMode) {
+                fillWayPoints(new google.maps.LatLng(lastDestinationLat, lastDestinationLon));
+            }
+        }
+
+        if (!changeTransitMode) {
+            solidarityPoints.push(new google.maps.LatLng(eventLat, eventLon));
+        }
+
+        lastDestinationLat = eventLat;
+        lastDestinationLon = eventLon;
+
+
+        directionsService.route(
+            trackInfo,
             (response, status) => {
                 if (status === "OK") {
-                    me.directionsRenderer.setDirections(response);
-                    dist = response.routes[0].legs[0].distance.text;
-                    document.getElementById("distanceBox").innerHTML = "Distance: " + dist;
+                    directionsRenderer.setDirections(response);
+
+                    for (let i = 0; i < response.routes[0].legs.length; i++) {
+                        dist += response.routes[0].legs[i].distance.value / 1000;
+                    }
+                    document.getElementById("distanceBox").value = "Distance: " + Math.round(dist) + " km";
+                    document.getElementById("distanceBox").style.visibility = "visible";
+                    dist = 0;
                 } else {
                     window.alert("Directions request failed due to " + status);
                 }
             }
         );
-
         document.getElementById("submitButton").style.visibility = "visible";
+        document.getElementById("floating-panel").style.visibility = "visible";
     }
 }
 
-function backToInitialPage() {
-    window.location.href = "../../../initialPage/initialPage.html";
-}
+document.getElementById("mode").addEventListener("change", () => {
+    currTravelMode = document.getElementById("mode").value;
+    new AutocompleteDirectionsHandler(map, false, true);
+});
 
-function goToAfterLoginPage() {
-    window.location.href = "../../afterLoginPage.html";
-}
-
-function callCreateTrack(data) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            alert(this.responseText);
-        } else if (this.readyState === 4 && this.status === 400) {
-            alert("You need to be logged in to execute this operation.");
-        } else if (this.readyState === 4 && this.status === 403) {
-            alert("Please insert a title.");
-        } else if (this.readyState === 4 && this.status === 409) {
-            alert("The track with the given title already exists.");
-        } else if (this.readyState === 4 && this.status !== 200) {
-            alert("Wrong parameters.");
+function getNrMembers(membersString) {
+    // [b,g] comes looking like "[\"b\",\"g\"]"
+    let nrMembers = 0;
+    if (membersString !== "[]") {
+        let nrMembersAux = (membersString.match(/,/g) || []).length;
+        if (membersString === 0) {
+            nrMembers = 1;
+        } else {
+            nrMembers = nrMembersAux + 1;
         }
-    };
-    xhttp.open("POST", "/rest/map/registerTrack", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(data);
-}
-
-function changeSliderValue(value) {
-    document.getElementById('sliderInput').value = value;
-}
-
-document.getElementById("sliderInput").oninput = function () {
-    document.getElementById("sliderOutput").value = document.getElementById("sliderInput").value;
-}
-
-function handleCreateTrack() {
-    let inputs = document.getElementsByName("createTrack")
-
-    let data = {
-        title: inputs[0].value,
-        description: inputs[1].value,
-        origin: document.getElementById("origin-input").value,
-        destination: document.getElementById("destination-input").value,
-        distance: dist,
-        difficulty: document.getElementById("sliderOutput").value
     }
-    callCreateTrack(JSON.stringify(data));
+    return nrMembers;
 }
 
-let createTrackForm = document.getElementById("TrackFormId");
-createTrackForm.onsubmit = () => {
-    handleCreateTrack();
-    return false;
+function fillLocationsArray(obj) {
+    let locationInfo = {
+        name: obj[stringToIndex(name)].value,
+        initial_date: obj[stringToIndex(initial_date)].value,
+        ending_date: obj[stringToIndex(ending_date)].value,
+        time: obj[stringToIndex(time)].value,
+        durability: obj[stringToIndex(durability)].value,
+        minParticipants: obj[stringToIndex(minParticipants)].value,
+        maxParticipants: obj[stringToIndex(maxParticipants)].value,
+        description: obj[stringToIndex(description)].value,
+        tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
+        nrMembers: getNrMembers(obj[stringToIndex(members)].value),
+        latitude: obj[stringToIndex(coordinates)].value.split(" ")[0],
+        longitude: obj[stringToIndex(coordinates)].value.split(" ")[1],
+        ended: obj[stringToIndex(ended)].value,
+        points: obj[stringToIndex(points)].value,
+        rating: obj[stringToIndex(rating)].value
+    }
+    locations.push(locationInfo);
 }
-
-let locations = [
-    ['Canil Municipal de Sintra', 38.80103664384434, -9.362070114620005],
-    ['Cáritas Diocesana de Setúbal', 38.52423234014446, -8.8967447733166],
-    ['Comunidade Vida e Paz', 38.750773862083626, -9.133415786802798],
-    ['Casa de Acolhimento Residencial D. Nuno Álvares Pereira', 38.67591762242458, -9.160317675163238]
-];
 
 var markers = [];
 
-function addMarkers() {
+function fillWayPoints(givenLocation) {
+    waypts.push({
+        location: givenLocation,
+        stopover: true
+    });
 
+}
+
+function convertToTags(currTags) {
+    // tags:  ["animals", "environment", "children", "elderly", "supplies", "homeless"]
+    // 1 to 6
+    // currTags: if '[2,6]' then comes looking like '26'
+    let tagsString = "";
+    let currNrTags = currTags.length;
+    if (currNrTags === 0) {
+        tagsString = "None.";
+    } else {
+        for (let j = 0; j < currNrTags; j++) {
+            switch (currTags[j]) {
+                case '1':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "animals.";
+                    } else {
+                        tagsString += "animals, ";
+                    }
+                    break;
+                case '2':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "environment.";
+                    } else {
+                        tagsString += "environment, ";
+                    }
+                    break;
+                case '3':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "children.";
+                    } else {
+                        tagsString += "children, ";
+                    }
+                    break;
+                case '4':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "elderly.";
+                    } else {
+                        tagsString += "elderly, ";
+                    }
+                    break;
+                case '5':
+                    if (j + 1 === currNrTags) {
+                        tagsString += "supplies.";
+                    } else {
+                        tagsString += "supplies, ";
+                    }
+                    break;
+                case '6':
+                    tagsString += "homeless.";
+                    break;
+                default:
+                    tagsString += "ERROR ";
+                    break;
+            }
+        }
+    }
+    return tagsString;
+}
+
+function fillInfoWindow(marker, i) {
     var infowindow = new google.maps.InfoWindow();
+
+    locationAux = locations[i];
+
+    infowindow.setContent(
+        'Event name: ' + locationAux.name +
+        '<p></p>' +
+        'Initial date: ' + locationAux.initial_date +
+        '<p></p>' +
+        'End date: ' + locationAux.ending_date +
+        '<p></p>' +
+        'Hour: ' + locationAux.time +
+        '<p></p>' +
+        'Frequency: ' + locationAux.durability +
+        '<p></p>' +
+        'Min participants: ' + locationAux.minParticipants +
+        '<p></p>' +
+        'Max participants: ' + locationAux.maxParticipants +
+        '<p></p>' +
+        'Number of current members: ' + locationAux.nrMembers +
+        '<p></p>' +
+        'Tags: ' + convertToTags(locationAux.tags) +
+        '<p></p>' +
+        'Description: ' + locationAux.description +
+        '<p></p>' +
+        `<button onclick="addToTrack(${i}, locationAux.latitude, locationAux.longitude)">Add to track</button>`
+    );
+    infowindow.open(map, marker);
+}
+
+function addMarkers() {
 
     var marker, i;
 
     for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            position: new google.maps.LatLng(locations[i].latitude, locations[i].longitude),
             map: map
         });
 
@@ -173,25 +326,133 @@ function addMarkers() {
 
         google.maps.event.addListener(marker, 'click', (function (marker, i) {
             return function () {
-                infowindow.setContent(locations[i][0]);
-                infowindow.open(map, marker);
+                fillInfoWindow(marker, i)
             }
         })(marker, i));
     }
 }
 
-function clearMap() {
-    for(let m=0; m<markers.length; m++){
-        markers[m].setMap(null);
-    }
-}
-
-function goToAboutUs() {
-    localStorage.setItem("isUserPage","true");
-    window.location.href = "../../functionalities/aboutUs/aboutUs.html";
-}
-
-function goBack() {
+function goToPageBefore() {
     window.location.href = "../../afterLoginPage.html";
 }
 
+function populateMap(jsonResponse) {
+    for (let i = 0; i < jsonResponse.length; i++) {
+        let obj = [];
+        obj = JSON.parse(jsonResponse[i]);
+
+        fillLocationsArray(obj);
+    }
+    addMarkers();
+}
+
+function callSeeEvents() {
+    var jsonResponse = []
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            jsonResponse = JSON.parse(xhttp.responseText);
+            populateMap(jsonResponse)
+        }
+    };
+    xhttp.open("GET", "/rest/event/listUserEvents", true);
+    xhttp.send();
+}
+
+function showOriginInput(i, firstMarker, latitude, longitude) {
+    let elem = document.getElementById("eventOrigin");
+    elem.style.visibility = "visible";
+    elem.value = "";
+
+    eventLat = parseFloat(latitude);
+    eventLon = parseFloat(longitude);
+
+    new AutocompleteDirectionsHandler(map, firstMarker, false);
+}
+
+function addToTrack(i, latitude, longitude) {
+    if (emptyOrigin) {
+        emptyOrigin = false;
+        showOriginInput(i, true, latitude, longitude);
+    } else {
+        showOriginInput(i, false, latitude, longitude);
+    }
+}
+
+
+
+
+function callCreateTrack(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200:
+                    alert(this.responseText);
+                    break;
+                case 400:
+                    alert("Initial date needs to be in the future");
+                    break;
+                case 401:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+                case 411:
+                    alert("Please fill in all fields.");
+                    break;
+                case 412:
+                    alert("Final date needs to be after initial date or in the same day");
+                    break;
+                case 406:
+                    alert("Number of participants is invalid.");
+                    break;
+                case 403:
+                    alert("Invalid date format.");
+                    break;
+                case 409:
+                    alert("Event already exists.");
+                    break;
+                case 417:
+                    alert("Invalid hour format.");
+                    break;
+                default:
+                    alert("Something went wrong.");
+                    break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/map/registerTrack", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
+
+function handleSubmitTrack() {
+    let inputs = document.getElementsByName("createTrack");
+
+    // let gson = new Gson();
+    //
+    // let aux2 = gson.toJson(solidarityPoints);
+
+    let auxString = "";
+    let solidarityPointsString = JSON.stringify(solidarityPoints).toString();
+    solidarityPointsString = solidarityPointsString.replace(/lat/g, 'latitude');
+    solidarityPointsString = solidarityPointsString.replace(/lng/g, 'longitude');
+
+    let data = {
+        title: inputs[0].value,
+        description: inputs[1].value,
+        distance: dist.toString(),
+        difficulty: document.getElementById("sliderOutput").value,
+        solidarityPoints: solidarityPointsString,
+        type: "live",
+        username: localStorage.getItem("currUser"),
+        time: "0"
+    }
+    callCreateTrack(JSON.stringify(data));
+}
+
+
+let submitTrackForm = document.getElementById("TrackFormId");
+submitTrackForm.onsubmit = () => {
+    handleSubmitTrack();
+    return false;
+}

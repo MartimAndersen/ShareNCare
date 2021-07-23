@@ -6,7 +6,7 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <link rel="stylesheet" type="text/css" href="createTrackStyle.css"/>
 </head>
-<body>
+<body onload="callSeeEvents()">
 
 <ul>
     <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>
@@ -14,58 +14,60 @@
     <img src="../../../afterLogin/images/logo" height="5%" width="5%">
 </ul>
 
-<div style="display: none">
-    <input
-            id="origin-input"
-            class="controls"
-            type="text"
-            placeholder="Enter an origin location"
-    />
 
-    <input
-            id="destination-input"
-            class="controls"
-            type="text"
-            placeholder="Enter a destination location"
-    />
-
+<div id="floating-panel">
+    <b>Mode of Travel: </b>
+    <select id="mode">
+        <option value="WALKING">Walking</option>
+        <option value="DRIVING">Driving</option>
+        <!--        <option value="BICYCLING">Bicycling</option>-->
+        <!--        <option value="TRANSIT">Transit</option>-->
+    </select>
 </div>
 
-<div id="map"></div>
+<input id="distanceBox" type="text" readonly/>
 
-<h2>Track Information</h2>
+&nbsp;&nbsp;
 
-<button style="font-size : 15px;  float: right;" onclick="clearMap()">Clear Map</button>
+<button id="clearMapButton" onclick="clearDirections()">Clear route</button>
 
-<button style="font-size : 15px;  float: right;" onclick="addMarkers()">Find Institutions</button>
+&nbsp;&nbsp;
 
-<textarea id="distanceBox" readonly>
-Distance:
-</textarea>
+<input id="eventOrigin" class="controls" type="text" placeholder="Enter an origin location"/>
 
-<form id="TrackFormId" action="#" method="post">
+<br>
+<br>
 
-    <p>
-        <label for="title" class="floatLabel"></label>
-        <input id="title" name="createTrack" type="text" placeholder="Track Title">
-    </p>
-    <p>
-        <label for="description" class="floatLabel"></label>
-        <textarea id="description" name="createTrack" type="text" style="height:170px; width:750px;"
-                  placeholder="Track Description (optional)"></textarea>
-    </p>
+<div id="map" class="split right"></div>
 
-    <div class="slider">
-        Difficulty of the walk: <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput"
-                                       oninput="this.nextElementSibling.value = this.value">
-        <output id="sliderOutput">5</output>
-    </div>
+<div id="trackDiv" class="split left">
 
-    <p>
-        <input id="submitButton" type="submit" value="Submit Track" id="submitTrackDescription">
-    </p>
+    <h2>Track Information</h2>
 
-</form>
+    <form id="TrackFormId" action="#" method="post">
+
+        <p>
+            <label for="title" class="floatLabel"></label>
+            <input id="title" name="createTrack" type="text" placeholder="Track Title">
+        </p>
+        <p>
+            <label for="description" class="floatLabel"></label>
+            <textarea id="description" name="createTrack" type="text" placeholder="Track Description (optional)"></textarea>
+        </p>
+
+        <div class="slider">
+            Difficulty of the walk: <input type="range" min="0" max="10" value="5" class="slider" step="1" id="sliderInput"
+                                           oninput="this.nextElementSibling.value = this.value">
+            <output id="sliderOutput">5</output>
+        </div>
+
+        <p>
+            <input id="submitButton" type="submit" value="Submit Track" id="submitTrackDescription">
+        </p>
+
+    </form>
+
+</div>
 
 <script src="./createTrack.js"></script>
 
