@@ -280,7 +280,7 @@ public class RakingUserResource {
 					pic = blob.getContent();
 				}
 			}
-			if(pic.length != 0) {
+			if(pic != null) {
 				pointsList.get(i).setPic(pic);				
 			}else {
 				pic = null;
