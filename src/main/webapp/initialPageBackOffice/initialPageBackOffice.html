@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share&Care</title>
+    <link rel="stylesheet" href="initialPageBackOffice.css">
+
+</head>
+<body>
+
+<ul>
+    <!--    <li><a class="active" onclick="goToAboutUs()" style="cursor: pointer">About Us</a></li>-->
+    <li><a class="active" href="../welcomePage/welcomePage.html">Back to Welcome Page</a></li>
+    <!--    <img src="../afterLogin/images/logo" height="5%" width="5%">-->
+</ul>
+
+<ul>
+    <img src="../afterLogin/images/logo" height="10%" width="10%">
+</ul>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+
+<div class="split left">
+    <div>
+        <form id="regFormId" action="#" method="post">
+            <h1>Sign Up</h1>
+            <p>
+                <label for="username" class="floatLabel"></label>
+                <input id="username" name="regInput" type="text" placeholder="Username">
+            </p>
+
+            <p>
+                <label for="email" class="floatLabel"></label>
+                <input id="email" name="regInput" type="text" placeholder="Email">
+            </p>
+            <p>
+                <label for="password" class="floatLabel"></label>
+                <input id="password" name="regInput" type="password"
+                       style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                       placeholder="Password">
+                <i onclick="togglePassword('password', 'password1')" class="fas fa-eye-slash" id="password1"
+                   style="margin-left: -30px; cursor: pointer;"></i>
+            </p>
+
+            <p>
+                <label for="confirmation" class="floatLabel"></label>
+                <input id="confirmation" name="regInput" type="password"
+                       style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                       placeholder="Confirm Password">
+                <i onclick="togglePassword('confirmation', 'confirmation1')" class="fas fa-eye-slash" id="confirmation1"
+                   style="margin-left: -30px; cursor: pointer;"></i>
+            </p>
+            <p>
+                <input type="submit" value="Sign Up" id="submitRegister">
+            </p>
+        </form>
+
+    </div>
+</div>
+
+<div class="split right">
+    <form id="loginFormId" action="#" method="post">
+        <h1>Login</h1>
+        <p>
+            <label for="usernameLogin" class="floatLabel"></label>
+            <input id="usernameLogin" name="loginInput" type="text" placeholder="Username">
+        </p>
+        <p>
+            <label for="passwordLogin" class="floatLabel"></label>
+            <input id="passwordLogin" name="loginInput" type="password"
+                   style="width: 80%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box;"
+                   placeholder="Password">
+            <i onclick="togglePassword('passwordLogin', 'passwordLogin1')" class="fas fa-eye-slash" id="passwordLogin1"
+               style="margin-left: -30px; cursor: pointer;"></i>
+        </p>
+
+        <p>
+            <input type="submit" value="Sign In" id="submitLogin">
+        </p>
+    </form>
+    <button onclick="goToAfterLoginPage()">More User Functionalities</button>
+</div>
+</div>
+
+<script src="initialPageBackOffice.js"></script>
+</body>
+</html>
+
