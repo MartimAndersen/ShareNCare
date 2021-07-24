@@ -22,7 +22,7 @@ function goToCreateEvent() {
 
 function goToDeleteAccount() {
     localStorage.setItem("isUserPage","false");
-    window.location.href = "functionalities/deleteInstitutionAccount/deleteInstitutionAccount.html";
+    window.location.href = "functionalities/deleteAccount/deleteInstitutionAccount.html";
 }
 
 function goToMyEvent() {

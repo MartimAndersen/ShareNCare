@@ -99,7 +99,7 @@ public class DeleteUsersResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		if(token.getString("username").equals(nif)){
+		if(!token.getString("username").equals(nif)){
 			return Response.status(Status.CONFLICT).build();
 		}
 
@@ -175,7 +175,7 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/institutionWeb")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteInstitution(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+	public Response deleteInstitutionWeb(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -184,7 +184,7 @@ public class DeleteUsersResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		if(token.getString("username").equals(data.name)){
+		if(!token.getString("username").equals(data.name)){
 			return Response.status(Status.CONFLICT).build();
 		}
 
