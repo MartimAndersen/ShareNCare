@@ -144,7 +144,7 @@ function populate_table_comments(jsonResponse) {
 
         let row = table.insertRow(-1);
         let cell = row.insertCell(0);
-        let text = document.createTextNode(obj.comments);
+        let text = document.createTextNode(obj.commentsRank);
         cell.appendChild(text);
         cell = row.insertCell(0);
         text = document.createTextNode(obj.username);
