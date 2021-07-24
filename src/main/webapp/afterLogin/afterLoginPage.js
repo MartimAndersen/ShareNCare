@@ -25,6 +25,11 @@ function goToCreateTrack() {
     window.location.href = "functionalities/createTrack/createTrack.html";
 }
 
+function goToMyTracks() {
+    localStorage.setItem("isUserPage","true");
+    window.location.href = "functionalities/myTracks/myTracks.html";
+}
+
 function goToJoinEvent() {
     window.location.href = "functionalities/joinEvent/joinEvent.html";
 }
