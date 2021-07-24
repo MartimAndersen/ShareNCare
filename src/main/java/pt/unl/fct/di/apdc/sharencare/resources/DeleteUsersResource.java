@@ -21,6 +21,8 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.sharencare.util.FinishEvent;
+
 @Path("/delete")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class DeleteUsersResource {
@@ -111,6 +113,63 @@ public class DeleteUsersResource {
 
 		return Response.ok("Institution deleted.").build();
 
+	}
+	
+	@POST
+	@Path("/userWeb")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteUserWeb(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+		
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.name);
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).entity("User with username: " + data.name + " doesn't exist").build();
+		
+		if(!token.getString("username").equals(data.name))
+			return Response.status(Status.CONFLICT).build();
+	
+		
+		String e = user.getString("events");
+
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> events = g.fromJson(e, stringList);
+		
+		for(String eventId: events) {
+			Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(eventId);
+			Entity event = datastore.get(eventKey);
+			
+			String m = event.getString("members");
+			List<String> members = g.fromJson(m, stringList);
+			
+			members.remove(data.name);
+			
+			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
+					.set("description", event.getString("description"))
+					.set("minParticipants", event.getString("minParticipants"))
+					.set("maxParticipants", event.getString("maxParticipants")).set("time", event.getString("time"))
+					.set("coordinates", event.getString("coordinates")).set("durability", event.getString("durability"))
+					.set("institutionName", event.getString("institutionName"))
+					.set("initial_date", event.getString("initial_date"))
+					.set("ending_date", event.getString("ending_date")).set("members", g.toJson(members))
+					.set("points", event.getString("points")).set("tags", event.getString("tags"))
+					.set("rating", event.getString("rating")).set("ended", event.getString("ended")).build();
+			
+			datastore.update(event);
+		}
+
+		
+		datastore.delete(userKey);
+
+		return Response.ok("User deleted.").build();
 	}
 
 }

@@ -12,7 +12,7 @@ function callDeleteAccount(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedIn/removeUser", true);
+    xhttp.open("POST", "/rest/delete/userWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }
@@ -20,7 +20,7 @@ function callDeleteAccount(data) {
 function handleDeleteAccount() {
     let inputs = document.getElementsByName("deleteAccountInput")
     let data = {
-        userToBeDeleted: inputs[0].value
+        name: inputs[0].value
     }
     callDeleteAccount(JSON.stringify(data));
 }
