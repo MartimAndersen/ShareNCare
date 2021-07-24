@@ -88,7 +88,7 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/institution")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteInstitution(@CookieParam("Token") NewCookie cookie, @QueryParam("username") String nif) {
+	public Response deleteInstitution(@CookieParam("Token") NewCookie cookie, @QueryParam("nif") String nif) {
 		
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
