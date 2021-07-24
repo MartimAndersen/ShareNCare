@@ -20,6 +20,11 @@ function goToCreateEvent() {
     window.location.href = "functionalities/createEvent/createEvent.html";
 }
 
+function goToDeleteAccount() {
+    localStorage.setItem("isUserPage","false");
+    window.location.href = "functionalities/deleteInstitutionAccount/deleteInstitutionAccount.html";
+}
+
 function goToMyEvent() {
     window.location.href = "functionalities/myEventsCompany/myEvents.html";
 }
