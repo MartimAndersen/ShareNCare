@@ -373,7 +373,7 @@ public class InsideLoginInstitutionResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("nif"));
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
 
 		if (user == null)
