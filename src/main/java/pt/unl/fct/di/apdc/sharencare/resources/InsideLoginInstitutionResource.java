@@ -309,7 +309,7 @@ public class InsideLoginInstitutionResource {
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
 		
-		if(user.getString("role").equals("INSTITUTION")) {
+		if(!user.getString("role").equals("INSTITUTION")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
