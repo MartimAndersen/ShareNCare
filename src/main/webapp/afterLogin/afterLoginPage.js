@@ -1,7 +1,3 @@
-function backToInitialPage() {
-    window.location.href = "../welcomePage/welcomePage.html";
-}
-
 function goToAboutUs() {
     localStorage.setItem("isUserPage","true");
     window.location.href = "functionalities/aboutUs/aboutUs.html";
@@ -14,10 +10,6 @@ function goToChangePassword() {
 
 function goToChangeAttributes() {
     window.location.href = "functionalities/changeAttributes/changeAttributes.html";
-}
-
-function goToChangeRole() {
-    window.location.href = "functionalities/changeRole/changeRole.html";
 }
 
 function goToCreateTrack() {
@@ -36,6 +28,10 @@ function goToJoinEvent() {
 
 function goToSeeEvents() {
     window.location.href = "functionalities/seeEvents/seeEvents.html";
+}
+
+function goToSeeTracks() {
+    window.location.href = "functionalities/myTracks/myTracks.html";
 }
 
 function goToSeeLeaderboard() {
