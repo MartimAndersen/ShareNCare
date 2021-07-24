@@ -81,42 +81,42 @@ function convertToTags(currTags) {
     } else {
         for (let j = 0; j < currNrTags; j++) {
             switch (currTags[j]) {
-                case '1':
+                case '0':
                     if (j + 1 === currNrTags) {
                         tagsString += "animals.";
                     } else {
                         tagsString += "animals, ";
                     }
                     break;
-                case '2':
+                case '1':
                     if (j + 1 === currNrTags) {
                         tagsString += "environment.";
                     } else {
                         tagsString += "environment, ";
                     }
                     break;
-                case '3':
+                case '2':
                     if (j + 1 === currNrTags) {
                         tagsString += "children.";
                     } else {
                         tagsString += "children, ";
                     }
                     break;
-                case '4':
+                case '3':
                     if (j + 1 === currNrTags) {
                         tagsString += "elderly.";
                     } else {
                         tagsString += "elderly, ";
                     }
                     break;
-                case '5':
+                case '4':
                     if (j + 1 === currNrTags) {
                         tagsString += "supplies.";
                     } else {
                         tagsString += "supplies, ";
                     }
                     break;
-                case '6':
+                case '5':
                     tagsString += "homeless.";
                     break;
                 default:

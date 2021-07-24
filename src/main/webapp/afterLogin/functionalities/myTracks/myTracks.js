@@ -37,14 +37,13 @@ function stringToIndex(attributes, id) {
 }
 
 function initMap() {
-    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
     directionsService = new google.maps.DirectionsService();
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeControl: true,
         center: {lat: 38.659784, lng: -9.202765},
         zoom: 9
     });
-    new AutocompleteDirectionsHandler(map, true, false);
 }
 
 let originInput;
@@ -57,7 +56,7 @@ function clearDirections() {
     document.getElementById("distanceBox").style.visibility = "hidden";
     document.getElementById("submitButton").style.visibility = "hidden";
     directionsRenderer.setMap(null);
-    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
     directionsRenderer.setMap(map);
     while (waypts.length) {
         waypts.pop();
@@ -76,7 +75,7 @@ let lastDestinationLat;
 let lastDestinationLon;
 
 class AutocompleteDirectionsHandler {
-    constructor(map, firstMarker, changeTransitMode) {
+    constructor(map) {
         this.map = map;
         this.originPlaceId = "";
         directionsRenderer.setMap(map);
@@ -84,67 +83,22 @@ class AutocompleteDirectionsHandler {
         const originAutocomplete = new google.maps.places.Autocomplete(originInput);
         originAutocomplete.setFields(["place_id", 'geometry']);
 
-        firstMarker ? this.setupPlaceChangedListener(originAutocomplete, firstMarker, changeTransitMode) : this.route(firstMarker, changeTransitMode);
+        this.route();
     }
 
-    setupPlaceChangedListener(autocomplete, firstMarker, changeTransitMode) {
-        autocomplete.bindTo("bounds", this.map);
-        autocomplete.addListener("place_changed", () => {
-            place = autocomplete.getPlace();
-
-            if (!place.place_id) {
-                window.alert("Please select an option from the dropdown list.");
-                return;
-            } else {
-                solidarityPoints.push(new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng()));
-            }
-
-            this.originPlaceId = place.place_id;
-            currOriginPlaceId = this.originPlaceId;
-
-
-            this.route(firstMarker, changeTransitMode);
-        });
-    }
-
-    route(firstMarker, changeTransitMode) {
+    route() {
         document.getElementById("eventOrigin").style.visibility = "hidden";
         document.getElementById("clearMapButton").style.visibility = "visible";
 
-        if (firstMarker) {
-            if (!this.originPlaceId && currOriginPlaceId === "") {
-                return;
-            }
-            originAux = {placeId: currOriginPlaceId};
-        }
-
-        if (firstMarker) {
-            trackInfo = {
-                origin: originAux,
-                destination: {
-                    "lat": eventLat,
-                    "lng": eventLon
-                },
-                travelMode: google.maps.TravelMode[currTravelMode]
-            };
-        } else {
-            trackInfo = {
-                origin: originAux,
-                destination: {
-                    "lat": eventLat,
-                    "lng": eventLon
-                },
-                waypoints: waypts,
-                travelMode: google.maps.TravelMode[currTravelMode]
-            };
-            if (!changeTransitMode) {
-                fillWayPoints(new google.maps.LatLng(lastDestinationLat, lastDestinationLon));
-            }
-        }
-
-        if (!changeTransitMode) {
-            solidarityPoints.push(new google.maps.LatLng(eventLat, eventLon));
-        }
+        trackInfo = {
+            origin: originAux,
+            destination: {
+                "lat": eventLat,
+                "lng": eventLon
+            },
+            waypoints: waypts,
+            travelMode: google.maps.TravelMode[currTravelMode]
+        };
 
         lastDestinationLat = eventLat;
         lastDestinationLon = eventLon;
@@ -174,7 +128,7 @@ class AutocompleteDirectionsHandler {
 
 document.getElementById("mode").addEventListener("change", () => {
     currTravelMode = document.getElementById("mode").value;
-    new AutocompleteDirectionsHandler(map, false, true);
+    new AutocompleteDirectionsHandler(map);
 });
 
 function getNrMembers(membersString) {
@@ -219,7 +173,13 @@ function fillWayPoints(givenLocation) {
         location: givenLocation,
         stopover: true
     });
+}
 
+function generateLocation(givenLat, givenLon) {
+    return {
+        "lat": givenLat,
+        "lng": givenLon
+    };
 }
 
 function convertToTags(currTags) {
@@ -233,42 +193,42 @@ function convertToTags(currTags) {
     } else {
         for (let j = 0; j < currNrTags; j++) {
             switch (currTags[j]) {
-                case '1':
+                case '0':
                     if (j + 1 === currNrTags) {
                         tagsString += "animals.";
                     } else {
                         tagsString += "animals, ";
                     }
                     break;
-                case '2':
+                case '1':
                     if (j + 1 === currNrTags) {
                         tagsString += "environment.";
                     } else {
                         tagsString += "environment, ";
                     }
                     break;
-                case '3':
+                case '2':
                     if (j + 1 === currNrTags) {
                         tagsString += "children.";
                     } else {
                         tagsString += "children, ";
                     }
                     break;
-                case '4':
+                case '3':
                     if (j + 1 === currNrTags) {
                         tagsString += "elderly.";
                     } else {
                         tagsString += "elderly, ";
                     }
                     break;
-                case '5':
+                case '4':
                     if (j + 1 === currNrTags) {
                         tagsString += "supplies.";
                     } else {
                         tagsString += "supplies, ";
                     }
                     break;
-                case '6':
+                case '5':
                     tagsString += "homeless.";
                     break;
                 default:
@@ -304,9 +264,7 @@ function fillInfoWindow(marker, i) {
         '<p></p>' +
         'Tags: ' + convertToTags(locationAux.tags) +
         '<p></p>' +
-        'Description: ' + locationAux.description +
-        '<p></p>' +
-        `<button onclick="addToTrack(${i}, locationAux.latitude, locationAux.longitude)">Add to track</button>`
+        'Description: ' + locationAux.description
     );
     infowindow.open(map, marker);
 }
@@ -356,26 +314,6 @@ function callSeeEvents() {
     };
     xhttp.open("GET", "/rest/event/listUserEvents", true);
     xhttp.send();
-}
-
-function showOriginInput(i, firstMarker, latitude, longitude) {
-    let elem = document.getElementById("eventOrigin");
-    elem.style.visibility = "visible";
-    elem.value = "";
-
-    eventLat = parseFloat(latitude);
-    eventLon = parseFloat(longitude);
-
-    new AutocompleteDirectionsHandler(map, firstMarker, false);
-}
-
-function addToTrack(i, latitude, longitude) {
-    if (emptyOrigin) {
-        emptyOrigin = false;
-        showOriginInput(i, true, latitude, longitude);
-    } else {
-        showOriginInput(i, false, latitude, longitude);
-    }
 }
 
 
@@ -634,6 +572,12 @@ function fillTracksArray(obj) {
     let solidarityPointsParsed = JSON.parse(obj[stringToIndex(trackAttributes, solidarity_points)].value);
 
     // commentsParsed[0].comment == "nice"
+    // comment: "nice"
+    // likes: 0
+    // rating: "3"
+    // routeName: "sobreda ate costa"
+    // username: "a"
+
 
     let trackInfo = {
         average_rating: obj[stringToIndex(trackAttributes, average_rating)].value,
@@ -661,6 +605,27 @@ function populateMapTrack(jsonResponse) {
 
         fillTracksArray(obj);
     }
+    // if (tracks.length !== 0) {
+    //     let currPoints = [];
+    //     currPoints = tracks[0].solidarity_points;
+    //     originAux = new google.maps.LatLng(parseFloat(currPoints[0].latitude), parseFloat(currPoints[0].longitude));
+    //     for (let i = 1; i < currPoints - 1; i++) {
+    //         fillWayPoints(new google.maps.LatLng(parseFloat(currPoints[i].latitude), parseFloat(currPoints[i].longitude)));
+    //     }
+    //     new AutocompleteDirectionsHandler(map);
+    // }
+    if (tracks.length !== 0) {
+        let currPoints = [];
+        currPoints = tracks[0].solidarity_points;
+        originAux = generateLocation(currPoints[0].latitude, currPoints[0].longitude);
+        let lastPointIndex = currPoints.length - 1;
+        for (let i = 1; i < lastPointIndex; i++) {
+            fillWayPoints(generateLocation(currPoints[i].latitude, currPoints[i].longitude));
+        }
+        eventLat = currPoints[lastPointIndex].latitude;
+        eventLon = currPoints[lastPointIndex].longitude;
+        new AutocompleteDirectionsHandler(map);
+    }
 }
 
 function callSeeTracks() {
@@ -671,6 +636,7 @@ function callSeeTracks() {
                 case 200:
                     let jsonResponse = JSON.parse(xhttp.responseText);
                     populateMapTrack(jsonResponse);
+
                     break;
                 case 400:
                     alert("Initial date needs to be in the future");
