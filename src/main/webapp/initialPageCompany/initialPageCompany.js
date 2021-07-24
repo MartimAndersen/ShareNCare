@@ -27,7 +27,7 @@ function callLoginCompany(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
-                case 200: alert(localStorage.getItem("currUser") + " is now logged in."); window.location.href = "../afterLogin/afterLoginCompanyPage.html"; break;
+                case 200: window.location.href = "../afterLogin/afterLoginCompanyPage.html"; break;
                 case 401: alert("Please fill in all non-optional fields."); break;
                 case 404: alert("User does not exist."); break;
                 case 417: alert("Incorrect password."); break;

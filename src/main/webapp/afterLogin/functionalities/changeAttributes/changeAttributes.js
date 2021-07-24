@@ -193,10 +193,10 @@ function handleChangeAttributes(bytesPic) {
         radioButton = inputs[2].value
     }
    // const inputNode = inputs[0].value
-    url = document.getElementById('image');
-    console.log(url);
+   // url = document.getElementById('image');
+    //console.log(url);
 
-    var bytes = bytesPic;
+    //var bytes = bytesPic;
     /*
       var files = document.getElementById('image').files;
       if (files.length > 0) {
@@ -205,9 +205,9 @@ function handleChangeAttributes(bytesPic) {
 */
 
   //getByteArray();
-  console.log(bytes);
-b = JSON.stringify(bytes);
-console.log(b);
+  //console.log(bytes);
+//b = JSON.stringify(bytes);
+//console.log(b);
    //bytes = base64ToArrayBuffer(fileContent);
    // const byteFile = getAsByteArray(inputNode)
     let data = {
@@ -221,7 +221,7 @@ console.log(b);
         bio: inputs[8].value,
         tags: fillTagsListToSend(inputs),
         events: currUser.events,
-        profilePic: b
+        profilePic: ""
     }
     callChangeAttributes(JSON.stringify(data));
 }
@@ -243,7 +243,7 @@ function handleChangeAttributesPic(){
 
 let changeAttributesForm = document.getElementById("changeAttributesFormId");
 changeAttributesForm.onsubmit = () => {
-    handleChangeAttributesPic();
+    handleChangeAttributes("");
     return false;
 }
 

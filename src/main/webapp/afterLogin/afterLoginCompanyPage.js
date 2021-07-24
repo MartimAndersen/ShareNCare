@@ -29,7 +29,7 @@ function logout() {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
-                case 200: alert(this.responseText); backToInitialPage(); break;
+                case 200: backToInitialPage(); break;
                 default: alert("You need to be logged in to execute this operation."); break;
             }
         }
