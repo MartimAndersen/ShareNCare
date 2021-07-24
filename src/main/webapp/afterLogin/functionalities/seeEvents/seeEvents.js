@@ -159,13 +159,41 @@ function fillInfoWindow(marker, i) {
     infowindow.open(map, marker);
 }
 
+function adjustMarkerPlace(latlng) {
+   ///get array of markers currently in cluster
+   //final position for marker, could be updated if another marker already exists in same position
+   var finalLatLng = new google.maps.LatLng(latlng.latitude,latlng.longitude);
+
+   //check to see if any of the existing markers match the latlng of the new marker
+   if (markers.length !== 0) {
+       for (let i=0; i < markers.length; i++) {
+           var existingMarker = markers[i];
+           var pos = existingMarker.getPosition();
+
+           //check if a marker already exists in the same position as this marker
+           if (finalLatLng.equals(pos)) {
+
+               //update the position of the coincident marker by applying a small multipler to its coordinates
+               var newLat = finalLatLng.lat() + (Math.random() / 10000);
+               var newLng = finalLatLng.lng() + (Math.random() / 10000);
+               console.log(newLat,newLng);
+
+               finalLatLng = new google.maps.LatLng(newLat,newLng);
+
+           }
+       }
+   }
+
+   return finalLatLng;
+}
 function addMarkers() {
 
     var marker, i;
 
     for (i = 0; i < locations.length; i++) {
+    var position = adjustMarkerPlace(locations[i]);
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i].latitude, locations[i].longitude),
+            position: position,
             map: map
         });
 

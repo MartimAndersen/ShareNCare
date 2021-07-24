@@ -339,8 +339,10 @@ public class RakingUserResource {
 		
 		pointsList.sort(Comparator.comparing(PointsData::getLeaderBoard).reversed());
 		
+		List<PointsData> list = new ArrayList<PointsData>();
+		list = pointsList.subList(0, 10);
 		
-	return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+	return Response.ok(g.toJson(list)).cookie(cookie).build();
 	}
 
 	@GET
@@ -387,8 +389,11 @@ public class RakingUserResource {
 		}
 
 		pointsList.sort(Comparator.comparing(PointsData::getEvents).reversed());
+		
+		List<PointsData> list = new ArrayList<PointsData>();
+		list = pointsList.subList(0, 10);
 
-		return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+		return Response.ok(g.toJson(list)).cookie(cookie).build();
 	}
 
 	@GET
@@ -435,8 +440,11 @@ public class RakingUserResource {
 		}
 
 		pointsList.sort(Comparator.comparing(PointsData::getTracks).reversed());
+		
+		List<PointsData> list = new ArrayList<PointsData>();
+		list = pointsList.subList(0, 10);
 
-		return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+		return Response.ok(g.toJson(list)).cookie(cookie).build();
 	}
 
 	@GET
@@ -483,8 +491,10 @@ public class RakingUserResource {
 		}
 
 		pointsList.sort(Comparator.comparing(PointsData::getCommentsRank).reversed());
+		List<PointsData> list = new ArrayList<PointsData>();
+		list = pointsList.subList(0, 10);
 
-		return Response.ok(g.toJson(pointsList)).cookie(cookie).build();
+		return Response.ok(g.toJson(list)).cookie(cookie).build();
 	}
 
 	@GET
