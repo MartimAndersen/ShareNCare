@@ -46,9 +46,9 @@ public class DeleteUsersResource {
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST).entity("User with username: " + username + " doesn't exist").build();
 		
-		if(token.getString("username").equals(username)){
+		if(!token.getString("username").equals(username))
 			return Response.status(Status.CONFLICT).build();
-		}
+	
 		
 		String e = user.getString("events");
 
