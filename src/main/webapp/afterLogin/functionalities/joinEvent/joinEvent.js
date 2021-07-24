@@ -380,7 +380,7 @@ function callGetEvents() {
             //console.log(xhttp.response);
             // console.log(xhttp.responseText);
             jsonResponse = JSON.parse(xhttp.responseText);
-            populateMap(jsonResponse)
+            populateMap(jsonResponse);
         }
     };
     xhttp.open("GET", "/rest/event/getAllEvents", true);

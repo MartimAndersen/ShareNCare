@@ -35,10 +35,6 @@ function goToSeeEvents() {
     window.location.href = "functionalities/seeEvents/seeEvents.html";
 }
 
-function goToSeeTracks() {
-    window.location.href = "functionalities/seeTracks/seeTracks.html";
-}
-
 function goToSeeLeaderboard() {
     window.location.href = "functionalities/leaderboard/leaderboard.html";
 }

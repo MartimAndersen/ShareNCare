@@ -32,7 +32,7 @@ let solidarityPoints = [];
 const attributes = [coordinates, description, durability, ended, ending_date, initial_date, institutionName,
     maxParticipants, members, minParticipants, name, points, rating, tags, time];
 
-function stringToIndex(id) {
+function stringToIndex(attributes, id) {
     return attributes.indexOf(id);
 }
 
@@ -193,21 +193,21 @@ function getNrMembers(membersString) {
 
 function fillLocationsArray(obj) {
     let locationInfo = {
-        name: obj[stringToIndex(name)].value,
-        initial_date: obj[stringToIndex(initial_date)].value,
-        ending_date: obj[stringToIndex(ending_date)].value,
-        time: obj[stringToIndex(time)].value,
-        durability: obj[stringToIndex(durability)].value,
-        minParticipants: obj[stringToIndex(minParticipants)].value,
-        maxParticipants: obj[stringToIndex(maxParticipants)].value,
-        description: obj[stringToIndex(description)].value,
-        tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
-        nrMembers: getNrMembers(obj[stringToIndex(members)].value),
-        latitude: obj[stringToIndex(coordinates)].value.split(" ")[0],
-        longitude: obj[stringToIndex(coordinates)].value.split(" ")[1],
-        ended: obj[stringToIndex(ended)].value,
-        points: obj[stringToIndex(points)].value,
-        rating: obj[stringToIndex(rating)].value
+        name: obj[stringToIndex(attributes, name)].value,
+        initial_date: obj[stringToIndex(attributes, initial_date)].value,
+        ending_date: obj[stringToIndex(attributes, ending_date)].value,
+        time: obj[stringToIndex(attributes, time)].value,
+        durability: obj[stringToIndex(attributes, durability)].value,
+        minParticipants: obj[stringToIndex(attributes, minParticipants)].value,
+        maxParticipants: obj[stringToIndex(attributes, maxParticipants)].value,
+        description: obj[stringToIndex(attributes, description)].value,
+        tags: obj[stringToIndex(attributes, tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
+        nrMembers: getNrMembers(obj[stringToIndex(attributes, members)].value),
+        latitude: obj[stringToIndex(attributes, coordinates)].value.split(" ")[0],
+        longitude: obj[stringToIndex(attributes, coordinates)].value.split(" ")[1],
+        ended: obj[stringToIndex(attributes, ended)].value,
+        points: obj[stringToIndex(attributes, points)].value,
+        rating: obj[stringToIndex(attributes, rating)].value
     }
     locations.push(locationInfo);
 }
@@ -608,13 +608,69 @@ function goBack() {
 
 /* ====================== See Tracks ====================== */
 
+const average_rating = "average_rating";
+const comments = "comments";
+// const description = "description";
+const difficulty = "difficulty";
+const distance = "distance";
+// const markers = "markers";
+const solidarity_points = "solidarity_points";
+// const time = "time";
+const title = "title";
+const trackDangerZones = "trackDangerZones";
+const trackMedia = "trackMedia";
+const trackNotes = "trackNotes";
+const type = "type";
+const username = "username";
+
+let tracks = [];
+
+const trackAttributes = [average_rating, comments, description, difficulty, distance, markers,
+    solidarity_points, time, title, trackDangerZones, trackMedia, trackNotes, type, username];
+
+function fillTracksArray(obj) {
+
+    let commentsParsed = JSON.parse(obj[stringToIndex(trackAttributes, comments)].value);
+    let solidarityPointsParsed = JSON.parse(obj[stringToIndex(trackAttributes, solidarity_points)].value);
+
+    // commentsParsed[0].comment == "nice"
+
+    let trackInfo = {
+        average_rating: obj[stringToIndex(trackAttributes, average_rating)].value,
+        comments: commentsParsed,
+        description: obj[stringToIndex(trackAttributes, description)].value,
+        difficulty: obj[stringToIndex(trackAttributes, difficulty)].value,
+        distance: obj[stringToIndex(trackAttributes, distance)].value,
+        markers: obj[stringToIndex(trackAttributes, markers)].value,
+        solidarity_points: solidarityPointsParsed,
+        time: obj[stringToIndex(trackAttributes, time)].value,
+        title: obj[stringToIndex(trackAttributes, title)].value,
+        trackDangerZones: obj[stringToIndex(trackAttributes, trackDangerZones)].value,
+        trackMedia: obj[stringToIndex(trackAttributes, trackMedia)].value,
+        trackNotes: obj[stringToIndex(trackAttributes, trackNotes)].value,
+        type: obj[stringToIndex(trackAttributes, type)].value,
+        username: obj[stringToIndex(trackAttributes, username)].value
+    }
+    tracks.push(trackInfo);
+}
+
+function populateMapTrack(jsonResponse) {
+    for (let i = 0; i < jsonResponse.length; i++) {
+        let obj = [];
+        obj = JSON.parse(jsonResponse[i]);
+
+        fillTracksArray(obj);
+    }
+}
+
 function callSeeTracks() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200:
-                    let a = JSON.parse(xhttp.responseText);
+                    let jsonResponse = JSON.parse(xhttp.responseText);
+                    populateMapTrack(jsonResponse);
                     break;
                 case 400:
                     alert("Initial date needs to be in the future");
