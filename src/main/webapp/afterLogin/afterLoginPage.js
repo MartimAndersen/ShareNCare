@@ -12,6 +12,11 @@ function goToChangeAttributes() {
     window.location.href = "functionalities/changeAttributes/changeAttributes.html";
 }
 
+function goToDeleteAccount() {
+    localStorage.setItem("isUserPage","true");
+    window.location.href = "functionalities/deleteAccount/deleteAccount.html";
+}
+
 function goToCreateTrack() {
     localStorage.setItem("isUserPage","true");
     window.location.href = "functionalities/createTrack/createTrack.html";
@@ -31,7 +36,7 @@ function goToSeeEvents() {
 }
 
 function goToSeeTracks() {
-    window.location.href = "functionalities/myTracks/myTracks.html";
+    window.location.href = "functionalities/seeTracks/seeTracks.html";
 }
 
 function goToSeeLeaderboard() {
