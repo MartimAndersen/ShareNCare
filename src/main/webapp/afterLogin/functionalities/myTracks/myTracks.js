@@ -412,7 +412,7 @@ function prepareDrawTrack(trackIndex){
     document.getElementById("avgRating").innerHTML = tracks[trackIndex].average_rating + " out of 5";
     // document.getElementById("distance").innerHTML = Math.round(dist) + " km";
     document.getElementById("difficultyOfTheWalk").innerHTML = tracks[trackIndex].difficulty + " out of 10";
-
+    document.getElementById("descriptionOfTrack").innerHTML = tracks[trackIndex].description;
 }
 
 function callSeeTracks() {
