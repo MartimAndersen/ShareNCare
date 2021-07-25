@@ -533,17 +533,18 @@ public class MapResource {
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> userTracks = new ArrayList<String>();
 
-	
-		//	userTracks = Arrays.asList(mapper.readValue(user.getString("my_tracks"), String[].class));
+		try {
+			userTracks = Arrays.asList(mapper.readValue(user.getString("my_tracks"), String[].class));
 			while (eventsQuery.hasNext()) {
 				Entity t = eventsQuery.next();
-				if(t.getString("username").equals(user.getString("username"))) {
-				//if (userTracks.contains(t.getString("title"))) {
+				if (userTracks.contains(t.getString("title"))) {
 					String track = g.toJson(t.getProperties().values());
 					tracks.add(track);
 				}
 			}
-	
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
 
@@ -765,7 +766,6 @@ public class MapResource {
 		return Response.ok(g.toJson(res)).cookie(cookie).build();
 	}
 	
-
 	@POST
 	@Path("/addTrackToUser")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -826,10 +826,9 @@ public class MapResource {
 		datastore.update(user);
 		
 		return Response.ok(g.toJson(tracks)).build();
-		
-		
 	}
-
+		
+		
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData
