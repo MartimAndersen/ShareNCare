@@ -14,9 +14,8 @@
     <img src="../../../afterLogin/images/logo" height="5%" width="5%">
 </ul>
 
-
 <div id="floating-panel">
-    <b>Mode of Travel: </b>
+    <b>Travel mode: </b>
     <select id="mode">
         <option value="WALKING">Walking</option>
         <option value="DRIVING">Driving</option>
@@ -24,16 +23,6 @@
         <!--        <option value="TRANSIT">Transit</option>-->
     </select>
 </div>
-
-<input id="distanceBox" type="text" readonly/>
-
-&nbsp;&nbsp;
-
-<button id="clearMapButton" onclick="clearDirections()">Clear route</button>
-
-&nbsp;&nbsp;
-
-<input id="eventOrigin" class="controls" type="text" placeholder="Enter an origin location"/>
 
 <br>
 <br>
@@ -44,69 +33,30 @@
 
     <h2>Track Information</h2>
 
-    <form id="TrackFormId" action="#" method="post">
+    <br>
+    <br>
 
-        <p>
-            <label for="title" class="floatLabel"></label>
-            <input id="title" name="createTrack" type="text" placeholder="Track Title">
-        </p>
-        <p>
-            <label for="description" class="floatLabel"></label>
-            <textarea id="description" name="createTrack" type="text"
-                      placeholder="Track Description (optional)"></textarea>
-        </p>
-
-        <div class="slider">
-            Difficulty of the walk: <input type="range" min="0" max="10" value="5" class="slider" step="1"
-                                           id="sliderInput"
-                                           oninput="this.nextElementSibling.value = this.value">
-            <output id="sliderOutput">5</output>
-        </div>
-
-        <p>
-            <input id="submitButton" type="submit" value="Submit Track" id="submitTrackDescription">
-        </p>
-
-    </form>
-
-</div>
-
-
-<h2>Add Review</h2>
-<!--<button id="review-add-btn" aria-label="add review" title="Add Review"></button>-->
-<div id="modal" role="dialog" aria-modal="true" aria-labelledby="add-review-header" class="">
-    <button class="close-btn" id="closeReviewButton" aria-label="close" title="Close">x</button>
-    <div id="review-form-container">
-        <h2 id="add-review-header">Add Review</h2>
-        <form id="review-form">
-
-            <div class="fieldset">
-                <label for="reviewComments">Comments</label>
-                <textarea name="reviewComments" id="reviewComments" cols="20" rows="5" required=""></textarea>
-            </div>
-
-            <div class="fieldset">
-                <label>Rating</label>
-                <div class="rate">
-                    <input type="radio" id="star5" name="rate" value="5" />
-                    <label for="star5" title="text">5 stars</label>
-                    <input type="radio" id="star4" name="rate" value="4" />
-                    <label for="star4" title="text">4 stars</label>
-                    <input type="radio" id="star3" name="rate" value="3" />
-                    <label for="star3" title="text">3 stars</label>
-                    <input type="radio" id="star2" name="rate" value="2" />
-                    <label for="star2" title="text">2 stars</label>
-                    <input type="radio" id="star1" name="rate" value="1" />
-                    <label for="star1" title="text">1 star</label>
-                </div>
-                &nbsp;&nbsp;
-                <button id="submit-review-btn">Save</button>
-            </div>
-
-        </form>
+    <div id="floating-panel2">
+        <b>Track name: </b>
+        <select id="selectTrack">
+<!--            <option value="WALKING">Walking</option>-->
+<!--            <option value="DRIVING">Driving</option>-->
+            <!--        <option value="BICYCLING">Bicycling</option>-->
+            <!--        <option value="TRANSIT">Transit</option>-->
+        </select>
     </div>
+
+    <br>
+
+    <div>
+        <b>Average rating: </b>&nbsp;<span id="avgRating"></span>
+        <br>
+<!--        <b>Distance: </b>&nbsp;<span id="distance"></span>-->
+        <br>
+        <b>Difficulty of the walk: </b>&nbsp;<span id="difficultyOfTheWalk"></span>
+    </div>
+
 </div>
-<div class="modal-overlay"></div>
 
 <script src="myTracks.js"></script>
 

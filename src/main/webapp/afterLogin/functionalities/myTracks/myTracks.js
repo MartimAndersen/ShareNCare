@@ -2,7 +2,6 @@ let map;
 let eventLat;
 let eventLon;
 let currTravelMode = "WALKING";
-let currOriginPlaceId = "";
 let place = "";
 let directionsRenderer;
 let directionsService;
@@ -46,50 +45,29 @@ function initMap() {
     });
 }
 
-let originInput;
+var dist = 0;
 
-let dist = 0;
+const waypts = [];
 
-function clearDirections() {
-    emptyOrigin = true;
-    document.getElementById("clearMapButton").style.visibility = "hidden";
-    document.getElementById("distanceBox").style.visibility = "hidden";
-    document.getElementById("submitButton").style.visibility = "hidden";
-    directionsRenderer.setMap(null);
-    directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
-    directionsRenderer.setMap(map);
+function popWayPoints() {
     while (waypts.length) {
         waypts.pop();
     }
-    while (solidarityPoints.length) {
-        solidarityPoints.pop();
-    }
-
 }
-
-const waypts = [];
 
 let originAux;
 let trackInfo;
 let lastDestinationLat;
 let lastDestinationLon;
 
-class AutocompleteDirectionsHandler {
+class DrawTrack {
     constructor(map) {
         this.map = map;
-        this.originPlaceId = "";
         directionsRenderer.setMap(map);
-        originInput = document.getElementById("eventOrigin");
-        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
-        originAutocomplete.setFields(["place_id", 'geometry']);
-
         this.route();
     }
 
     route() {
-        document.getElementById("eventOrigin").style.visibility = "hidden";
-        document.getElementById("clearMapButton").style.visibility = "visible";
-
         trackInfo = {
             origin: originAux,
             destination: {
@@ -113,22 +91,23 @@ class AutocompleteDirectionsHandler {
                     for (let i = 0; i < response.routes[0].legs.length; i++) {
                         dist += response.routes[0].legs[i].distance.value / 1000;
                     }
-                    document.getElementById("distanceBox").value = "Distance: " + Math.round(dist) + " km";
-                    document.getElementById("distanceBox").style.visibility = "visible";
-                    dist = 0;
                 } else {
                     window.alert("Directions request failed due to " + status);
                 }
             }
         );
-        document.getElementById("submitButton").style.visibility = "visible";
         document.getElementById("floating-panel").style.visibility = "visible";
     }
 }
 
 document.getElementById("mode").addEventListener("change", () => {
     currTravelMode = document.getElementById("mode").value;
-    new AutocompleteDirectionsHandler(map);
+    new DrawTrack(map);
+});
+
+document.getElementById("selectTrack").addEventListener("change", () => {
+    dist = 0;
+    prepareDrawTrack(document.getElementById("selectTrack").value);
 });
 
 function getNrMembers(membersString) {
@@ -425,116 +404,6 @@ function getStarsRating() {
     return res;
 }
 
-let submitTrackForm = document.getElementById("TrackFormId");
-submitTrackForm.onsubmit = () => {
-    handleSubmitTrack();
-    return false;
-}
-
-/* ====================== Review Form ====================== */
-
-let focusedElementBeforeModal;
-const modal = document.getElementById('modal');
-const modalOverlay = document.querySelector('.modal-overlay');
-
-// function callAddReview() {
-//     const addReview = document.getElementById('submitButton');
-//     addReview.id = 'submitButton';
-//     addReview.innerHTML = '+';
-//     addReview.setAttribute('aria-label', 'add review');
-//     addReview.title = 'Add Review';
-//     addReview.addEventListener('click', openModal);
-//     addReview.click();
-// }
-
-function openModal() {
-    // Save current focus
-    focusedElementBeforeModal = document.activeElement;
-
-    // Listen for and trap the keyboard
-    modal.addEventListener('keydown', trapTabKey);
-
-    // Listen for indicators to close the modal
-    modalOverlay.addEventListener('click', closeModal);
-    // Close btn
-    const closeBtn = document.querySelector('.close-btn');
-    closeBtn.addEventListener('click', closeModal);
-
-    // submit form
-    const form = document.getElementById('review-form');
-    form.addEventListener('submit', submitAddReview, false);
-
-    // Find all focusable children
-    let focusableElementsString = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], [contenteditable]';
-    let focusableElements = modal.querySelectorAll(focusableElementsString);
-    // Convert NodeList to Array
-    focusableElements = Array.prototype.slice.call(focusableElements);
-
-    let firstTabStop = focusableElements[0];
-    let lastTabStop = focusableElements[focusableElements.length - 1];
-
-    // Show the modal and overlay
-    modal.classList.add('show');
-    modalOverlay.classList.add('show');
-
-    function trapTabKey(e) {
-        // Check for TAB key press
-        if (e.keyCode === 9) {
-            // SHIFT + TAB
-            if (e.shiftKey) {
-                if (document.activeElement === firstTabStop) {
-                    e.preventDefault();
-                    lastTabStop.focus();
-                }
-                // TAB
-            } else {
-                if (document.activeElement === lastTabStop) {
-                    e.preventDefault();
-                    firstTabStop.focus();
-                }
-            }
-        }
-        // ESCAPE
-        if (e.keyCode === 27) {
-            closeModal();
-        }
-    }
-};
-
-const submitAddReview = (e) => {
-    let comment = document.getElementById("reviewComments").value;
-    let starsRating = getStarsRating();
-    handleSubmitComment(comment, starsRating);
-    e.preventDefault();
-    closeModal();
-};
-
-const closeModal = () => {
-    // Hide the modal and overlay
-    modal.classList.remove('show');
-    modalOverlay.classList.remove('show');
-
-    const form = document.getElementById('review-form');
-    form.reset();
-    // Set focus back to element that had it before the modal was opened
-    focusedElementBeforeModal.focus();
-};
-
-/* ====================== Review Form End ====================== */
-
-
-function handleSubmitComment(comment, starsRating) {
-
-    let data = {
-        comment: comment,
-        rating: starsRating,
-        routeName: trackTitle,
-        username: localStorage.getItem("currUser"),
-        likes: 0
-    }
-    callRegisterComment(JSON.stringify(data));
-}
-
 function goToAboutUs() {
     localStorage.setItem("isUserPage", "true");
     window.location.href = "../../functionalities/aboutUs/aboutUs.html";
@@ -612,20 +481,40 @@ function populateMapTrack(jsonResponse) {
     //     for (let i = 1; i < currPoints - 1; i++) {
     //         fillWayPoints(new google.maps.LatLng(parseFloat(currPoints[i].latitude), parseFloat(currPoints[i].longitude)));
     //     }
-    //     new AutocompleteDirectionsHandler(map);
+    //     new DrawTrack(map);
     // }
     if (tracks.length !== 0) {
-        let currPoints = [];
-        currPoints = tracks[0].solidarity_points;
-        originAux = generateLocation(currPoints[0].latitude, currPoints[0].longitude);
-        let lastPointIndex = currPoints.length - 1;
-        for (let i = 1; i < lastPointIndex; i++) {
-            fillWayPoints(generateLocation(currPoints[i].latitude, currPoints[i].longitude));
-        }
-        eventLat = currPoints[lastPointIndex].latitude;
-        eventLon = currPoints[lastPointIndex].longitude;
-        new AutocompleteDirectionsHandler(map);
+        fillSelectTrackPanel();
+        prepareDrawTrack(0);
     }
+}
+
+function fillSelectTrackPanel() {
+    let max = tracks.length;
+    for (let i = 0; i < max; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.innerHTML = tracks[i].title;
+        document.getElementById("selectTrack").appendChild(opt);
+    }
+}
+
+function prepareDrawTrack(trackIndex){
+    let currPoints = [];
+    currPoints = tracks[trackIndex].solidarity_points;
+    originAux = generateLocation(currPoints[0].latitude, currPoints[0].longitude);
+    let lastPointIndex = currPoints.length - 1;
+    popWayPoints();
+    for (let i = 1; i < lastPointIndex; i++) {
+        fillWayPoints(generateLocation(currPoints[i].latitude, currPoints[i].longitude));
+    }
+    eventLat = currPoints[lastPointIndex].latitude;
+    eventLon = currPoints[lastPointIndex].longitude;
+    new DrawTrack(map);
+    document.getElementById("avgRating").innerHTML = tracks[trackIndex].average_rating + " out of 5";
+    // document.getElementById("distance").innerHTML = Math.round(dist) + " km";
+    document.getElementById("difficultyOfTheWalk").innerHTML = tracks[trackIndex].difficulty + " out of 10";
+
 }
 
 function callSeeTracks() {
