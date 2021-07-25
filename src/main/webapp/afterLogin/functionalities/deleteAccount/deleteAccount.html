@@ -18,18 +18,12 @@
 
 <div class="center">
 
-    <form id="deleteAccountFormId" action="#" method="post">
-        <h1>Delete Your Account</h1>
-        <p>
-            <label for="userToBeDeleted" class="floatLabel">Please insert your username</label><br>
-            <input id="userToBeDeleted" name="deleteAccountInput" type="text" placeholder="User to be deleted">
-        </p>
-        <p>
-            <input type="submit" value="Delete Account" id="submitDeleteAccount">
-        </p>
-    </form>
-
-
+    <p>
+        Do you really wish to delete your account?
+    </p>
+    <p>
+        <input type="submit" value="Delete Account" onclick="callDeleteAccount()">
+    </p>
 
 </div>
 

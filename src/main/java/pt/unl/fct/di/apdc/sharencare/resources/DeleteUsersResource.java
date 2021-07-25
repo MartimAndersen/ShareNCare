@@ -118,7 +118,7 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/userWeb")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUserWeb(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+	public Response deleteUserWeb(@CookieParam("Token") NewCookie cookie) {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -127,15 +127,8 @@ public class DeleteUsersResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.name);
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
-
-		if (user == null)
-			return Response.status(Status.BAD_REQUEST).entity("User with username: " + data.name + " doesn't exist").build();
-
-		if(!token.getString("username").equals(data.name))
-			return Response.status(Status.CONFLICT).build();
-
 
 		String e = user.getString("events");
 
@@ -150,7 +143,7 @@ public class DeleteUsersResource {
 			String m = event.getString("members");
 			List<String> members = g.fromJson(m, stringList);
 
-			members.remove(data.name);
+			members.remove(token.getString("username"));
 
 			event = Entity.newBuilder(eventKey).set("name", event.getString("name"))
 					.set("description", event.getString("description"))
@@ -175,7 +168,7 @@ public class DeleteUsersResource {
 	@POST
 	@Path("/institutionWeb")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteInstitutionWeb(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
+	public Response deleteInstitutionWeb(@CookieParam("Token") NewCookie cookie) {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
@@ -184,16 +177,8 @@ public class DeleteUsersResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		if(!token.getString("username").equals(data.name)){
-			return Response.status(Status.CONFLICT).build();
-		}
-
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.name);
-		Entity user = datastore.get(userKey);
-
-		if (user == null)
-			return Response.status(Status.BAD_REQUEST).entity("Institution with nif: " + data.name + " doesn't exist").build();
-
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		
 		datastore.delete(userKey);
 
 		return Response.ok("Institution deleted.").build();

@@ -1,4 +1,4 @@
-function callDeleteAccount(data) {
+function callDeleteAccount() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
@@ -13,22 +13,7 @@ function callDeleteAccount(data) {
         }
     };
     xhttp.open("POST", "/rest/delete/userWeb", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(data);
-}
-
-function handleDeleteAccount() {
-    let inputs = document.getElementsByName("deleteAccountInput")
-    let data = {
-        name: inputs[0].value
-    }
-    callDeleteAccount(JSON.stringify(data));
-}
-
-let deleteAccountForm = document.getElementById("deleteAccountFormId");
-deleteAccountForm.onsubmit = () => {
-    handleDeleteAccount();
-    return false;
+    xhttp.send();
 }
 
 function goToPageBefore() {
