@@ -191,8 +191,8 @@ function fillLocationsArray(obj) {
         description: obj[stringToIndex(description)].value,
         tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
         nrMembers: getNrMembers(obj[stringToIndex(members)].value),
-        latitude:  obj[stringToIndex(coordinates)].value.split(" ")[0],
-        longitude:  obj[stringToIndex(coordinates)].value.split(" ")[1],
+        latitude: obj[stringToIndex(coordinates)].value.split(" ")[0],
+        longitude: obj[stringToIndex(coordinates)].value.split(" ")[1],
         ended: obj[stringToIndex(ended)].value,
         points: obj[stringToIndex(points)].value,
         rating: obj[stringToIndex(rating)].value
@@ -306,37 +306,38 @@ function fillInfoWindow(marker, i) {
 }
 
 function adjustMarkerPlace(latlng) {
-   ///get array of markers currently in cluster
-   //final position for marker, could be updated if another marker already exists in same position
-   var finalLatLng = new google.maps.LatLng(latlng.latitude,latlng.longitude);
+    ///get array of markers currently in cluster
+    //final position for marker, could be updated if another marker already exists in same position
+    var finalLatLng = new google.maps.LatLng(latlng.latitude, latlng.longitude);
 
-   //check to see if any of the existing markers match the latlng of the new marker
-   if (markers.length !== 0) {
-       for (let i=0; i < markers.length; i++) {
-           var existingMarker = markers[i];
-           var pos = existingMarker.getPosition();
+    //check to see if any of the existing markers match the latlng of the new marker
+    if (markers.length !== 0) {
+        for (let i = 0; i < markers.length; i++) {
+            var existingMarker = markers[i];
+            var pos = existingMarker.getPosition();
 
-           //check if a marker already exists in the same position as this marker
-           if (finalLatLng.equals(pos)) {
+            //check if a marker already exists in the same position as this marker
+            if (finalLatLng.equals(pos)) {
 
-               //update the position of the coincident marker by applying a small multipler to its coordinates
-               var newLat = finalLatLng.lat() + (Math.random() / 10000);
-               var newLng = finalLatLng.lng() + (Math.random() / 10000);
-               console.log(newLat,newLng);
+                //update the position of the coincident marker by applying a small multipler to its coordinates
+                var newLat = finalLatLng.lat() + (Math.random() / 10000);
+                var newLng = finalLatLng.lng() + (Math.random() / 10000);
+                console.log(newLat, newLng);
 
-               finalLatLng = new google.maps.LatLng(newLat,newLng);
+                finalLatLng = new google.maps.LatLng(newLat, newLng);
 
-           }
-       }
-   }
+            }
+        }
+    }
 
-   return finalLatLng;
+    return finalLatLng;
 }
+
 function addMarkers() {
     console.log("aqui")
     var marker, i;
     for (i = 0; i < locations.length; i++) {
-      var position = adjustMarkerPlace(locations[i]);
+        var position = adjustMarkerPlace(locations[i]);
         marker = new google.maps.Marker({
             position: position,
             map: map
@@ -433,26 +434,29 @@ function handleJoinEvent(eventName) {
     callJoinEvents(JSON.stringify(data));
 }
 
-function openFormFilter(){
+function openFormFilter() {
 
-  document.getElementById("filterForm").style.display = "block";
-  document.getElementById("filterButton").style.visibility="hidden"
+    document.getElementById("filterForm").style.display = "block";
+    document.getElementById("filterButton").style.visibility = "hidden"
 }
+
 function closeFormFilter() {
-  document.getElementById("filterForm").style.display = "none";
-    document.getElementById("filterButton").style.visibility="visible"
+    document.getElementById("filterForm").style.display = "none";
+    document.getElementById("filterButton").style.visibility = "visible"
 }
+
 function setMapOnAll(map) {
-  for (let i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-  }
+    for (let i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
 }
+
 // Deletes all markers in the array by removing references to them.
 function deleteMarkers() {
-   setMapOnAll(null);
-    markers.length=0;
+    setMapOnAll(null);
+    markers.length = 0;
     locations.length = 0;
-   console.log(markers);
+    console.log(markers);
 }
 
 function callFilter(data) {
@@ -497,8 +501,7 @@ function fillTagsList(inputs) {
 }
 
 
-
-function handleFilter(){
+function handleFilter() {
     let inputs = document.getElementsByName("filterInput")
 
 
@@ -520,17 +523,36 @@ filterForm.onsubmit = () => {
 
     return false;
 }
-function  visibleSubmitButton(){
-  document.getElementById("SubmitButton").style.visibility = "visible";
-}
 
 function uncheck() {
     let currTagId = "";
-        for (let counter = 0; counter <= 5; counter++) {
-            currTagId = "tag" + counter;
-            document.getElementById(currTagId).checked = false;
-
-            }
+    for (let counter = 0; counter <= 5; counter++) {
+        currTagId = "tag" + counter;
+        document.getElementById(currTagId).checked = false;
+    }
 }
-<div class="checkbox-group required">
+
+function atLeastOneTagSelected() {
+    let currTagId = "";
+    for (let counter = 0; counter <= 5; counter++) {
+        currTagId = "tag" + counter;
+        if (document.getElementById(currTagId).checked) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const checkbox = document.querySelectorAll("input[type=checkbox]")
+checkbox.forEach(function(element){
+    element.addEventListener('click', function () {
+        if (atLeastOneTagSelected()) {
+            document.getElementById("SubmitButton").style.visibility = "visible";
+        } else {
+            document.getElementById("SubmitButton").style.visibility = "hidden";
+        }
+    });
+});
+
+
 
