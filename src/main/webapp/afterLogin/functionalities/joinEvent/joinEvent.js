@@ -333,7 +333,7 @@ function adjustMarkerPlace(latlng) {
    return finalLatLng;
 }
 function addMarkers() {
-
+    console.log("aqui")
     var marker, i;
     for (i = 0; i < locations.length; i++) {
       var position = adjustMarkerPlace(locations[i]);
@@ -357,6 +357,7 @@ function goToPageBefore() {
 }
 
 function populateMap(jsonResponse) {
+    console.log("here")
     for (let i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         obj = JSON.parse(jsonResponse[i]);
@@ -443,13 +444,15 @@ function closeFormFilter() {
 }
 function setMapOnAll(map) {
   for (let i = 0; i < markers.length; i++) {
-    markers[i].setMap(map);
+    markers[i].setMap(null);
   }
 }
 // Deletes all markers in the array by removing references to them.
 function deleteMarkers() {
    setMapOnAll(null);
-   markers=[];
+    markers.length=0;
+    locations.length = 0;
+   console.log(markers);
 }
 
 function callFilter(data) {
@@ -478,12 +481,14 @@ function callFilter(data) {
     xhttp.send(data);
 }
 
+
 function fillTagsList(inputs) {
     let tagsList = [];
     let currTagId = "";
     for (let counter = 0; counter <= 5; counter++) {
         currTagId = "tag" + counter;
         if (document.getElementById(currTagId).checked) {
+
             // tagsList.push(inputs[t].value);
             tagsList.push(counter);
         }
@@ -491,30 +496,13 @@ function fillTagsList(inputs) {
     return "[" + tagsList.toString() + "]";
 }
 
-function ChangeFormateDate(oldDate)
-{
-   return oldDate.toString().split("-").reverse().join("/");
-}
+
 
 function handleFilter(){
     let inputs = document.getElementsByName("filterInput")
-    date = ChangeFormateDate(inputs[0].value);
-
-    let radioButtonResult = ""
-        if (document.getElementById('popular').checked) {
-            radioButtonResult = inputs[3].value
-        }
-        if (document.getElementById('popular1').checked) {
-            radioButtonResult = inputs[4].value
-        }
 
 
     let data1 = {
-        coordinates: "",
-        date: date,
-        institution: inputs[1].value,
-        name: inputs[2].value,
-        popularity: radioButtonResult,
         tags: fillTagsList(inputs)
     }
     callFilter(JSON.stringify(data1));
@@ -523,8 +511,26 @@ function handleFilter(){
 
 let filterForm = document.getElementById("filterForm");
 filterForm.onsubmit = () => {
+
     handleFilter();
     closeFormFilter();
+
+    document.getElementById("SubmitButton").style.visibility = "hidden";
+    uncheck()
+
     return false;
 }
+function  visibleSubmitButton(){
+  document.getElementById("SubmitButton").style.visibility = "visible";
+}
+
+function uncheck() {
+    let currTagId = "";
+        for (let counter = 0; counter <= 5; counter++) {
+            currTagId = "tag" + counter;
+            document.getElementById(currTagId).checked = false;
+
+            }
+}
+<div class="checkbox-group required">
 

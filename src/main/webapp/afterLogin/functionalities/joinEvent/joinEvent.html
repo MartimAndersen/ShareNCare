@@ -51,56 +51,32 @@
 <br>
 <br>
 <div class="form-popup" id="filterForm">
-    <form action="/action_page.php" class="form-container">
+    <form action="/action_page.php" class="form-container" onsubmit="return false">
         <h1>Filter Events</h1>
-        <p>
-            <label for="date" class="floatLabel">Date</label>
-            <input id="date" name="filterInput" type="date" placeholder="date">
-        </p>
 
-        <p>
-            <label for="institution" class="floatLabel">Institution: </label>
-            <br>
-            <input id="institution" name="filterInput" type="text" placeholder="institution">
-        </p>
-
-        <p>
-            <label for="name" class="floatLabel">Event name: </label>
-            <br>
-            <input id="name" name="filterInput" type="text" placeholder="name">
-        </p>
-
-        <p>&nbsp;
-            Order by:
-            &nbsp;
-            <input type="radio" id="popular" name="filterInput" value="Most Popular">
-            <label for="popular">Most Popular</label>
-            &nbsp;&nbsp;
-            <input type="radio" id="popular1" name="filterInput" value="Least Popular">
-            <label for="popular">Least Popular</label><br>
-
-
-        </p>
         <p>
             Tags (select at least one):
         <p>&nbsp;
-            <input type="checkbox" id="tag0" name="filterInput" value="animals"> Animals
+        <div class="checkbox-group required">
+            <input type="checkbox" id="tag0" name="filterInput" value="animals" onclick = "visibleSubmitButton()"> Animals
             &nbsp;&nbsp;
-            <input type="checkbox" id="tag1" name="filterInput" value="environment"> Environment
+            <input type="checkbox" id="tag1" name="filterInput" value="environment" onclick = "visibleSubmitButton()"> Environment
             &nbsp;&nbsp;
-            <input type="checkbox" id="tag2" name="filterInput" value="children"> Children
+            <input type="checkbox" id="tag2" name="filterInput" value="children" onclick = "visibleSubmitButton()"> Children
 
             <br>
             &nbsp;&nbsp;
-            <input type="checkbox" id="tag3" name="filterInput" value="elderly"> Elderly
+            <input type="checkbox" id="tag3" name="filterInput" value="elderly" onclick = "visibleSubmitButton()"> Elderly
             &nbsp;&nbsp;
-            <input type="checkbox" id="tag4" name="filterInput" value="supplies"> Supplies
+            <input type="checkbox" id="tag4" name="filterInput" value="supplies" onclick = "visibleSubmitButton()"> Supplies
             &nbsp;&nbsp;
-            <input type="checkbox" id="tag5" name="filterInput" value="homeless"> Homeless
+            <input type="checkbox" id="tag5" name="filterInput" value="homeless" onclick = "visibleSubmitButton()"> Homeless
         </p>
+    </div>
 
 
-        <button type="submit" class="btn">Submit</button>
+        <button type="submit" class="btn" id="SubmitButton">Submit</button>
+        <button type="button" class="btn" onclick="callGetEvents()">See all events</button>
         <button type="button" class="btn cancel" onclick="closeFormFilter()">Close</button>
     </form>
 </div>

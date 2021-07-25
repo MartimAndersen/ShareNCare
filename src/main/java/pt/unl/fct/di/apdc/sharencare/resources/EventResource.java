@@ -48,6 +48,7 @@ import pt.unl.fct.di.apdc.sharencare.util.AbandonEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EditEventData;
 import pt.unl.fct.di.apdc.sharencare.util.EventData;
 import pt.unl.fct.di.apdc.sharencare.util.FilterData;
+import pt.unl.fct.di.apdc.sharencare.util.FilterDataWeb;
 import pt.unl.fct.di.apdc.sharencare.util.FinishEvent;
 import pt.unl.fct.di.apdc.sharencare.util.GetEventsByLocationData;
 
@@ -1005,7 +1006,7 @@ public class EventResource {
 	@Path("/filterEventsWeb")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response filterEventsWeb(@CookieParam("Token") NewCookie cookie, FilterData data) {
+	public Response filterEventsWeb(@CookieParam("Token") NewCookie cookie, FilterDataWeb data) {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
@@ -1027,30 +1028,11 @@ public class EventResource {
 			return Response.status(Status.FORBIDDEN)
 					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 
-		List<PropertyFilter> filters = data.getFilter();
-		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
+		
 
 		Builder query = Query.newEntityQueryBuilder().setKind("Event");
 
-		if (!filters.isEmpty()) {
-
-			PropertyFilter first = filters.get(0);
-
-			if (filters.size() == 1)
-				query.setFilter(first);
-
-			else {
-				for (int i = 1; i < filters.size(); i++)
-					subFilter[i] = filters.get(i);
-
-				query.setFilter(CompositeFilter.and(first, subFilter));
-			}
-		}
-		if (data.popularity.equals("Most Popular"))
-			query = query.setOrderBy(OrderBy.desc("points"));
-		if (data.popularity.equals("Least Popular"))
-			query = query.setOrderBy(OrderBy.asc("points"));
-
+		
 		Query<Entity> q = query.build();
 
 		QueryResults<Entity> eventsQuery = datastore.run(q);
@@ -1059,7 +1041,7 @@ public class EventResource {
 		while (eventsQuery.hasNext()) {
 			Entity e = eventsQuery.next();
 			String event = g.toJson(e.getProperties().values());
-			if (!hasEnded(e.getString("ending_date"))) {
+			if (data.containsTag(e.getString("tags"))) {
 				events.add(event);
 			}
 		}
