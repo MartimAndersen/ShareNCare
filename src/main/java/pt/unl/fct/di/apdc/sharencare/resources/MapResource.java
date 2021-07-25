@@ -533,18 +533,17 @@ public class MapResource {
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> userTracks = new ArrayList<String>();
 
-		try {
-			userTracks = Arrays.asList(mapper.readValue(user.getString("my_tracks"), String[].class));
+	
+		//	userTracks = Arrays.asList(mapper.readValue(user.getString("my_tracks"), String[].class));
 			while (eventsQuery.hasNext()) {
 				Entity t = eventsQuery.next();
-				if (userTracks.contains(t.getString("title"))) {
+				if(t.getString("username").equals(user.getString("username"))) {
+				//if (userTracks.contains(t.getString("title"))) {
 					String track = g.toJson(t.getProperties().values());
 					tracks.add(track);
 				}
 			}
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+	
 
 		return Response.ok(g.toJson(tracks)).cookie(cookie).build();
 
@@ -765,6 +764,72 @@ public class MapResource {
 */
 		return Response.ok(g.toJson(res)).cookie(cookie).build();
 	}
+	
+
+	@POST
+	@Path("/addTrackToUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addTrackToUser(@CookieParam("Token") NewCookie cookie, @QueryParam("trackId") String trackId) {
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(trackId);
+		Entity track = datastore.get(trackKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		if (track == null)
+			return Response.status(Status.BAD_REQUEST).entity("Track with id: " + trackId + " doesn't exist").build();
+		
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null) {
+			System.out.println("The user with the given token does not exist.");
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+		}
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
+		
+		
+		Type t = new TypeToken<List<String>>() {
+		}.getType();
+		
+		List<String> tracks = g.fromJson(user.getString("my_tracks"), t);
+		
+		tracks.add(trackId);
+		
+
+		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+				.set("password", user.getString("password")).set("email", user.getString("email"))
+				.set("bio", user.getString("bio")).set("profileType", user.getString("profileType"))
+				.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+				.set("address", user.getString("address")).set("secondAddress", user.getString("secondAddress"))
+				.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+				.set("state", user.getString("state")).set("tags", user.getString("tags"))
+				.set("events", user.getString("events")).set("points", user.getString("points"))
+				.set("my_tracks", g.toJson(tracks)).build();
+
+		
+		datastore.update(user);
+		
+		return Response.ok().build();
+		
+		
+	}
+
 
 	/*
 	 * //checks if all data is valid private boolean validateData(RegisterTrackData
