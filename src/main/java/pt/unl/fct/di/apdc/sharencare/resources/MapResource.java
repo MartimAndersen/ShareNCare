@@ -825,7 +825,7 @@ public class MapResource {
 		
 		datastore.update(user);
 		
-		return Response.ok().build();
+		return Response.ok(g.toJson(tracks)).build();
 		
 		
 	}
