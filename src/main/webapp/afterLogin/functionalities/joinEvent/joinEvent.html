@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="joinEventStyle.css"/>
 </head>
 
-<body >
+<body onload="callGetEvents()">
 
 <ul>
     <li><a class="active" href="../aboutUs/aboutUs.html" style="cursor: pointer">About Us</a></li>
@@ -20,10 +20,14 @@
     <select id="mode">
         <option value="WALKING">Walking</option>
         <option value="DRIVING">Driving</option>
-<!--        <option value="BICYCLING">Bicycling</option>-->
+        <!--        <option value="BICYCLING">Bicycling</option>-->
         <option value="TRANSIT">Transit</option>
     </select>
 </div>
+
+&nbsp;&nbsp;
+
+<button type="button" class="button2" id="filterButton" onclick="openFormFilter()">Filter Preferences</button>
 
 <input id="distanceBox" type="text" readonly/>
 
@@ -39,7 +43,7 @@
 <br>
 
 <!--<div><button type="button" class="button2" onclick="callGetEvents()">See all events</button></div>-->
-<div><button type="button" class="button2" onclick="openFormFilter()">Filter Preferences</button></div>
+
 
 <div id="map" style="border-radius: 20px"></div>
 
@@ -48,19 +52,21 @@
 <br>
 <div class="form-popup" id="filterForm">
     <form action="/action_page.php" class="form-container">
-        <h1>Remove User from Event</h1>
+        <h1>Filter Events</h1>
         <p>
             <label for="date" class="floatLabel">Date</label>
             <input id="date" name="filterInput" type="date" placeholder="date">
         </p>
 
         <p>
-            <label for="institution" class="floatLabel">Institution</label>
+            <label for="institution" class="floatLabel">Institution: </label>
+            <br>
             <input id="institution" name="filterInput" type="text" placeholder="institution">
         </p>
 
         <p>
-            <label for="name" class="floatLabel">Event name</label>
+            <label for="name" class="floatLabel">Event name: </label>
+            <br>
             <input id="name" name="filterInput" type="text" placeholder="name">
         </p>
 
@@ -83,6 +89,8 @@
             <input type="checkbox" id="tag1" name="filterInput" value="environment"> Environment
             &nbsp;&nbsp;
             <input type="checkbox" id="tag2" name="filterInput" value="children"> Children
+
+            <br>
             &nbsp;&nbsp;
             <input type="checkbox" id="tag3" name="filterInput" value="elderly"> Elderly
             &nbsp;&nbsp;

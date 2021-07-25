@@ -1,8 +1,3 @@
-document.getElementById("eventOrigin").style.visibility = "hidden";
-document.getElementById("distanceBox").style.visibility = "hidden";
-document.getElementById("floating-panel").style.visibility = "hidden";
-document.getElementById("clearMapButton").style.visibility = "hidden";
-
 let map;
 let eventLat;
 let eventLon;
@@ -440,9 +435,11 @@ function handleJoinEvent(eventName) {
 function openFormFilter(){
 
   document.getElementById("filterForm").style.display = "block";
+  document.getElementById("filterButton").style.visibility="hidden"
 }
 function closeFormFilter() {
   document.getElementById("filterForm").style.display = "none";
+    document.getElementById("filterButton").style.visibility="visible"
 }
 function setMapOnAll(map) {
   for (let i = 0; i < markers.length; i++) {
@@ -462,7 +459,6 @@ function callFilter(data) {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200:
-                    alert("filter.");
                     deleteMarkers();
                     jsonResponse = JSON.parse(xhttp.responseText);
                     populateMap(jsonResponse);
@@ -528,6 +524,7 @@ function handleFilter(){
 let filterForm = document.getElementById("filterForm");
 filterForm.onsubmit = () => {
     handleFilter();
+    closeFormFilter();
     return false;
 }
 
