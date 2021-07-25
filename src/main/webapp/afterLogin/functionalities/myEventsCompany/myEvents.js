@@ -288,7 +288,7 @@ function callDeleteEvent(data) {
             }
         }
     };
-    xhttp.open("DELETE", "/rest/event/deleteEvent", true);
+    xhttp.open("POST", "/rest/event/deleteEvent", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 }

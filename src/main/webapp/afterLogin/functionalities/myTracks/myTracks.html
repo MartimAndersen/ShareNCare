@@ -19,8 +19,6 @@
     <select id="mode">
         <option value="WALKING">Walking</option>
         <option value="DRIVING">Driving</option>
-        <!--        <option value="BICYCLING">Bicycling</option>-->
-        <!--        <option value="TRANSIT">Transit</option>-->
     </select>
 </div>
 
@@ -39,10 +37,6 @@
     <div id="floating-panel2">
         <b>Track name: </b>
         <select id="selectTrack">
-<!--            <option value="WALKING">Walking</option>-->
-<!--            <option value="DRIVING">Driving</option>-->
-            <!--        <option value="BICYCLING">Bicycling</option>-->
-            <!--        <option value="TRANSIT">Transit</option>-->
         </select>
     </div>
 
@@ -54,6 +48,9 @@
 <!--        <b>Distance: </b>&nbsp;<span id="distance"></span>-->
         <br>
         <b>Difficulty of the walk: </b>&nbsp;<span id="difficultyOfTheWalk"></span>
+        <br>
+        <br>
+        <button type="button" id="deleteTrackButton" onclick="callDeleteTrack()">Delete Track</button>
     </div>
 
 </div>

@@ -295,115 +295,6 @@ function callSeeEvents() {
     xhttp.send();
 }
 
-
-function callCreateTrack(data) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4) {
-            switch (this.status) {
-                case 200:
-                    openModal();
-                    break;
-                case 400:
-                    alert("Initial date needs to be in the future");
-                    break;
-                case 401:
-                    alert("You need to be logged in to execute this operation.");
-                    break;
-                case 411:
-                    alert("Please fill in all fields.");
-                    break;
-                case 412:
-                    alert("Final date needs to be after initial date or in the same day");
-                    break;
-                case 406:
-                    alert("Number of participants is invalid.");
-                    break;
-                case 403:
-                    alert("Invalid date format.");
-                    break;
-                case 409:
-                    alert("Event already exists.");
-                    break;
-                case 417:
-                    alert("Invalid hour format.");
-                    break;
-                default:
-                    alert("Something went wrong.");
-                    break;
-            }
-        }
-    };
-    xhttp.open("POST", "/rest/map/registerTrack", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(data);
-}
-
-function callRegisterComment(data) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4) {
-            switch (this.status) {
-                case 200:
-                    alert("Track " + trackTitle + " registered.")
-                    break;
-                case 405:
-                    alert("Your comment is inappropriate.");
-                    break;
-                default:
-                    alert("Something went wrong.");
-                    break;
-            }
-        }
-    };
-    xhttp.open("POST", "/rest/map/comment", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(data);
-}
-
-
-let trackTitle;
-
-function handleSubmitTrack() {
-    let inputs = document.getElementsByName("createTrack");
-
-    let solidarityPointsString = JSON.stringify(solidarityPoints).toString();
-    solidarityPointsString = solidarityPointsString.replace(/lat/g, 'latitude');
-    solidarityPointsString = solidarityPointsString.replace(/lng/g, 'longitude');
-
-    trackTitle = inputs[0].value;
-
-    let data = {
-        title: trackTitle,
-        description: inputs[1].value,
-        distance: dist.toString(),
-        difficulty: document.getElementById("sliderOutput").value,
-        solidarityPoints: solidarityPointsString,
-        type: "pre-made",
-        username: localStorage.getItem("currUser"),
-        time: "0"
-    }
-    callCreateTrack(JSON.stringify(data));
-}
-
-function isChecked(element) {
-    return document.getElementById(element).checked;
-}
-
-function getStarsRating() {
-    let res = 5;
-    if (isChecked("star1")) {
-        res = 1;
-    } else if (isChecked("star2")) {
-        res = 2;
-    } else if (isChecked("star3")) {
-        res = 3;
-    } else if (isChecked("star4")) {
-        res = 4;
-    }
-    return res;
-}
-
 function goToAboutUs() {
     localStorage.setItem("isUserPage", "true");
     window.location.href = "../../functionalities/aboutUs/aboutUs.html";
@@ -467,6 +358,8 @@ function fillTracksArray(obj) {
     tracks.push(trackInfo);
 }
 
+let tracksLength = 0;
+
 function populateMapTrack(jsonResponse) {
     for (let i = 0; i < jsonResponse.length; i++) {
         let obj = [];
@@ -483,18 +376,23 @@ function populateMapTrack(jsonResponse) {
     //     }
     //     new DrawTrack(map);
     // }
-    if (tracks.length !== 0) {
+    tracksLength = tracks.length;
+
+    if (tracksLength !== 0) {
+        document.getElementById("deleteTrackButton").style.visibility = "visible";
         fillSelectTrackPanel();
         prepareDrawTrack(0);
     }
 }
 
+let trackTitle;
+
 function fillSelectTrackPanel() {
-    let max = tracks.length;
-    for (let i = 0; i < max; i++) {
+    for (let i = 0; i < tracksLength; i++) {
         let opt = document.createElement('option');
         opt.value = i;
-        opt.innerHTML = tracks[i].title;
+        trackTitle = tracks[i].title;
+        opt.innerHTML = trackTitle;
         document.getElementById("selectTrack").appendChild(opt);
     }
 }
@@ -564,3 +462,33 @@ function callSeeTracks() {
 
 
 /* ====================== See Tracks End ====================== */
+
+function handleDeleteTrack(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200:
+                    alert("Track deleted successfully.");
+                    location.reload();
+                    break;
+                case 409:
+                    alert("There are no tracks available to be deleted.");
+                    break;
+                default:
+                    alert("Something went wrong.");
+                    break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/map/deleteTrackWeb", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
+
+function callDeleteTrack() {
+    let data = {
+        trackName: trackTitle
+    }
+    handleDeleteTrack(JSON.stringify(data));
+}

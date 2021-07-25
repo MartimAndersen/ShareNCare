@@ -34,19 +34,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.sharencare.util.ReviewData;
-import pt.unl.fct.di.apdc.sharencare.util.TrackDangerZones;
-import pt.unl.fct.di.apdc.sharencare.util.BadWordsUtil;
-import pt.unl.fct.di.apdc.sharencare.util.FinishedTrack;
-import pt.unl.fct.di.apdc.sharencare.util.GetMediaPic;
-import pt.unl.fct.di.apdc.sharencare.util.MarkerData;
-import pt.unl.fct.di.apdc.sharencare.util.PointsData;
-import pt.unl.fct.di.apdc.sharencare.util.ProfileData;
-import pt.unl.fct.di.apdc.sharencare.util.RemoveCommentData;
-import pt.unl.fct.di.apdc.sharencare.util.TrackData;
-import pt.unl.fct.di.apdc.sharencare.util.TrackMarkers;
-import pt.unl.fct.di.apdc.sharencare.util.TrackMedia;
-import pt.unl.fct.di.apdc.sharencare.util.TrackNotes;
+import pt.unl.fct.di.apdc.sharencare.util.*;
 
 @Path("/map")
 public class MapResource {
@@ -458,11 +446,35 @@ public class MapResource {
 			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
 					.build();
 
-		Key trackKey = datastore.newKeyFactory().setKind("Event").newKey(title);
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(title);
 		Entity track = datastore.get(trackKey);
 
 		if (track == null)
 			return Response.status(Status.BAD_REQUEST).entity("Track with title: " + title + " doesn't exist").build();
+
+		datastore.delete(trackKey);
+
+		return Response.ok("Event deleted.").build();
+
+	}
+
+	@POST
+	@Path("/deleteTrackWeb")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteTrack(@CookieParam("Token") NewCookie cookie, DeleteTrackData data) {
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
+		Key trackKey = datastore.newKeyFactory().setKind("Track").newKey(data.trackName);
+		Entity track = datastore.get(trackKey);
+
+		if (track == null)
+			return Response.status(Status.CONFLICT).entity("There are no tracks available to be deleted.").build();
 
 		datastore.delete(trackKey);
 
