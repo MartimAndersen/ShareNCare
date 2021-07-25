@@ -175,7 +175,7 @@ public class EventResource {
 		}
 	}
 
-	@DELETE
+	@POST
 	@Path("/deleteEvent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteEvent(@CookieParam("Token") NewCookie cookie, FinishEvent data) {
