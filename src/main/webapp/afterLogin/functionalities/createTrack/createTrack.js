@@ -388,28 +388,13 @@ function callCreateTrack(data) {
                     openModal();
                     break;
                 case 400:
-                    alert("Initial date needs to be in the future");
-                    break;
-                case 401:
                     alert("You need to be logged in to execute this operation.");
                     break;
-                case 411:
-                    alert("Please fill in all fields.");
-                    break;
-                case 412:
-                    alert("Final date needs to be after initial date or in the same day");
-                    break;
-                case 406:
-                    alert("Number of participants is invalid.");
-                    break;
                 case 403:
-                    alert("Invalid date format.");
+                    alert("Please enter a title for the track.");
                     break;
                 case 409:
-                    alert("Event already exists.");
-                    break;
-                case 417:
-                    alert("Invalid hour format.");
+                    alert("The track with the given title already exists.");
                     break;
                 default:
                     alert("Something went wrong.");
@@ -514,13 +499,13 @@ function openModal() {
     focusedElementBeforeModal = document.activeElement;
 
     // Listen for and trap the keyboard
-    modal.addEventListener('keydown', trapTabKey);
+    // modal.addEventListener('keydown', trapTabKey);
 
     // Listen for indicators to close the modal
     modalOverlay.addEventListener('click', closeModal);
     // Close btn
-    const closeBtn = document.querySelector('.close-btn');
-    closeBtn.addEventListener('click', closeModal);
+    // const closeBtn = document.querySelector('.close-btn');
+    // closeBtn.addEventListener('click', closeModal);
 
     // submit form
     const form = document.getElementById('review-form');
@@ -539,28 +524,28 @@ function openModal() {
     modal.classList.add('show');
     modalOverlay.classList.add('show');
 
-    function trapTabKey(e) {
-        // Check for TAB key press
-        if (e.keyCode === 9) {
-            // SHIFT + TAB
-            if (e.shiftKey) {
-                if (document.activeElement === firstTabStop) {
-                    e.preventDefault();
-                    lastTabStop.focus();
-                }
-                // TAB
-            } else {
-                if (document.activeElement === lastTabStop) {
-                    e.preventDefault();
-                    firstTabStop.focus();
-                }
-            }
-        }
-        // ESCAPE
-        if (e.keyCode === 27) {
-            closeModal();
-        }
-    }
+    // function trapTabKey(e) {
+    //     // Check for TAB key press
+    //     if (e.keyCode === 9) {
+    //         // SHIFT + TAB
+    //         if (e.shiftKey) {
+    //             if (document.activeElement === firstTabStop) {
+    //                 e.preventDefault();
+    //                 lastTabStop.focus();
+    //             }
+    //             // TAB
+    //         } else {
+    //             if (document.activeElement === lastTabStop) {
+    //                 e.preventDefault();
+    //                 firstTabStop.focus();
+    //             }
+    //         }
+    //     }
+    //     // ESCAPE
+    //     if (e.keyCode === 27) {
+    //         closeModal();
+    //     }
+    // }
 };
 
 const submitAddReview = (e) => {
