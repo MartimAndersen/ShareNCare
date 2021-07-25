@@ -1000,6 +1000,69 @@ public class EventResource {
 		}
 		return Response.ok(g.toJson(events)).build();
 	}
+	
+	@POST
+	@Path("/filterEventsWeb")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response filterEventsWeb(@CookieParam("Token") NewCookie cookie, FilterData data) {
+		
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+
+
+		List<PropertyFilter> filters = data.getFilter();
+		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
+		PropertyFilter first = filters.get(0);
+
+		Builder query = Query.newEntityQueryBuilder().setKind("Event");
+
+		if (filters.size() == 1)
+			query.setFilter(first);
+
+		else {
+			for (int i = 1; i < filters.size(); i++)
+				subFilter[i] = filters.get(i);
+
+			query.setFilter(CompositeFilter.and(first, subFilter));
+		}
+
+		if (data.popularity.equals("Most Popular"))
+			query = query.setOrderBy(OrderBy.desc("points"));
+		if (data.popularity.equals("Least Popular"))
+			query = query.setOrderBy(OrderBy.asc("points"));
+
+		Query<Entity> q = query.build();
+
+		QueryResults<Entity> eventsQuery = datastore.run(q);
+		List<String> events = new ArrayList<>();
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String event = g.toJson(e.getProperties().values());
+			if (!hasEnded(e.getString("ending_date"))) {
+				events.add(event);
+			}
+		}
+		return Response.ok(g.toJson(events)).build();
+	}
 
 	@GET
 	@Path("/getEvent")

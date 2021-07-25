@@ -437,3 +437,83 @@ function handleJoinEvent(eventName) {
     callJoinEvents(JSON.stringify(data));
 }
 
+function openFormFilter(){
+
+  document.getElementById("filterForm").style.display = "block";
+}
+function closeFormFilter() {
+  document.getElementById("filterForm").style.display = "none";
+}
+
+function callFilter(data) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            switch (this.status) {
+                case 200:
+                    location.reload();
+                    break;
+                case 401:
+                    alert("You need to be logged in to execute this operation.");
+                    break;
+
+                default:
+                    alert("Something went wrong.");
+                    break;
+            }
+        }
+    };
+    xhttp.open("POST", "/rest/event/filterEventsWeb", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(data);
+}
+
+function fillTagsList(inputs) {
+    let tagsList = [];
+    let currTagId = "";
+    for (let counter = 0; counter <= 5; counter++) {
+        currTagId = "tag" + counter;
+        if (document.getElementById(currTagId).checked) {
+            // tagsList.push(inputs[t].value);
+            tagsList.push(counter);
+        }
+    }
+    return "[" + tagsList.toString() + "]";
+}
+
+function ChangeFormateDate(oldDate)
+{
+   return oldDate.toString().split("-").reverse().join("/");
+}
+
+function handleFilter(){
+    let inputs = document.getElementsByName("filterInput")
+    date = ChangeFormateDate(inputs[0].value);
+
+    let radioButtonResult = ""
+        if (document.getElementById('popular').checked) {
+            radioButtonResult = inputs[3].value
+        }
+        if (document.getElementById('popular1').checked) {
+            radioButtonResult = inputs[4].value
+        }
+
+
+    let data = {
+        coordinates: "",
+        date: date,
+        institution: inputs[1].value,
+        name: inputs[2].value,
+        popularity: radioButtonResult,
+        tags: fillTagsList(inputs)
+    }
+    callFilter(JSON.stringify(data));
+    console.log(data)
+}
+
+let filterForm = document.getElementById("filterForm");
+filterForm.onsubmit = () => {
+    handleFilter();
+    return false;
+}
+

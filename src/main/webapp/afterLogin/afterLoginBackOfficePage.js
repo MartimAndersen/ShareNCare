@@ -325,9 +325,9 @@ function handleDeleteUser() {
     callDeleteUser(JSON.stringify(data));
 }
 
-let changeAttributesForm = document.getElementById("deleteUser");
-changeAttributesForm.onsubmit = () => {
-    handleDeleteUser();
+let DeleteUsersForm = document.getElementById("filterForm");
+DeleteUsersForm.onsubmit = () => {
+    handleFilter();
     return false;
 }
 

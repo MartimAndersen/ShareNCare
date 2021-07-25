@@ -126,7 +126,7 @@ function callCreateEvent(data) {
 function fillTagsList(inputs) {
     let tagsList = [];
     let currTagId = "";
-    for (let counter = 1; counter <= 6; counter++) {
+    for (let counter = 0; counter <= 5; counter++) {
         currTagId = "tag" + counter;
         if (document.getElementById(currTagId).checked) {
             // tagsList.push(inputs[t].value);
