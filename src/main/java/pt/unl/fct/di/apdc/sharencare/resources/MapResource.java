@@ -654,7 +654,7 @@ public class MapResource {
 		return mediaList;
 	}
 	
-	@GET
+	@POST
 	@Path("/getMediaPic")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMediaPic(@CookieParam("Token") NewCookie cookie, GetMediaPic data) {
