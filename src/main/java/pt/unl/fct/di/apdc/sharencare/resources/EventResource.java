@@ -732,7 +732,7 @@ public class EventResource {
 
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> userEvents = new ArrayList<String>();
-		
+
 		List<String> sortedEvents = new ArrayList<>();
 
 		try {
@@ -745,7 +745,7 @@ public class EventResource {
 				}
 			}
 			sortByDate(events);
-			for(Entity e: events) {
+			for (Entity e : events) {
 				String event = g.toJson(e.getProperties().values());
 				sortedEvents.add(event);
 			}
@@ -756,20 +756,20 @@ public class EventResource {
 		return Response.ok(g.toJson(sortedEvents)).cookie(cookie).build();
 	}
 
-	private List<Entity> sortByDate(List<Entity> list){
-    	List<Entity> sortedList = new ArrayList<>();
-    	for(int i = 0 ; i < list.size();i++) {
-            for(int j = i+1 ; j< list.size();j++) {
-                if(isBefore(list.get(i).getString("initial_date"), list.get(j).getString("initial_date"))) {
-                    Entity temp = list.get(i);
-                    list.set(i, list.get(j));
-                    list.set(i, temp);
-                }
-            }
-    	}
-    	return sortedList;
-    }
-	
+	private List<Entity> sortByDate(List<Entity> list) {
+		List<Entity> sortedList = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (isBefore(list.get(i).getString("initial_date"), list.get(j).getString("initial_date"))) {
+					Entity temp = list.get(i);
+					list.set(i, list.get(j));
+					list.set(i, temp);
+				}
+			}
+		}
+		return sortedList;
+	}
+
 	private boolean isBefore(String date1, String date2) {
 		String[] dateFirst = date1.split("/");
 		String[] dateSecond = date2.split("/");
@@ -1000,13 +1000,13 @@ public class EventResource {
 		}
 		return Response.ok(g.toJson(events)).build();
 	}
-	
+
 	@POST
 	@Path("/filterEventsWeb")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response filterEventsWeb(@CookieParam("Token") NewCookie cookie, FilterData data) {
-		
+
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
@@ -1027,23 +1027,25 @@ public class EventResource {
 			return Response.status(Status.FORBIDDEN)
 					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 
-
 		List<PropertyFilter> filters = data.getFilter();
 		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
-		PropertyFilter first = filters.get(0);
 
 		Builder query = Query.newEntityQueryBuilder().setKind("Event");
 
-		if (filters.size() == 1)
-			query.setFilter(first);
+		if (!filters.isEmpty()) {
 
-		else {
-			for (int i = 1; i < filters.size(); i++)
-				subFilter[i] = filters.get(i);
+			PropertyFilter first = filters.get(0);
 
-			query.setFilter(CompositeFilter.and(first, subFilter));
+			if (filters.size() == 1)
+				query.setFilter(first);
+
+			else {
+				for (int i = 1; i < filters.size(); i++)
+					subFilter[i] = filters.get(i);
+
+				query.setFilter(CompositeFilter.and(first, subFilter));
+			}
 		}
-
 		if (data.popularity.equals("Most Popular"))
 			query = query.setOrderBy(OrderBy.desc("points"));
 		if (data.popularity.equals("Least Popular"))

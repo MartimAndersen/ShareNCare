@@ -13,6 +13,10 @@ public class FilterData {
 	public String name;
 	public String popularity;
 	public String tags;
+	
+	public FilterData() {
+		
+	}
 
 	public FilterData(String coordinates, String date, String institution, String name, String popularity,
 			String tags) {

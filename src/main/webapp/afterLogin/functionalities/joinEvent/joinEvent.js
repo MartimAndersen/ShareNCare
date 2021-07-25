@@ -444,14 +444,28 @@ function openFormFilter(){
 function closeFormFilter() {
   document.getElementById("filterForm").style.display = "none";
 }
+function setMapOnAll(map) {
+  for (let i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+   setMapOnAll(null);
+   markers=[];
+}
 
 function callFilter(data) {
+    console.log(data);
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200:
-                    location.reload();
+                    alert("filter.");
+                    deleteMarkers();
+                    jsonResponse = JSON.parse(xhttp.responseText);
+                    populateMap(jsonResponse);
                     break;
                 case 401:
                     alert("You need to be logged in to execute this operation.");
@@ -499,7 +513,7 @@ function handleFilter(){
         }
 
 
-    let data = {
+    let data1 = {
         coordinates: "",
         date: date,
         institution: inputs[1].value,
@@ -507,8 +521,8 @@ function handleFilter(){
         popularity: radioButtonResult,
         tags: fillTagsList(inputs)
     }
-    callFilter(JSON.stringify(data));
-    console.log(data)
+    callFilter(JSON.stringify(data1));
+    console.log(data1)
 }
 
 let filterForm = document.getElementById("filterForm");
