@@ -2,17 +2,18 @@ package pt.unl.fct.di.apdc.sharencare.util;
 
 public class PointsData {
 	
-	String username;
+	public String username;
 	public int events;
-	int tracks;
-	int comments;
-	int quitEvents;
-	int badComments;
-	int likedComents;
-	int dislikedComents;
-	int commentsRank;
-	int total;
-	byte[] pic;
+	public int tracks;
+	public int comments;
+	public int quitEvents;
+	public int badComments;
+	public int likedComents;
+	public int dislikedComents;
+	public int commentsRank;
+	public int total;
+	public int rank;
+	public byte[] pic;
 	
 	public PointsData() {
 		
@@ -30,6 +31,7 @@ public class PointsData {
 		this.dislikedComents = 0;
 		this.commentsRank = 0;
 		this.total = 0;
+		this.rank = -1;
 		this.pic = null;
 	}
 	

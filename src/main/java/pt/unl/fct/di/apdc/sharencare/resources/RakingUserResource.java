@@ -286,7 +286,14 @@ public class RakingUserResource {
 				pic = null;
 				pointsList.get(i).setPic(pic);	
 			}
+			pointsList.get(i).rank = i + 1;
 			top10Users.add(pointsList.get(i));
+		}
+		for(int l = 0; l < pointsList.size(); l++) {
+			if (pointsList.get(l).getUsername().equals(token.getString("username"))) {
+				pointsList.get(l).rank = l + 1;
+				top10Users.add(pointsList.get(l));
+			}
 		}
 
 		return Response.ok(g.toJson(top10Users)).cookie(cookie).build();
