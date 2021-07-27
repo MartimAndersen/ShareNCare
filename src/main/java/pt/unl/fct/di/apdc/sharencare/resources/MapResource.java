@@ -339,7 +339,9 @@ public class MapResource {
 			
 			List<TrackMedia> mediaList = getMedia(media);
 			
-			String bucketName = "capable-sphinx-312419" + "-" + track.getString("title");
+			String transformedName = transformBucketName(track.getString("title"));
+			
+			String bucketName = "capable-sphinx-312419" + "-" + transformedName;
 			Bucket bucket = null;
 			
 			Page<Bucket> b = storage.list();
@@ -701,7 +703,9 @@ public class MapResource {
 					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 		}
 		
-		String bucketName = "capable-sphinx-312419" + "-" + data.title;
+		String transformedName = transformBucketName(data.title);
+		
+		String bucketName = "capable-sphinx-312419" + "-" + transformedName;
 		Bucket bucket = null;
 		if(storage.get(bucketName,Storage.BucketGetOption.fields(Storage.BucketField.values())) == null) {
 			return Response.status(Status.NOT_ACCEPTABLE).build();
@@ -848,7 +852,22 @@ public class MapResource {
 		
 		return Response.ok(g.toJson(tracks)).build();
 	}
+	
+	private String transformBucketName(String titleName) {
+		String bucketName = titleName;
 		
+		char[] c = titleName.toCharArray();
+		char dot = '.';
+		char hifen = '-';
+	
+		
+		for(int i = 0; i < c.length; i++)
+			if(!(Character.isLowerCase(c[i]) || c[i] == dot || c[i] == hifen || Character.isDigit(c[i])))
+				c[i] = '.';
+		
+		bucketName = c.toString();
+		return bucketName;
+	}
 		
 
 	/*

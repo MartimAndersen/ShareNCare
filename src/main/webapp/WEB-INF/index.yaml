@@ -1,7 +1,0 @@
-indexes:
-
-- kind: User
-  properties:
-  - name: role
-  - name: points
-    direction: desc
