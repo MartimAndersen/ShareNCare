@@ -965,7 +965,9 @@ public class EventResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response filterEvents(@QueryParam("filterString") String filterString) {
 
-		FilterData data = g.fromJson(filterString, FilterData.class);
+		Type t = new TypeToken<FilterData>(){}.getType();
+		
+		FilterData data = g.fromJson(filterString, t);
 		List<PropertyFilter> filters = data.getFilter();
 		PropertyFilter[] subFilter = new PropertyFilter[filters.size()];
 		PropertyFilter first = filters.get(0);
@@ -982,10 +984,10 @@ public class EventResource {
 			query.setFilter(CompositeFilter.and(first, subFilter));
 		}
 
-		if (data.popularity.equals("Most Popular"))
+	/*	if (data.popularity.equals("Most Popular"))
 			query = query.setOrderBy(OrderBy.desc("points"));
 		if (data.popularity.equals("Least Popular"))
-			query = query.setOrderBy(OrderBy.asc("points"));
+			query = query.setOrderBy(OrderBy.asc("points"));*/
 
 		Query<Entity> q = query.build();
 
