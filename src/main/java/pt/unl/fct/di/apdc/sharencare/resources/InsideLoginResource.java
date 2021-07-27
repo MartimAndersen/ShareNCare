@@ -317,17 +317,7 @@ public class InsideLoginResource {
 		if (!data.validProfileType()) {
 			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 		}
-		/*
-		System.out.println("carolina");
-		System.out.println(profilePic + " carolina");
-		System.out.println(data.profilePic);
-		byte[] pic = Base64.decodeBase64(profilePic);
-		bucket.create(user.getString("username"),pic);
-		
-		System.out.println(pic);	
-		
 
-*/
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("bio", bio).set("email", email)
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)

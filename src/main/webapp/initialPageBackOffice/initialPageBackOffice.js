@@ -4,7 +4,7 @@ function callRegister(data) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
-                case 200: alert(this.responseText);window.location.href = "../afterLogin/afterLoginBackOfficePage.html";  break;
+                case 200: alert(this.responseText);  break;
                 case 401: alert("Please fill in all non-optional fields."); break;
                 case 409: alert("User already exists."); break;
                 case 403: alert("Invalid email."); break;

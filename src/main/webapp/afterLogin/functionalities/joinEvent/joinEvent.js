@@ -1,8 +1,3 @@
-document.getElementById("eventOrigin").style.visibility = "hidden";
-document.getElementById("distanceBox").style.visibility = "hidden";
-document.getElementById("floating-panel").style.visibility = "hidden";
-document.getElementById("clearMapButton").style.visibility = "hidden";
-
 let map;
 let eventLat;
 let eventLon;
@@ -196,8 +191,8 @@ function fillLocationsArray(obj) {
         description: obj[stringToIndex(description)].value,
         tags: obj[stringToIndex(tags)].value.split("[")[1].split("]")[0].replace(/,/g, ''), // '[2,6]' to '26' (g means global/all string)
         nrMembers: getNrMembers(obj[stringToIndex(members)].value),
-        latitude:  obj[stringToIndex(coordinates)].value.split(" ")[0],
-        longitude:  obj[stringToIndex(coordinates)].value.split(" ")[1],
+        latitude: obj[stringToIndex(coordinates)].value.split(" ")[0],
+        longitude: obj[stringToIndex(coordinates)].value.split(" ")[1],
         ended: obj[stringToIndex(ended)].value,
         points: obj[stringToIndex(points)].value,
         rating: obj[stringToIndex(rating)].value
@@ -311,37 +306,38 @@ function fillInfoWindow(marker, i) {
 }
 
 function adjustMarkerPlace(latlng) {
-   ///get array of markers currently in cluster
-   //final position for marker, could be updated if another marker already exists in same position
-   var finalLatLng = new google.maps.LatLng(latlng.latitude,latlng.longitude);
+    ///get array of markers currently in cluster
+    //final position for marker, could be updated if another marker already exists in same position
+    var finalLatLng = new google.maps.LatLng(latlng.latitude, latlng.longitude);
 
-   //check to see if any of the existing markers match the latlng of the new marker
-   if (markers.length !== 0) {
-       for (let i=0; i < markers.length; i++) {
-           var existingMarker = markers[i];
-           var pos = existingMarker.getPosition();
+    //check to see if any of the existing markers match the latlng of the new marker
+    if (markers.length !== 0) {
+        for (let i = 0; i < markers.length; i++) {
+            var existingMarker = markers[i];
+            var pos = existingMarker.getPosition();
 
-           //check if a marker already exists in the same position as this marker
-           if (finalLatLng.equals(pos)) {
+            //check if a marker already exists in the same position as this marker
+            if (finalLatLng.equals(pos)) {
 
-               //update the position of the coincident marker by applying a small multipler to its coordinates
-               var newLat = finalLatLng.lat() + (Math.random() / 10000);
-               var newLng = finalLatLng.lng() + (Math.random() / 10000);
-               console.log(newLat,newLng);
+                //update the position of the coincident marker by applying a small multipler to its coordinates
+                var newLat = finalLatLng.lat() + (Math.random() / 10000);
+                var newLng = finalLatLng.lng() + (Math.random() / 10000);
+                console.log(newLat, newLng);
 
-               finalLatLng = new google.maps.LatLng(newLat,newLng);
+                finalLatLng = new google.maps.LatLng(newLat, newLng);
 
-           }
-       }
-   }
+            }
+        }
+    }
 
-   return finalLatLng;
+    return finalLatLng;
 }
-function addMarkers() {
 
+function addMarkers() {
+    console.log("aqui")
     var marker, i;
     for (i = 0; i < locations.length; i++) {
-      var position = adjustMarkerPlace(locations[i]);
+        var position = adjustMarkerPlace(locations[i]);
         marker = new google.maps.Marker({
             position: position,
             map: map
@@ -362,6 +358,7 @@ function goToPageBefore() {
 }
 
 function populateMap(jsonResponse) {
+    console.log("here")
     for (let i = 0; i < jsonResponse.length; i++) {
         let obj = [];
         obj = JSON.parse(jsonResponse[i]);
@@ -437,21 +434,41 @@ function handleJoinEvent(eventName) {
     callJoinEvents(JSON.stringify(data));
 }
 
-function openFormFilter(){
+function openFormFilter() {
 
-  document.getElementById("filterForm").style.display = "block";
+    document.getElementById("filterForm").style.display = "block";
+    document.getElementById("filterButton").style.visibility = "hidden"
 }
+
 function closeFormFilter() {
-  document.getElementById("filterForm").style.display = "none";
+    document.getElementById("filterForm").style.display = "none";
+    document.getElementById("filterButton").style.visibility = "visible"
+}
+
+function setMapOnAll(map) {
+    for (let i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+    setMapOnAll(null);
+    markers.length = 0;
+    locations.length = 0;
+    console.log(markers);
 }
 
 function callFilter(data) {
+    console.log(data);
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             switch (this.status) {
                 case 200:
-                    location.reload();
+                    deleteMarkers();
+                    jsonResponse = JSON.parse(xhttp.responseText);
+                    populateMap(jsonResponse);
                     break;
                 case 401:
                     alert("You need to be logged in to execute this operation.");
@@ -468,12 +485,14 @@ function callFilter(data) {
     xhttp.send(data);
 }
 
+
 function fillTagsList(inputs) {
     let tagsList = [];
     let currTagId = "";
     for (let counter = 0; counter <= 5; counter++) {
         currTagId = "tag" + counter;
         if (document.getElementById(currTagId).checked) {
+
             // tagsList.push(inputs[t].value);
             tagsList.push(counter);
         }
@@ -481,39 +500,59 @@ function fillTagsList(inputs) {
     return "[" + tagsList.toString() + "]";
 }
 
-function ChangeFormateDate(oldDate)
-{
-   return oldDate.toString().split("-").reverse().join("/");
-}
 
-function handleFilter(){
+function handleFilter() {
     let inputs = document.getElementsByName("filterInput")
-    date = ChangeFormateDate(inputs[0].value);
-
-    let radioButtonResult = ""
-        if (document.getElementById('popular').checked) {
-            radioButtonResult = inputs[3].value
-        }
-        if (document.getElementById('popular1').checked) {
-            radioButtonResult = inputs[4].value
-        }
 
 
-    let data = {
-        coordinates: "",
-        date: date,
-        institution: inputs[1].value,
-        name: inputs[2].value,
-        popularity: radioButtonResult,
+    let data1 = {
         tags: fillTagsList(inputs)
     }
-    callFilter(JSON.stringify(data));
-    console.log(data)
+    callFilter(JSON.stringify(data1));
+    console.log(data1)
 }
 
 let filterForm = document.getElementById("filterForm");
 filterForm.onsubmit = () => {
+
     handleFilter();
+    closeFormFilter();
+
+    document.getElementById("SubmitButton").style.visibility = "hidden";
+    uncheck()
+
     return false;
 }
+
+function uncheck() {
+    let currTagId = "";
+    for (let counter = 0; counter <= 5; counter++) {
+        currTagId = "tag" + counter;
+        document.getElementById(currTagId).checked = false;
+    }
+}
+
+function atLeastOneTagSelected() {
+    let currTagId = "";
+    for (let counter = 0; counter <= 5; counter++) {
+        currTagId = "tag" + counter;
+        if (document.getElementById(currTagId).checked) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const checkbox = document.querySelectorAll("input[type=checkbox]")
+checkbox.forEach(function(element){
+    element.addEventListener('click', function () {
+        if (atLeastOneTagSelected()) {
+            document.getElementById("SubmitButton").style.visibility = "visible";
+        } else {
+            document.getElementById("SubmitButton").style.visibility = "hidden";
+        }
+    });
+});
+
+
 

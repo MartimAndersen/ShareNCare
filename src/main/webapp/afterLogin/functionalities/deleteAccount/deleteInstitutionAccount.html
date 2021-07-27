@@ -18,18 +18,12 @@
 
 <div class="center">
 
-  <form id="deleteAccountFormId" action="#" method="post">
-    <h1>Delete Your Account</h1>
-    <p>
-      <label for="institutionToBeDeleted" class="floatLabel">Please insert your Institution's NIF</label><br>
-      <input id="institutionToBeDeleted" name="deleteAccountInput" type="text" placeholder="Institution to be deleted">
-    </p>
-    <p>
-      <input type="submit" value="Delete Account" id="submitDeleteAccount">
-    </p>
-  </form>
-
-
+  <p>
+    Do you really wish to delete your account?
+  </p>
+  <p>
+    <input type="submit" value="Delete Account" onclick="callDeleteAccount()">
+  </p>
 
 </div>
 

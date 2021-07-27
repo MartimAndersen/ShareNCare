@@ -20,10 +20,14 @@
     <select id="mode">
         <option value="WALKING">Walking</option>
         <option value="DRIVING">Driving</option>
-<!--        <option value="BICYCLING">Bicycling</option>-->
-        <option value="TRANSIT">Transit</option>
+        <!--        <option value="BICYCLING">Bicycling</option>-->
+<!--        <option value="TRANSIT">Transit</option>-->
     </select>
 </div>
+
+&nbsp;&nbsp;
+
+<button type="button" class="button2" id="filterButton" onclick="openFormFilter()">Filter Preferences</button>
 
 <input id="distanceBox" type="text" readonly/>
 
@@ -38,51 +42,29 @@
 <br>
 <br>
 
-
+<!--<div><button type="button" class="button2" onclick="callGetEvents()">See all events</button></div>-->
 
 
 <div id="map" style="border-radius: 20px"></div>
 
-<div><button type="button" class="button2" onclick="openFormFilter()">Filter Preferences</button></div>
+
 <br>
 <br>
 <div class="form-popup" id="filterForm">
-    <form action="/action_page.php" class="form-container">
-        <h1>Remove User from Event</h1>
-        <p>
-            <label for="date" class="floatLabel">Date</label>
-            <input id="date" name="filterInput" type="date" placeholder="date">
-        </p>
+    <form action="/action_page.php" class="form-container" onsubmit="return false">
+        <h1>Filter Events</h1>
 
-        <p>
-            <label for="institution" class="floatLabel">Institution</label>
-            <input id="institution" name="filterInput" type="text" placeholder="institution">
-        </p>
-
-        <p>
-            <label for="name" class="floatLabel">Event name</label>
-            <input id="name" name="filterInput" type="text" placeholder="name">
-        </p>
-
-        <p>&nbsp;
-            Order by:
-            &nbsp;
-            <input type="radio" id="popular" name="filterInput" value="Most Popular">
-            <label for="popular">Most Popular</label>
-            &nbsp;&nbsp;
-            <input type="radio" id="popular1" name="filterInput" value="Least Popular">
-            <label for="popular">Least Popular</label><br>
-
-
-        </p>
         <p>
             Tags (select at least one):
         <p>&nbsp;
+        <div class="checkbox-group required">
             <input type="checkbox" id="tag0" name="filterInput" value="animals"> Animals
             &nbsp;&nbsp;
             <input type="checkbox" id="tag1" name="filterInput" value="environment"> Environment
             &nbsp;&nbsp;
             <input type="checkbox" id="tag2" name="filterInput" value="children"> Children
+
+            <br>
             &nbsp;&nbsp;
             <input type="checkbox" id="tag3" name="filterInput" value="elderly"> Elderly
             &nbsp;&nbsp;
@@ -90,9 +72,11 @@
             &nbsp;&nbsp;
             <input type="checkbox" id="tag5" name="filterInput" value="homeless"> Homeless
         </p>
+    </div>
 
 
-        <button type="submit" class="btn">Submit</button>
+        <button type="submit" class="btn" id="SubmitButton">Submit</button>
+        <button type="button" class="btn" onclick="callGetEvents()">See all events</button>
         <button type="button" class="btn cancel" onclick="closeFormFilter()">Close</button>
     </form>
 </div>

@@ -225,6 +225,15 @@ function handleChangeAttributes(bytesPic) {
     }
     callChangeAttributes(JSON.stringify(data));
 }
+
+let changeAttributesForm = document.getElementById("changeAttributesFormId");
+changeAttributesForm.onsubmit = () => {
+    handleChangeAttributes("");
+    return false;
+}
+
+/*
+
 function handleChangeAttributesPic(){
     var fileInput = document.getElementById('image');
 
@@ -240,14 +249,6 @@ function handleChangeAttributesPic(){
     	console.log('Error: ', error);
     };
 }
-
-let changeAttributesForm = document.getElementById("changeAttributesFormId");
-changeAttributesForm.onsubmit = () => {
-    handleChangeAttributes("");
-    return false;
-}
-
-
 
 
 document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
@@ -323,7 +324,7 @@ function updateThumbnail(dropZoneElement, file) {
     }
 
 }
-
+*/
 
 /*
 document.addEventListener("DOMContentLoaded", () => {
