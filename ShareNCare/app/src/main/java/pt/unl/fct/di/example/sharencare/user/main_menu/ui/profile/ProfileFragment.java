@@ -398,7 +398,7 @@ public class ProfileFragment extends Fragment {
         }if(!user.getSecondAddress().equals("")) {
             secondAddress.setText(user.getSecondAddress());
             editedSecondAddress.setText(user.getSecondAddress());
-        }if(!user.getZipCode().equals("")) {
+        }if(!user.getZipCode().equals("-") &&!user.getZipCode().equals("")) {
             String[] split = user.getZipCode().split("-");
             zipCode.setText(split[0]);
             zipCodeSecond.setText(split[1]);

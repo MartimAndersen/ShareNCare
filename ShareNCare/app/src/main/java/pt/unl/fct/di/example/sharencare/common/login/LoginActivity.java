@@ -136,8 +136,8 @@ public class LoginActivity extends AppCompatActivity implements Serializable {
                         if (r.isSuccessful()) {
                             if (remember.isChecked()) {
                                 loginUser(u.getUsername(), 0);
-                                saveUser(r);
                             }
+                            saveUser(r);
 
                             openWelcomeActivity.putExtra("name_key", username.getText().toString());
                             openWelcomeActivity.putExtra("user_type", 0);

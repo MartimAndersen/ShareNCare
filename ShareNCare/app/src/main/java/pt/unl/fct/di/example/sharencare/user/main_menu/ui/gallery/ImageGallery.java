@@ -21,10 +21,11 @@ public class ImageGallery {
         File imagesFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), galleryFolderName);
         File[] files = imagesFolder.listFiles();
 
-        for(int i = 0; i < files.length; i++){
-            Uri uri = Uri.parse(files[i].toString());
-            allImagesList.add(uri.getPath());
-
+        if(files != null) {
+            for (int i = 0; i < files.length; i++) {
+                Uri uri = Uri.parse(files[i].toString());
+                allImagesList.add(uri.getPath());
+            }
         }
 
         return allImagesList;
