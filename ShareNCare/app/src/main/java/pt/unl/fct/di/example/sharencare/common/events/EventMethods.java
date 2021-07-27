@@ -95,7 +95,6 @@ public class EventMethods {
                 for (int j = 0; j < list.size(); j++)
                     event.add(list.get(j).get("value").toString());
 
-
                 EventData e = new EventData(
                         event.get(1),
                         event.get(2),

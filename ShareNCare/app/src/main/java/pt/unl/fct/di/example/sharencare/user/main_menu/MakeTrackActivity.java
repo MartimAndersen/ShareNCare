@@ -208,7 +208,7 @@ public class MakeTrackActivity extends AppCompatActivity implements RoutingListe
                     myLocation = new LatLng(lat, lon);
                     end = myLocation;
                     addedEvents.add(myLocation);
-                    map.addMarker(new MarkerOptions().position(myLocation).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    map.addMarker(new MarkerOptions().position(myLocation).title(title).snippet("USER").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     map.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
                     map.moveCamera(CameraUpdateFactory.zoomTo(7));
                 }
@@ -230,57 +230,11 @@ public class MakeTrackActivity extends AppCompatActivity implements RoutingListe
         LatLng loc = new LatLng(event.getLat(), event.getLon());
         String data = gson.toJson(event);
 
-        map.addMarker(new MarkerOptions().position(loc).title(event.getName()).snippet(data));
+        map.addMarker(new MarkerOptions().position(loc).title(data).snippet("MARKER"));
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull @NotNull Marker marker) {
-                View infoView = findViewById(R.id.info_view);
-                infoView.setVisibility(View.VISIBLE);
-
-                Type t = new TypeToken<EventData>(){}.getType();
-                EventData e = gson.fromJson(marker.getSnippet(), t);
-
-                eventName = infoView.findViewById(R.id.fragment_event_info_name);
-                eventDate = infoView.findViewById(R.id.fragment_event_info_date);
-                eventInstitution = infoView.findViewById(R.id.fragment_event_info_institution);
-                eventTags = infoView.findViewById(R.id.fragment_event_info_tags);
-                Button select = infoView.findViewById(R.id.activity_make_track_select);
-
-                String markerTitle = marker.getTitle();
-
-                eventName.setText(markerTitle);
-                eventDate.setText(getDateAndTime(e.getInitialDate(), e.getEndingDate(), e.getTime()));
-                eventInstitution.setText(e.getInstitutionName());
-                List<Integer> tag = EventMethods.getTags(gson.toJson(e.getTags()));
-                if(!set) {
-                    for (int chip : tag)
-                        setChip(chip, infoView.getContext());
-                    set = true;
-                }
-
-                select.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        LatLng coordinates = new LatLng(e.getLat(), e.getLon());
-                        start = end;
-                        end = coordinates;
-                        if(!addedEvents.contains(coordinates)) {
-                            addedEvents.add(coordinates);
-                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-                            findRoutes(start, end);
-                        } else{
-                            int position = -1;
-                            for(int i = 0; i < addedEvents.size() && position == -1; i++){
-                                if(addedEvents.get(i) == coordinates)
-                                    position = i;
-                            }
-                            addedEvents.remove(coordinates);
-                            polylines.remove(position);
-                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                        }
-                    }
-                });
-
+                markerClickEvent(marker, marker.getSnippet());
                 return false;
             }
         });
@@ -426,6 +380,66 @@ public class MakeTrackActivity extends AppCompatActivity implements RoutingListe
                         Toast.makeText(getApplicationContext(), "FAIL", Toast.LENGTH_LONG);
                     }
                 });
+            }
+        });
+    }
+
+    private void markerClickEvent(Marker marker, String type){
+        if(type != null){
+            switch(type) {
+                case "MARKER":
+                    showInfo(marker);
+                case "USER":
+                    break;
+            }
+        }
+    }
+
+    private void showInfo(Marker marker){
+        View infoView = findViewById(R.id.info_view);
+        infoView.setVisibility(View.VISIBLE);
+
+        Type t = new TypeToken<EventData>(){}.getType();
+        EventData e = gson.fromJson(marker.getTitle(), t);
+
+        eventName = infoView.findViewById(R.id.fragment_event_info_name);
+        eventDate = infoView.findViewById(R.id.fragment_event_info_date);
+        eventInstitution = infoView.findViewById(R.id.fragment_event_info_institution);
+        eventTags = infoView.findViewById(R.id.fragment_event_info_tags);
+        Button select = infoView.findViewById(R.id.activity_make_track_select);
+
+        String markerTitle = marker.getTitle();
+
+        eventName.setText(e.getName());
+        eventDate.setText(getDateAndTime(e.getInitialDate(), e.getEndingDate(), e.getTime()));
+        eventInstitution.setText(e.getInstitutionName());
+        List<Integer> tag = EventMethods.getTags(gson.toJson(e.getTags()));
+        if(!set) {
+            for (int chip : tag)
+                setChip(chip, infoView.getContext());
+            set = true;
+        }
+
+        select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LatLng coordinates = new LatLng(e.getLat(), e.getLon());
+                start = end;
+                end = coordinates;
+                if(!addedEvents.contains(coordinates)) {
+                    addedEvents.add(coordinates);
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+                    findRoutes(start, end);
+                } else{
+                    int position = -1;
+                    for(int i = 0; i < addedEvents.size() && position == -1; i++){
+                        if(addedEvents.get(i) == coordinates)
+                            position = i;
+                    }
+                    addedEvents.remove(coordinates);
+                    polylines.remove(position);
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                }
             }
         });
     }

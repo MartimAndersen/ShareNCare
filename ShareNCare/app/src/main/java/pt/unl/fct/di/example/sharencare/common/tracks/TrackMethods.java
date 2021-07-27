@@ -38,8 +38,12 @@ public class TrackMethods {
                 for (int j = 0; j < list.size(); j++)
                     track.add(list.get(j).get("value").toString());
 
+                String rating = track.get(0);
+                if(rating.equals(""))
+                    rating = String.valueOf(0);
+
                 TrackInfo t = new TrackInfo(
-                        Float.parseFloat(track.get(0)),
+                        Float.parseFloat(rating),
                         track.get(1),
                         track.get(2),
                         Integer.parseInt(track.get(3)),

@@ -194,9 +194,6 @@ public class MainMenuUserActivity extends AppCompatActivity {
             case R.id.action_record_track:
                 startActivity(new Intent(MainMenuUserActivity.this, TrackOptionsActivity.class));
                 break;
-            case R.id.action_search_filters:
-                startActivityForResult(new Intent(MainMenuUserActivity.this, FilterActivity.class), 101);
-                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -336,13 +333,13 @@ public class MainMenuUserActivity extends AppCompatActivity {
     }
 
 
-    private String getTags(ChipGroup tags){
+    private List<Integer> getTags(ChipGroup tags){
         List<Integer> t = new ArrayList<>();
         for(int i = 0; i < tags.getChildCount(); i++) {
             Chip chip = (Chip) tags.getChildAt(i);
             if (chip.isChecked())
                 t.add(i);
         }
-        return gson.toJson(t);
+        return t;
     }
 }

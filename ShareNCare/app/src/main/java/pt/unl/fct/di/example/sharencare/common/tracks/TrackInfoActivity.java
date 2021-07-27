@@ -383,11 +383,6 @@ public class TrackInfoActivity extends AppCompatActivity implements
     private void onPlay() {
         requestingLocationUpdates = true;
         getLocation();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         play.setVisibility(View.INVISIBLE);
         stop.setVisibility(View.VISIBLE);
         camera.setVisibility(View.VISIBLE);
@@ -395,6 +390,11 @@ public class TrackInfoActivity extends AppCompatActivity implements
         danger.setVisibility(View.VISIBLE);
         marker.setVisibility(View.VISIBLE);
         startLocationUpdates();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -944,7 +944,7 @@ public class TrackInfoActivity extends AppCompatActivity implements
 
             int position = -1;
 
-            for(int i = 0; i < pins.length; i++)
+            for(int i = 0; i < pins.length && position == -1; i++)
                 if(pins[i].equals(type))
                     position = i;
 

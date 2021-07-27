@@ -1,5 +1,7 @@
 package pt.unl.fct.di.example.sharencare.user.main_menu.ui.events;
 
+import java.util.List;
+
 public class FilterData {
 
     private String coordinates;
@@ -7,9 +9,9 @@ public class FilterData {
     private String institution;
     private String name;
     private String popularity;
-    private String tags;
+    private List<Integer> tags;
 
-    public FilterData(String coordinates, String date, String institution, String name, String popularity, String tags) {
+    public FilterData(String coordinates, String date, String institution, String name, String popularity, List<Integer> tags) {
         this.coordinates = coordinates;
         this.date = date;
         this.institution = institution;
@@ -58,11 +60,11 @@ public class FilterData {
         this.popularity = popularity;
     }
 
-    public String getTags() {
+    public List<Integer> getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(List<Integer> tags) {
         this.tags = tags;
     }
 }

@@ -239,7 +239,7 @@ public class MapResource {
 					.set("trackNotes", track.getString("trackNotes"))
 					.set("trackDangerZones", track.getString("trackDangerZones"))
 					.set("markers", track.getString("markers")).set("type", track.getString("type"))
-					.set("username", track.getString("username")).set("average_rating", rating).build();
+					.set("username", track.getString("username")).set("average_rating", String.valueOf(rating)).build();
 
 			txn.update(track);
 			txn.commit();

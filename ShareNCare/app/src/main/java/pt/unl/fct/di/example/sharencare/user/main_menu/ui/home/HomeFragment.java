@@ -132,21 +132,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         String userInfo = sharedpreferences.getString("USER", null);
         UserInfo user = gson.fromJson(userInfo, UserInfo.class);
 
-        if (getArguments() != null) {
-            Fragment currentFragment = getChildFragmentManager().findFragmentByTag("HomeFragment");
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.detach(currentFragment);
-            fragmentTransaction.attach(currentFragment);
-            fragmentTransaction.commit();
-
-            String s = getArguments().getString("filter");
-            Type t = new TypeToken<List<EventData>>(){}.getType();
-            List<EventData> events = gson.fromJson(s, t);
-
-            for(EventData e : events)
-                showEvents(e);
-
-        } else {
+        if (!user.getTags().isEmpty()){
             eventsRepository.getEventsService()
                     .getEventPreferences(user.getToken())
                     .enqueue(new Callback<ResponseBody>() {
@@ -164,9 +150,27 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                             Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
                         }
                     });
-        }
+        } else {
+            eventsRepository.getEventsService()
+                    .getAllEvents(user.getToken())
+                    .enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                            if (r.isSuccessful()) {
+                                getEvents(r);
+                            } else {
+                                Toast.makeText(getActivity(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast.makeText(getActivity(), "NO", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
+
 
     @Override
     public void onDestroyView() {
