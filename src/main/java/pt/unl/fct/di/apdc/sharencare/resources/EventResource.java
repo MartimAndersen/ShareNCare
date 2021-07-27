@@ -1042,7 +1042,9 @@ public class EventResource {
 			Entity e = eventsQuery.next();
 			String event = g.toJson(e.getProperties().values());
 			if (data.containsTag(e.getString("tags"))) {
-				events.add(event);
+				if (!hasEnded(e.getString("ending_date"))) {
+					events.add(event);
+				}
 			}
 		}
 		return Response.ok(g.toJson(events)).build();
