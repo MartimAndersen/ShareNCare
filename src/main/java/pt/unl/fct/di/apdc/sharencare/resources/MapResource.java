@@ -341,10 +341,19 @@ public class MapResource {
 			
 			String bucketName = "capable-sphinx-312419" + "-" + track.getString("title");
 			Bucket bucket = null;
-			if(storage.get(bucketName,Storage.BucketGetOption.fields(Storage.BucketField.values())) == null) {
+			
+			Page<Bucket> b = storage.list();
+			boolean hasBucket = false;
+			for(Bucket bu: b.getValues()) {
+				if(bu.getName().equals(bucketName)) {
+					hasBucket = true;
+				}
+				
+			}
+			if(!hasBucket) {
 				bucket = storage.create(BucketInfo.of(bucketName));
 			}else {
-				bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
+				bucket = storage.get(bucketName,
 						Storage.BucketGetOption.fields(Storage.BucketField.values()));
 			}
 			
