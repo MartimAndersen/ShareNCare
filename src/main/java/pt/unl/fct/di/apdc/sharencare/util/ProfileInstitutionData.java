@@ -58,6 +58,10 @@ public class ProfileInstitutionData {
 		return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14);
 	}
 	
+	public boolean validLandLine() {
+		return (landLine.equals("") || landLine.length() == 9 || landLine.length() == 13 || landLine.length() == 14) && landLine.matches("^[0-9]*$");
+	}
+	
 	public boolean validPostalCode() {
 		return (zipCode.equals("") || zipCode.matches("\\d{4}(-\\d{3})?"));
 	}

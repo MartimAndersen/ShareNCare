@@ -65,7 +65,7 @@ function callChangeAttributes(data) {
                 case 405: alert("Invalid Postal Code."); break;
                 case 412: alert("Invalid email."); break;
                 case 409: alert("Invalid fax."); break;
-                case 417: alert("Invalid mobile phone."); break;
+                case 417: alert("Invalid mobile phone or LandLine ."); break;
                 default: alert("Wrong parameters."); break;
             }
         }
