@@ -105,7 +105,7 @@ function callChangeAttributes(data) {
                     alert("Invalid postal code.");
                     break;
                 case 417:
-                    alert("Invalid mobile phone.");
+                    alert("Invalid mobile phone or landLine.");
                     break;
                 default:
                     alert("Wrong parameters.");

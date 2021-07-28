@@ -109,6 +109,8 @@ public class InsideLoginInstitutionResource {
 
 		if (!data.validPhone())
 			return Response.status(Status.EXPECTATION_FAILED).build();
+		if (!data.validLandLine())
+			return Response.status(Status.EXPECTATION_FAILED).build();
 
 		if (!data.validPostalCode())
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
@@ -197,6 +199,8 @@ public class InsideLoginInstitutionResource {
 			return Response.status(Status.PRECONDITION_FAILED).build();
 
 		if (!data.validPhone())
+			return Response.status(Status.EXPECTATION_FAILED).build();
+		if (!data.validLandLine())
 			return Response.status(Status.EXPECTATION_FAILED).build();
 
 		if (!data.validPostalCode())
