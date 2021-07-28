@@ -1,10 +1,16 @@
 package pt.unl.fct.di.apdc.sharencare.resources;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
@@ -16,8 +22,20 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.api.gax.paging.Page;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
+import com.google.appengine.tools.cloudstorage.GcsFileOptions;
+import com.google.appengine.tools.cloudstorage.GcsFilename;
+import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
+import com.google.appengine.tools.cloudstorage.GcsService;
+import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -26,7 +44,6 @@ import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
-
 
 import pt.unl.fct.di.apdc.sharencare.util.*;
 
@@ -44,6 +61,8 @@ public class InsideLoginResource {
 	private final Bucket bucket = storage.get("capable-sphinx-312419-sharencare-apdc-2021",
 			Storage.BucketGetOption.fields(Storage.BucketField.values()));
 
+	private final GcsService gcsService = GcsServiceFactory.createGcsService();
+
 	private final Gson g = new Gson();
 	private Entity event;
 
@@ -54,7 +73,7 @@ public class InsideLoginResource {
 
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
-		 */		
+		 */
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -78,17 +97,17 @@ public class InsideLoginResource {
 		if (user == null)
 			return Response.status(Status.BAD_REQUEST)
 					.entity("User with username: " + data.userToDelete + " doesn't exist").build();
-		
+
 		Key backOfficeUserKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity backofficeUser = datastore.get(backOfficeUserKey);
-		
+
 		if (backofficeUser == null)
-			return Response.status(Status.BAD_REQUEST).entity("BackOffice user with username: " + token.getString("username") + " doesn't exist").build();
-		
-		if(!backofficeUser.getString("role").equals("GA")) {
+			return Response.status(Status.BAD_REQUEST)
+					.entity("BackOffice user with username: " + token.getString("username") + " doesn't exist").build();
+
+		if (!backofficeUser.getString("role").equals("GA")) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		
 
 		if (!token.getString("username").equals(data.userToDelete))
 			if (!checkRole(user.getString("role"), token.getString("role")))
@@ -100,40 +119,38 @@ public class InsideLoginResource {
 		 */
 
 		datastore.delete(userKey);
-		
-		 Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
 
-	        QueryResults<Entity> eventsQuery = datastore.run(query);
-	        List<String> members = new ArrayList<>();
-	        Type stringList = new TypeToken<ArrayList<String>>() {
-	        }.getType();
-	        
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("Event").build();
 
-	        while (eventsQuery.hasNext()) {
-	                Entity e = eventsQuery.next();
-	                String m = e.getString("members");
-	                members = g.fromJson(m, stringList);
-	               if( members.contains(data.userToDelete)) {
-	            	   members.remove(data.userToDelete);
-	            	   System.out.println(members);
-	                   Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(e.getString("name"));
-	                   Entity event = datastore.get(eventKey);
-	                   
-	                   
-	            	   event = Entity.newBuilder(eventKey).set("name", e.getString("name"))
-	                           .set("description", e.getString("description"))
-	                           .set("minParticipants", e.getString("minParticipants"))
-	                           .set("maxParticipants", e.getString("maxParticipants")).set("time", e.getString("time"))
-	                           .set("coordinates", e.getString("coordinates")).set("durability", e.getString("durability"))
-	                           .set("institutionName", e.getString("institutionName"))
-	                           .set("initial_date", e.getString("initial_date"))
-	                           .set("ending_date", e.getString("ending_date")).set("members", g.toJson(members))
-	                           .set("points", e.getString("points")).set("tags", e.getString("tags"))
-	                           .set("rating", e.getString("rating")).set("ended", e.getString("ended")).build();
-	            	   datastore.update(event);
-	               }
-	            }
-	     
+		QueryResults<Entity> eventsQuery = datastore.run(query);
+		List<String> members = new ArrayList<>();
+		Type stringList = new TypeToken<ArrayList<String>>() {
+		}.getType();
+
+		while (eventsQuery.hasNext()) {
+			Entity e = eventsQuery.next();
+			String m = e.getString("members");
+			members = g.fromJson(m, stringList);
+			if (members.contains(data.userToDelete)) {
+				members.remove(data.userToDelete);
+				System.out.println(members);
+				Key eventKey = datastore.newKeyFactory().setKind("Event").newKey(e.getString("name"));
+				Entity event = datastore.get(eventKey);
+
+				event = Entity.newBuilder(eventKey).set("name", e.getString("name"))
+						.set("description", e.getString("description"))
+						.set("minParticipants", e.getString("minParticipants"))
+						.set("maxParticipants", e.getString("maxParticipants")).set("time", e.getString("time"))
+						.set("coordinates", e.getString("coordinates")).set("durability", e.getString("durability"))
+						.set("institutionName", e.getString("institutionName"))
+						.set("initial_date", e.getString("initial_date")).set("ending_date", e.getString("ending_date"))
+						.set("members", g.toJson(members)).set("points", e.getString("points"))
+						.set("tags", e.getString("tags")).set("rating", e.getString("rating"))
+						.set("ended", e.getString("ended")).build();
+				datastore.update(event);
+			}
+		}
+
 		return Response.ok(data.userToDelete + " was successfully removed").build();
 
 	}
@@ -150,8 +167,8 @@ public class InsideLoginResource {
 			return Response.status(Status.FORBIDDEN).entity("User with username: " + data.username + " doesn't exist")
 					.build();
 		}
-		
-		if(!user.getString("role").equals("USER")) {
+
+		if (!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
@@ -161,9 +178,8 @@ public class InsideLoginResource {
 				.set("mobile", user.getString("mobile")).set("address", user.getString("address"))
 				.set("secondAddress", user.getString("secondAddress")).set("zipCode", user.getString("zipCode"))
 				.set("tags", g.toJson(data.tags)).set("events", user.getString("events"))
-				.set("role", user.getString("role")).set("state", user.getString("state")).set("points", user.getString("points"))
-				.set("my_tracks", user.getString("my_tracks"))
-				.build();
+				.set("role", user.getString("role")).set("state", user.getString("state"))
+				.set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
 
 		datastore.update(user);
 
@@ -199,8 +215,8 @@ public class InsideLoginResource {
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-		
-		if(!user.getString("role").equals("USER")) {
+
+		if (!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
@@ -227,9 +243,6 @@ public class InsideLoginResource {
 
 		if (!data.validPhone())
 			return Response.status(Status.EXPECTATION_FAILED).build();
-		
-		if (!data.validLandLine())
-			return Response.status(Status.EXPECTATION_FAILED).build();
 
 		if (!data.validZipCode())
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
@@ -237,19 +250,19 @@ public class InsideLoginResource {
 		if (!data.validProfileType())
 			return Response.status(Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 		System.out.println(profilePic);
-		if(profilePic != null) {
-			bucket.create(user.getString("username"), profilePic);
-		}else {
+		if (profilePic != null) {
+			bucket.create(token.getString("username"), profilePic);
+		} else {
 			profilePic = null;
 		}
-
 
 		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
 				.set("password", user.getString("password")).set("bio", bio).set("email", email)
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", tags)
 				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
+				.set("state", user.getString("state")).set("points", user.getString("points"))
+				.set("my_tracks", user.getString("my_tracks")).build();
 
 		datastore.update(user);
 
@@ -284,8 +297,8 @@ public class InsideLoginResource {
 		if (user.getString("state").equals("DISABLED"))
 			return Response.status(Status.NOT_ACCEPTABLE)
 					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-		
-		if(!user.getString("role").equals("USER")) {
+
+		if (!user.getString("role").equals("USER")) {
 			return Response.status(Status.CONFLICT).build();
 		}
 
@@ -302,10 +315,10 @@ public class InsideLoginResource {
 		String profileType = data.profileType;
 		String tags = g.toJson(data.tags);
 		String bio = data.bio;
-		//String profilePic = data.profilePic;
+		// String profilePic = data.profilePic;
 
 		System.out.println("aqui");
-		if (data.noChange(user)  /*&& getProfilePic(user.getString("username")) == profilePic*/)
+		if (data.noChange(user) /* && getProfilePic(user.getString("username")) == profilePic */)
 			return Response.status(Status.LENGTH_REQUIRED).build();
 
 		if (!data.validEmail())
@@ -313,7 +326,7 @@ public class InsideLoginResource {
 
 		if (!data.validPhone())
 			return Response.status(Status.EXPECTATION_FAILED).build();
-		
+
 		if (!data.validLandLine())
 			return Response.status(Status.EXPECTATION_FAILED).build();
 
@@ -329,7 +342,8 @@ public class InsideLoginResource {
 				.set("profileType", profileType).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("secondAddress", secondAddress).set("zipCode", zipCode).set("tags", tags)
 				.set("events", user.getString("events")).set("role", user.getString("role"))
-				.set("state", user.getString("state")).set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
+				.set("state", user.getString("state")).set("points", user.getString("points"))
+				.set("my_tracks", user.getString("my_tracks")).build();
 
 		datastore.update(user);
 
@@ -340,16 +354,17 @@ public class InsideLoginResource {
 	@Path("/getPic")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPic(@CookieParam("Token") NewCookie cookie) {
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-		
+
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null) {
 			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
 
 		}
 
@@ -380,7 +395,7 @@ public class InsideLoginResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
 
@@ -395,7 +410,8 @@ public class InsideLoginResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
 
 		/*
 		 * END OF VERIFICATIONS
@@ -412,7 +428,6 @@ public class InsideLoginResource {
 		return Response.ok(g.toJson(user.getProperties().values()) + g.toJson(pic)).cookie(cookie).build();
 	}
 
-	
 	@POST
 	@Path("/changeRole")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -463,7 +478,8 @@ public class InsideLoginResource {
 				.set("mobile", userToBeChanged.getString("mobile")).set("address", userToBeChanged.getString("address"))
 				.set("secondAddress", userToBeChanged.getString("secondAddress"))
 				.set("zipCode", userToBeChanged.getString("zipCode")).set("role", data.roleToChange)
-				.set("state", userToBeChanged.getString("state")).set("points", userToBeChanged.getString("points")).set("my_tracks", userToBeChanged.getString("my_tracks")).build();
+				.set("state", userToBeChanged.getString("state")).set("points", userToBeChanged.getString("points"))
+				.set("my_tracks", userToBeChanged.getString("my_tracks")).build();
 
 		datastore.update(userToBeChanged);
 		return Response.ok(data.userToBeChanged + " role was changed to: " + data.roleToChange).cookie(cookie).build();
@@ -518,7 +534,8 @@ public class InsideLoginResource {
 				.set("address", userToChange.getString("address"))
 				.set("secondAddress", userToChange.getString("secondAddress"))
 				.set("zipCode", userToChange.getString("zipCode")).set("role", userToChange.getString("role"))
-				.set("state", data.state).set("points", userToChange.getString("points")).set("my_tracks", userToChange.getString("my_tracks")).build();
+				.set("state", data.state).set("points", userToChange.getString("points"))
+				.set("my_tracks", userToChange.getString("my_tracks")).build();
 
 		datastore.put(userToChange);
 		return Response.ok(data.userToChange + " state was changed to: " + data.state).build();
@@ -542,7 +559,7 @@ public class InsideLoginResource {
 
 		return Response.ok(user + " is now logged out.").cookie(cookieAux).build();
 	}
-	
+
 	@POST
 	@Path("/changeEmail")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -574,31 +591,30 @@ public class InsideLoginResource {
 		/*
 		 * END OF VERIFICATIONS
 		 */
-		
+
 		String hashedPWD = user.getString("password");
 		if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 			if (data.validEmail()) {
 				Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
-    					.setFilter(PropertyFilter.eq("email", data.newEmail)).build();
-    			QueryResults<Entity> results = datastore.run(query);
-    			if(results.hasNext()) {
-                    return Response.status(Response.Status.FORBIDDEN)
-                            .entity("Email " + data.newEmail + " already exists.").build();
-    			}else {		
-    				user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-    						.set("password", user.getString("password"))
-    						.set("email", data.newEmail).set("bio", user.getString("bio"))
-    						.set("profileType", user.getString("profileType"))
-    						.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
-    						.set("address", user.getString("address"))
-    						.set("secondAddress", user.getString("secondAddress"))
-    						.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
-    						.set("state", user.getString("state"))
-    						.set("tags", user.getString("tags")).set("events", user.getString("events"))
-    						.set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
-    				datastore.put(user);
-    				return Response.ok("Email was changed").cookie(cookie).build();  				
-    			}
+						.setFilter(PropertyFilter.eq("email", data.newEmail)).build();
+				QueryResults<Entity> results = datastore.run(query);
+				if (results.hasNext()) {
+					return Response.status(Response.Status.FORBIDDEN)
+							.entity("Email " + data.newEmail + " already exists.").build();
+				} else {
+					user = Entity.newBuilder(userKey).set("username", token.getString("username"))
+							.set("password", user.getString("password")).set("email", data.newEmail)
+							.set("bio", user.getString("bio")).set("profileType", user.getString("profileType"))
+							.set("landLine", user.getString("landLine")).set("mobile", user.getString("mobile"))
+							.set("address", user.getString("address"))
+							.set("secondAddress", user.getString("secondAddress"))
+							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
+							.set("state", user.getString("state")).set("tags", user.getString("tags"))
+							.set("events", user.getString("events")).set("points", user.getString("points"))
+							.set("my_tracks", user.getString("my_tracks")).build();
+					datastore.put(user);
+					return Response.ok("Email was changed").cookie(cookie).build();
+				}
 			}
 			return Response.status(Response.Status.NOT_ACCEPTABLE).build();
 		}
@@ -650,9 +666,9 @@ public class InsideLoginResource {
 							.set("address", user.getString("address"))
 							.set("secondAddress", user.getString("secondAddress"))
 							.set("zipCode", user.getString("zipCode")).set("role", user.getString("role"))
-							.set("state", user.getString("state"))
-							.set("tags", user.getString("tags")).set("events", user.getString("events"))
-							.set("points", user.getString("points")).set("my_tracks", user.getString("my_tracks")).build();
+							.set("state", user.getString("state")).set("tags", user.getString("tags"))
+							.set("events", user.getString("events")).set("points", user.getString("points"))
+							.set("my_tracks", user.getString("my_tracks")).build();
 					datastore.put(user);
 					return Response.ok("Password was changed").cookie(cookie).build();
 
@@ -677,8 +693,7 @@ public class InsideLoginResource {
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist")
-					.build();
+			return Response.status(Status.BAD_REQUEST).entity("Token with id: " + tokenId + " doesn't exist").build();
 
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
@@ -745,7 +760,7 @@ public class InsideLoginResource {
 
 		return pic;
 	}
-	
+
 	@GET
 	@Path("/getCurrentUser")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -754,80 +769,78 @@ public class InsideLoginResource {
 		/*
 		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
 		 */
-		
+
 		if (cookie.getName().equals(""))
 			return Response.status(Status.UNAUTHORIZED).build();
-
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
 		Entity token = datastore.get(tokenKey);
 
 		if (token == null)
-			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist").build();
-		
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
+
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
 		Entity user = datastore.get(userKey);
 
 		if (user == null)
-			return Response.status(Status.FORBIDDEN).entity("User with username: " + token.getString("username") + " doesn't exist")
-					.build();
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
 
-        Type listString = new TypeToken<ArrayList<String>>() {
-        }.getType();
-        List<String> events = new Gson().fromJson(user.getString("events"), listString);
-        
-        Type listInt = new TypeToken<ArrayList<Integer>>() {
-        }.getType();
-        List<Integer> tags = new Gson().fromJson(user.getString("tags"), listInt);
-        
-        byte[] profilePic = null;
-		ProfileData data = new ProfileData(user.getString("address"), user.getString("bio"), user.getString("email"), events, user.getString("landLine"), user.getString("mobile"),
-				profilePic, user.getString("profileType"), user.getString("secondAddress"),tags , user.getString("zipCode"));
-	
+		Type listString = new TypeToken<ArrayList<String>>() {
+		}.getType();
+		List<String> events = new Gson().fromJson(user.getString("events"), listString);
+
+		Type listInt = new TypeToken<ArrayList<Integer>>() {
+		}.getType();
+		List<Integer> tags = new Gson().fromJson(user.getString("tags"), listInt);
+
+		byte[] profilePic = null;
+		ProfileData data = new ProfileData(user.getString("address"), user.getString("bio"), user.getString("email"),
+				events, user.getString("landLine"), user.getString("mobile"), profilePic, user.getString("profileType"),
+				user.getString("secondAddress"), tags, user.getString("zipCode"));
+
 		return Response.ok(g.toJson(data)).cookie(cookie).build();
-		
 
 	}
-	
+
 	@GET
-    @Path("/getAllUsers")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@CookieParam("Token") NewCookie cookie) {
+	@Path("/getAllUsers")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllUsers(@CookieParam("Token") NewCookie cookie) {
 
-        /*
-         * MAKE ALL VERIFICATIONS BEFORE METHOD START
-         */
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
 
-        if (cookie.getName().equals(""))
-            return Response.status(Status.UNAUTHORIZED).build();
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
 
-        Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-        Entity token = datastore.get(tokenKey);
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
 
-        if (token == null)
-            return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
-                    .build();
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id: " + cookie.getName() + " doesn't exist")
+					.build();
 
-        /*
-         * END OF VERIFICATIONS
-         */
+		/*
+		 * END OF VERIFICATIONS
+		 */
 
-        Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
+		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
 
-        QueryResults<Entity> usersQuery = datastore.run(query);
-        List<String> users = new ArrayList<>();
-        while (usersQuery.hasNext()) {
-            Entity e = usersQuery.next();
-            if(e.getString("profileType").equals("public")) {
-            	String user = g.toJson(e.getProperties().values());
-            	users.add(user);
-            }
-        }
+		QueryResults<Entity> usersQuery = datastore.run(query);
+		List<String> users = new ArrayList<>();
+		while (usersQuery.hasNext()) {
+			Entity e = usersQuery.next();
+			if (e.getString("profileType").equals("public")) {
+				String user = g.toJson(e.getProperties().values());
+				users.add(user);
+			}
+		}
 
-        return Response.ok(g.toJson(users)).cookie(cookie).build();
-    }
-
-
+		return Response.ok(g.toJson(users)).cookie(cookie).build();
+	}
 
 }
