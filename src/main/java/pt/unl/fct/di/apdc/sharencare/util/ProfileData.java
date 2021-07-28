@@ -45,13 +45,13 @@ public class ProfileData {
 		int emailSize = splitEmail.length - 1;
 		return (email.contains("@") && (splitEmail[emailSize].length() == 2 || splitEmail[emailSize].length() == 3));
 	}
-
-	public boolean validPhones() {
-		return mobile.length() <= 15 || landLine.length() <= 15;
-	}
 	
 	public boolean validPhone() {
-		return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14);
+		return (mobile.equals("") || mobile.length() == 9 || mobile.length() == 13 || mobile.length() == 14) && mobile.matches("^[0-9]*$");
+	}
+	
+	public boolean validLandLine() {
+		return (landLine.equals("") || landLine.length() == 9 || landLine.length() == 13 || landLine.length() == 14) && landLine.matches("^[0-9]*$");
 	}
 
 	public boolean validZipCode() {

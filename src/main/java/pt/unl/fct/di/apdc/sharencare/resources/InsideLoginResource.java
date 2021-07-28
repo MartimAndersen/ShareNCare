@@ -225,7 +225,10 @@ public class InsideLoginResource {
 		if (!data.validEmail())
 			return Response.status(Status.PRECONDITION_FAILED).build();
 
-		if (!data.validPhones())
+		if (!data.validPhone())
+			return Response.status(Status.EXPECTATION_FAILED).build();
+		
+		if (!data.validLandLine())
 			return Response.status(Status.EXPECTATION_FAILED).build();
 
 		if (!data.validZipCode())
@@ -308,7 +311,10 @@ public class InsideLoginResource {
 		if (!data.validEmail())
 			return Response.status(Status.PRECONDITION_FAILED).build();
 
-		if (!data.validPhones())
+		if (!data.validPhone())
+			return Response.status(Status.EXPECTATION_FAILED).build();
+		
+		if (!data.validLandLine())
 			return Response.status(Status.EXPECTATION_FAILED).build();
 
 		if (!data.validZipCode())
