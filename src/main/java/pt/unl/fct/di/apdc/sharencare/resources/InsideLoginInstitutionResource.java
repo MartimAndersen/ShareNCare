@@ -144,10 +144,37 @@ public class InsideLoginInstitutionResource {
 			System.out.println("You need to be logged in to execute this operation.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
-		if (data.allEmptyParameters()) {
-			System.out.println("Please enter at least one new attribute.");
-			return Response.status(Status.LENGTH_REQUIRED).build();
+		/*
+		 * MAKE ALL VERIFICATIONS BEFORE METHOD START
+		 */
+
+		if (cookie.getName().equals(""))
+			return Response.status(Status.UNAUTHORIZED).build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null)
+			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
+
+		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
+		Entity user = datastore.get(userKey);
+
+		if (user == null)
+			return Response.status(Status.FORBIDDEN)
+					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
+
+		if (user.getString("state").equals("DISABLED"))
+			return Response.status(Status.NOT_ACCEPTABLE)
+					.entity("User with id: " + user.getString("username") + " is disabled.").build();
+		
+		if(user.getString("role").equals("USER")) {
+			return Response.status(Status.CONFLICT).build();
 		}
+
+		/*
+		 * END OF VERIFICATIONS
+		 */
 
 		String email = data.email;
 		String mobile = data.mobile;
@@ -160,120 +187,37 @@ public class InsideLoginInstitutionResource {
 		String facebook = data.facebook;
 		String youtube = data.youtube;
 		String fax = data.fax;
-		//byte[] profilePic = data.profilePic;
 		String bio = data.bio;
-
-		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(cookie.getName());
-		Entity token = datastore.get(tokenKey);
-
-		if (token == null) {
-			System.out.println("The given token does not exist.");
-			return Response.status(Status.NOT_FOUND).entity("Token with id doesn't exist").build();
-		}
-
-
-		Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getString("username"));
-		Entity user = datastore.get(userKey);
-
-		if (user == null) {
-			System.out.println("The user with the given token does not exist.");
-			return Response.status(Status.FORBIDDEN)
-					.entity("User with username: " + token.getString("username") + " doesn't exist").build();
-		}
-
-		if (user.getString("state").equals("DISABLED")) {
-			System.out.println("The user with the given token is disabled.");
-			return Response.status(Status.NOT_ACCEPTABLE)
-					.entity("User with id: " + user.getString("username") + " is disabled.").build();
-		}
 		
-		if(user.getString("role").equals("USER")) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
+		if (data.noChange(user) )
+			return Response.status(Status.LENGTH_REQUIRED).build();
 
-		if (data.email.equals(""))
-			email = user.getString("email");
-		else {
-			if (!data.validEmail()) {
-				System.out.println("Invalid email.");
-				return Response.status(Status.PRECONDITION_FAILED).build();
-			}
-		}
+		if (!data.validEmail())
+			return Response.status(Status.PRECONDITION_FAILED).build();
 
-//		if (data.profilePic.length == 0) {
-//			profilePic = null;
-//		}
+		if (!data.validPhone())
+			return Response.status(Status.EXPECTATION_FAILED).build();
 
-		if (data.landLine.equals(""))
-			landLine = user.getString("landLine");
-
-		if (data.mobile.equals(""))
-			mobile = user.getString("mobile");
-		else {
-			if (!data.validPhone()) {
-				System.out.println("Invalid mobile phone number.");
-				return Response.status(Status.EXPECTATION_FAILED).build();
-			}
-		}
-
-		if (data.address.equals(""))
-			address = user.getString("address");
-
-		if (data.zipCode.equals("")) {
-			zipCode = user.getString("zipCode");
-		} else if (!data.validPostalCode()) {
-			System.out.println("Invalid postal code.");
+		if (!data.validPostalCode())
 			return Response.status(Status.METHOD_NOT_ALLOWED).build();
-		}
 
-		if (data.website.equals("")) {
-			website = user.getString("website");
-
-		} else if (!data.validWebsite()) {
-			System.out.println("Invalid website URL");
+		if (!data.validWebsite())
 			return Response.status(Status.BAD_REQUEST).build();
-		}
 
-		if (data.instagram.equals(""))
-			instagram = user.getString("instagram");
-
-		if (data.twitter.equals(""))
-			twitter = user.getString("twitter");
-
-		if (data.facebook.equals(""))
-			facebook = user.getString("facebook");
-
-		if (data.youtube.equals(""))
-			youtube = user.getString("youtube");
-
-		if (data.fax.equals("")) {
-			fax = user.getString("fax");
-
-		} else if (!data.validFax()) {
-			System.out.println("Invalid fax number");
+		if (!data.validFax())
 			return Response.status(Status.CONFLICT).build();
-		}
-		if (data.bio.equals("")) {
-			bio = user.getString("bio");
-		}
 
-		// falta saber que identificador utilizar para a profile pic
-		//bucket.create(token.getString("username"), profilePic);
-		/*
-		 * if(data.profilePic == null) profilePic = user.getBlob("profilePic");
-		 */
-//	if (!validateData(data))
-//		return Response.status(Status.BAD_REQUEST).entity("Invalid data").build();
+	
+		
 
-		user = Entity.newBuilder(userKey).set("username", token.getString("username"))
-				.set("password", user.getString("password")).set("nif", user.getString("nif"))/**.set("profilePic", user.getString("profilePic"))*/
-				.set("email", email).set("landLine", landLine).set("mobile", mobile).set("address", address)
+		user = Entity.newBuilder(userKey).set("username", user.getString("username"))
+				.set("nif", token.getString("username")).set("password", user.getString("password")).set("email", email)
+				.set("bio", bio).set("landLine", landLine).set("mobile", mobile).set("address", address)
 				.set("zipCode", zipCode).set("website", website).set("twitter", twitter).set("instagram", instagram)
 				.set("youtube", youtube).set("facebook", facebook).set("fax", fax)
-//			.set("members", g.toJson(user.getString("members")))
-				.set("events", g.toJson(user.getString("events")))
-				.set("role", user.getString("role")).set("state", user.getString("state")).set("bio", bio).set("coordinates", user.getString("coordinates")).build();
+				.set("events", user.getString("events")).set("role", user.getString("role"))
+				.set("state", user.getString("state")).set("coordinates", user.getString("coordinates")).build();
 
 		datastore.update(user);
 

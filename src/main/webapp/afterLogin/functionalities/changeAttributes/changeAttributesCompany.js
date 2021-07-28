@@ -70,7 +70,7 @@ function callChangeAttributes(data) {
             }
         }
     };
-    xhttp.open("POST", "/rest/loggedInInstitution/changeAttributes", true);
+    xhttp.open("POST", "/rest/loggedInInstitution/changeAttributesWeb", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(data);
 
