@@ -95,6 +95,9 @@ public class AutocompleteActivity extends AppCompatActivity implements OnMapRead
             lat = place.getLatLng().latitude;
             lon = place.getLatLng().longitude;
 
+            if(loc != null)
+                loc.remove();
+
             loc = map.addMarker(new MarkerOptions()
                     .position(place.getLatLng())
                     .draggable(true));

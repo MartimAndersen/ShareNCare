@@ -215,7 +215,7 @@ public class ProfileFragment extends Fragment {
 
                 String finalZip;
 
-                if(newZipCode.equals("") && newZipCodeSecond.equals(""))
+                if(newZipCode.equals("") || newZipCodeSecond.equals("") || newZipCode.length() < 4 || newZipCodeSecond.length() < 3)
                     finalZip = "";
                 else
                     finalZip = newZipCode + "-" + newZipCodeSecond;
@@ -435,7 +435,7 @@ public class ProfileFragment extends Fragment {
                     try {
                         String body = r.body().string();
                         Type t = new TypeToken<byte[]>(){}.getType();
-                        byte[] byteArray = gson.fromJson(r.body().string(),t);
+                        byte[] byteArray = gson.fromJson(body,t);
                         if(byteArray != null && !body.equals("")) {
                             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                             profilePic.setImageBitmap(bitmap);

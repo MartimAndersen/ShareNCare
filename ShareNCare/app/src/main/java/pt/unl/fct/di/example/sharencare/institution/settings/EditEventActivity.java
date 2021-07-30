@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -23,6 +25,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -208,7 +211,7 @@ public class EditEventActivity extends AppCompatActivity {
                         String.valueOf(lon),
                         maxParticipants.getText().toString(),
                         minParticipants.getText().toString(),
-                        getTags(),
+                        EventMethods.getTags(tags),
                         time1
                 );
 
@@ -227,7 +230,7 @@ public class EditEventActivity extends AppCompatActivity {
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                         if(r.isSuccessful()){
                             addToInstitution(ins.getToken(), e.getName());
-                            Toast.makeText(getApplicationContext(), "Event " + name + " Registered!", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), "Event Changed! Please reload 'My Events'", Toast.LENGTH_SHORT).show();
                         } else
                             Toast.makeText(getApplicationContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT);
                     }
@@ -249,7 +252,7 @@ public class EditEventActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                 if(r.isSuccessful())
-                    Toast.makeText(getApplicationContext(), "Event Added!", Toast.LENGTH_SHORT).show();
+                    ;
                 else
                     Toast.makeText(getApplicationContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
             }
@@ -287,16 +290,6 @@ public class EditEventActivity extends AppCompatActivity {
         dateTo.setText("To: " + date2);
     }
 
-    private List<Integer> getTags(){
-        List<Integer> t = new ArrayList<>();
-        for(int i = 0; i < tags.getChildCount(); i++) {
-            Chip chip = (Chip) tags.getChildAt(i);
-            if (chip.isChecked())
-                t.add(i+1);
-        }
-        return t;
-    }
-
     private void setAttributes(){
         eventsRepository.getEventsService().getEvent(eventName).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -316,6 +309,18 @@ public class EditEventActivity extends AppCompatActivity {
                     minParticipants.setText(event.getMinParticipants());
                     maxParticipants.setText(event.getMaxParticipants());
                     description.setText(event.getDescription());
+
+                    Geocoder geocoder;
+                    List<Address> addresses;
+                    geocoder = new Geocoder(EditEventActivity.this, Locale.getDefault());
+
+                    try {
+                        addresses = geocoder.getFromLocation(event.getLat(), event.getLon(), 1);
+                        String address = addresses.get(0).getAddressLine(0);
+                        location.setText(address);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     List<Integer> t = event.getTags();
 

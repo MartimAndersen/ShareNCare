@@ -238,7 +238,7 @@ public class TrackOthersInfoActivity extends AppCompatActivity implements
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
                     if(r.isSuccessful())
-                        Toast.makeText(TrackOthersInfoActivity.this, "Track Added!", Toast.LENGTH_LONG);
+                        Toast.makeText(TrackOthersInfoActivity.this, "Track Added!", Toast.LENGTH_SHORT);
                     else
                         Toast.makeText(TrackOthersInfoActivity.this, "CODE: " + r.code(), Toast.LENGTH_SHORT);
                 }

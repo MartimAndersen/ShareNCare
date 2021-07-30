@@ -3,6 +3,7 @@ package pt.unl.fct.di.example.sharencare.institution.main_menu.ui.events;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 
@@ -162,7 +163,14 @@ public class EventsFragment extends Fragment {
                             dates[i] = events.get(i).getInitialDate();
                             hours[i] = events.get(i).getTime();
                             try {
-                                locations[i] = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0).getLocality();
+                                Address address = geocoder.getFromLocation(events.get(i).getLat(), events.get(i).getLon(), 1).get(0);
+
+                                if(address.getThoroughfare() != null)
+                                    locations[i] = address.getThoroughfare();
+                                else if(address.getLocality() != null)
+                                    locations[i] = address.getLocality();
+                                else
+                                    locations[i] = address.getCountryName();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

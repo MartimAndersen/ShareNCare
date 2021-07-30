@@ -179,39 +179,43 @@ public class NewEventFragment extends Fragment {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String institutionInfo = sharedpreferences.getString("USER", null);
-                InstitutionInfo ins = gson.fromJson(institutionInfo, InstitutionInfo.class);
+                if(lat == null || lon == null){
+                    Toast.makeText(getContext(), "Please insert location!", Toast.LENGTH_SHORT);
+                } else {
+                    String institutionInfo = sharedpreferences.getString("USER", null);
+                    InstitutionInfo ins = gson.fromJson(institutionInfo, InstitutionInfo.class);
 
-                EventData e = new EventData(
-                        description.getText().toString(),
-                        durability.getSelectedItem().toString(),
-                        date2,
-                        date1,
-                        lat,
-                        lon,
-                        maxParticipants.getText().toString(),
-                        new ArrayList<>(),
-                        minParticipants.getText().toString(),
-                        name.getText().toString(),
-                        EventMethods.getTags(tags),
-                        time1
-                        );
+                    EventData e = new EventData(
+                            description.getText().toString(),
+                            durability.getSelectedItem().toString(),
+                            date2,
+                            date1,
+                            lat,
+                            lon,
+                            maxParticipants.getText().toString(),
+                            new ArrayList<>(),
+                            minParticipants.getText().toString(),
+                            name.getText().toString(),
+                            EventMethods.getTags(tags),
+                            time1
+                    );
 
-                eventsRepository.getEventsService().registerEvent(ins.getToken(), e).enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
-                        if(r.isSuccessful()){
-                            addToInstitution(ins.getToken(), e.getName());
-                            Toast.makeText(getContext(), "Event " + name + " Registered!", Toast.LENGTH_SHORT);
-                        } else
-                            Toast.makeText(getContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT);
-                    }
+                    eventsRepository.getEventsService().registerEvent(ins.getToken(), e).enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> r) {
+                            if (r.isSuccessful()) {
+                                addToInstitution(ins.getToken(), e.getName());
+                                Toast.makeText(getContext(), "Event " + name + " Registered!", Toast.LENGTH_SHORT);
+                            } else
+                                Toast.makeText(getContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT);
+                        }
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT);
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT);
+                        }
+                    });
+                }
             }
         });
     }

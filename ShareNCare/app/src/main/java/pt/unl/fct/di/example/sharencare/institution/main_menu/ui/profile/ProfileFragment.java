@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,9 +64,9 @@ public class ProfileFragment extends Fragment {
     private byte[] image;
 
     private TextView username, email, mobile, landline, address,
-            zipCode, website, instagram, youtube, twitter, facebook, fax, bio;
+            zipCode, zipCodeSecond, website, instagram, youtube, twitter, facebook, fax, bio;
     private EditText editedEmail, editedMobile, editedLandline, editedAddress,
-            editedZipCode, editedWebsite, editedInstagram, editedYoutube, editedTwitter, editedFacebook, editedFax, editedBio;
+            editedZipCode, editedZipCodeSecond, editedWebsite, editedInstagram, editedYoutube, editedTwitter, editedFacebook, editedFax, editedBio;
 
     private ImageView profilePic, editedProfilePic;
 
@@ -110,7 +111,8 @@ public class ProfileFragment extends Fragment {
         address = getView().findViewById(R.id.fragment_profile_institutions_address);
         mobile = getView().findViewById(R.id.fragment_profile_institution_mobile);
         landline = getView().findViewById(R.id.fragment_profile_institution_landline);
-        zipCode = getView().findViewById(R.id.fragment_profile_institution_zip);
+        zipCode = getView().findViewById(R.id.zip_institution);
+        zipCodeSecond = getView().findViewById(R.id.zip_second_institution);
         website = getView().findViewById(R.id.fragment_profile_institution_website);
         instagram = getView().findViewById(R.id.fragment_profile_institution_instagram);
         youtube = getView().findViewById(R.id.fragment_profile_institution_youtube);
@@ -123,7 +125,8 @@ public class ProfileFragment extends Fragment {
         editedAddress = getView().findViewById(R.id.fragment_profile_institution_edit_address);
         editedMobile = getView().findViewById(R.id.fragment_profile_institution_edit_mobile);
         editedLandline = getView().findViewById(R.id.fragment_profile_institution_edit_landline);
-        editedZipCode = getView().findViewById(R.id.fragment_profile_institution_edit_zip);
+        editedZipCode = getView().findViewById(R.id.fragment_profile_zip_code_institution);
+        editedZipCodeSecond = getView().findViewById(R.id.fragment_profile_zip_code_second_institution);
         editedInstagram = getView().findViewById(R.id.fragment_profile_institution_edit_instagram);
         editedFacebook = getView().findViewById(R.id.fragment_profile_institution_edit_facebook);
         editedTwitter = getView().findViewById(R.id.fragment_profile_institution_edit_twitter);
@@ -136,6 +139,7 @@ public class ProfileFragment extends Fragment {
         refresh = getView().findViewById(R.id.refresh_institution);
 
         setAttributes();
+        setTextProperties();
 
         editedProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,6 +177,9 @@ public class ProfileFragment extends Fragment {
                 zipCode.setVisibility(View.INVISIBLE);
                 editedZipCode.setVisibility(View.VISIBLE);
 
+                zipCodeSecond.setVisibility(View.INVISIBLE);
+                editedZipCodeSecond.setVisibility(View.VISIBLE);
+
                 instagram.setVisibility(View.INVISIBLE);
                 editedInstagram.setVisibility(View.VISIBLE);
 
@@ -207,6 +214,7 @@ public class ProfileFragment extends Fragment {
                 String newLandLine = editedLandline.getText().toString();
                 String newAddress = editedAddress.getText().toString();
                 String newZipCode = editedZipCode.getText().toString();
+                String newZipCodeSecond = editedZipCodeSecond.getText().toString();
                 String newInstagram = editedInstagram.getText().toString();
                 String newFacebook = editedFacebook.getText().toString();
                 String newTwitter = editedTwitter.getText().toString();
@@ -214,6 +222,13 @@ public class ProfileFragment extends Fragment {
                 String newWebsite = editedWebsite.getText().toString();
                 String newFax = editedFax.getText().toString();
                 String newBio = editedBio.getText().toString();
+
+                String finalZip;
+
+                if(newZipCode.equals("") || newZipCodeSecond.equals("") || newZipCode.length() < 4 || newZipCodeSecond.length() < 3)
+                    finalZip = "";
+                else
+                    finalZip = newZipCode + "-" + newZipCodeSecond;
 
                ProfileInstitution ins = new ProfileInstitution(
                     newAddress,
@@ -229,7 +244,7 @@ public class ProfileFragment extends Fragment {
                     newTwitter,
                     newWebsite,
                     newYoutube,
-                    newZipCode
+                    finalZip
                );
 
                 profileRepository.getProfileService().changeProfileInstitution(user.getToken(), ins).enqueue(new Callback<ResponseBody>() {
@@ -384,6 +399,13 @@ public class ProfileFragment extends Fragment {
                 editedProfilePic.setImageBitmap(bitmap);
                 profilePic.setImageBitmap(bitmap);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+                String heading = new String(Base64.encodeToString(out.toByteArray(),Base64.DEFAULT));
+
+                SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
+                prefsEditor.putString("PIC",heading);
+                prefsEditor.apply();
+
                 image = out.toByteArray();
             } catch (IOException e){
                 e.printStackTrace();
@@ -444,8 +466,6 @@ public class ProfileFragment extends Fragment {
             profilePic.setImageBitmap(bitmap);
             editedProfilePic.setImageBitmap(bitmap);
         }
-        getProfilePic(user.getToken());
-
     }
 
     private void getProfilePic(List<String> token){
@@ -456,7 +476,7 @@ public class ProfileFragment extends Fragment {
                     try {
                         String body = r.body().string();
                         Type t = new TypeToken<byte[]>(){}.getType();
-                        byte[] byteArray = gson.fromJson(r.body().string(),t);
+                        byte[] byteArray = gson.fromJson(body,t);
                         if(byteArray != null && !body.equals("")) {
                             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                             profilePic.setImageBitmap(bitmap);
@@ -464,10 +484,10 @@ public class ProfileFragment extends Fragment {
 
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-                            String headimg = new String(Base64.encodeToString(byteArrayOutputStream.toByteArray(),Base64.DEFAULT));
+                            String heading = new String(Base64.encodeToString(byteArrayOutputStream.toByteArray(),Base64.DEFAULT));
 
                             SharedPreferences.Editor prefsEditor = sharedpreferences.edit();
-                            prefsEditor.putString("PIC",headimg);
+                            prefsEditor.putString("PIC",heading);
                             prefsEditor.apply();
                         }
                     } catch (IOException e) {
@@ -484,6 +504,166 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
+    private void setTextProperties(){
+        username.setMaxLines(1);
+        username.setEllipsize(TextUtils.TruncateAt.END);
+        username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(username.getLineCount() > 1)
+                    username.setMaxLines(1);
+                else if(username.length() != 0)
+                    username.setMaxLines(username.length());
+            }
+        });
+
+        email.setMaxLines(1);
+        email.setEllipsize(TextUtils.TruncateAt.END);
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(email.getLineCount() > 1)
+                    email.setMaxLines(1);
+                else if(email.length() != 0)
+                    email.setMaxLines(email.length());
+
+            }
+        });
+
+        address.setMaxLines(1);
+        address.setEllipsize(TextUtils.TruncateAt.END);
+        address.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(address.getLineCount() > 1)
+                    address.setMaxLines(1);
+                else if(address.length() != 0)
+                    address.setMaxLines(address.length());
+            }
+        });
+
+        mobile.setMaxLines(1);
+        mobile.setEllipsize(TextUtils.TruncateAt.END);
+        mobile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mobile.getLineCount() > 1)
+                    mobile.setMaxLines(1);
+                else if(mobile.length() != 0)
+                    mobile.setMaxLines(mobile.length());
+            }
+        });
+
+        landline.setMaxLines(1);
+        landline.setEllipsize(TextUtils.TruncateAt.END);
+        landline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(landline.getLineCount() > 1)
+                    landline.setMaxLines(1);
+                else if(landline.length() != 0)
+                    landline.setMaxLines(landline.length());
+            }
+        });
+
+        zipCode.setMaxLines(1);
+        zipCode.setEllipsize(TextUtils.TruncateAt.END);
+        zipCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(zipCode.getLineCount() > 1)
+                    zipCode.setMaxLines(1);
+                else if(zipCode.length() != 0)
+                    zipCode.setMaxLines(zipCode.length());
+            }
+        });
+
+        bio.setMaxLines(5);
+        bio.setEllipsize(TextUtils.TruncateAt.END);
+        bio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bio.getLineCount() > 5)
+                    bio.setMaxLines(5);
+                else if(bio.length() != 0)
+                    bio.setMaxLines(bio.length());
+            }
+        });
+
+        fax.setMaxLines(1);
+        fax.setEllipsize(TextUtils.TruncateAt.END);
+        fax.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(fax.getLineCount() > 1)
+                    fax.setMaxLines(1);
+                else if(fax.length() != 0)
+                    fax.setMaxLines(fax.length());
+            }
+        });
+
+        instagram.setMaxLines(1);
+        instagram.setEllipsize(TextUtils.TruncateAt.END);
+        instagram.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(instagram.getLineCount() > 1)
+                    instagram.setMaxLines(1);
+                else if(instagram.length() != 0)
+                    instagram.setMaxLines(instagram.length());
+            }
+        });
+
+        facebook.setMaxLines(1);
+        facebook.setEllipsize(TextUtils.TruncateAt.END);
+        facebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(facebook.getLineCount() > 1)
+                    facebook.setMaxLines(1);
+                else if(facebook.length() != 0)
+                    facebook.setMaxLines(facebook.length());
+            }
+        });
+
+        youtube.setMaxLines(1);
+        youtube.setEllipsize(TextUtils.TruncateAt.END);
+        youtube.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(youtube.getLineCount() > 1)
+                    youtube.setMaxLines(1);
+                else if(youtube.length() != 0)
+                    youtube.setMaxLines(youtube.length());
+            }
+        });
+
+        twitter.setMaxLines(1);
+        twitter.setEllipsize(TextUtils.TruncateAt.END);
+        twitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(twitter.getLineCount() > 1)
+                    twitter.setMaxLines(1);
+                else if(twitter.length() != 0)
+                    twitter.setMaxLines(twitter.length());
+            }
+        });
+
+        website.setMaxLines(1);
+        website.setEllipsize(TextUtils.TruncateAt.END);
+        website.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(website.getLineCount() > 1)
+                    website.setMaxLines(1);
+                else if(website.length() != 0)
+                    website.setMaxLines(website.length());
+            }
+        });
+    }
+
 
     public void saveInstitution(Response<ResponseBody> r){
         if (r.isSuccessful()) {

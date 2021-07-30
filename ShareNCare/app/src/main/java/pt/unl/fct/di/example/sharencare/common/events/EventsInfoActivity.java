@@ -125,7 +125,10 @@ public class EventsInfoActivity extends AppCompatActivity {
 
                                 Toast.makeText(getApplicationContext(), "Event Added!", Toast.LENGTH_SHORT).show();
                             } else
-                                Toast.makeText(getApplicationContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
+                                if(r.code() == 409)
+                                    Toast.makeText(getApplicationContext(), "You already joined this event!", Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(getApplicationContext(), "CODE: " + r.code(), Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -271,17 +274,48 @@ public class EventsInfoActivity extends AppCompatActivity {
             geocoder = new Geocoder(this, Locale.getDefault());
             Address address = geocoder.getFromLocation(latLon.first, latLon.second, 1).get(0);
 
+            List<String> locs = new ArrayList<String>();
+
             String thoroughfare = address.getThoroughfare();
-            String location = "location";
+            String postalCode = address.getPostalCode();
+            String locality = address.getLocality();
+            String adminArea = address.getAdminArea();
+            String countryName = address.getCountryName();
+
+            String location = "";
+            String[] array = new String[3];
+
             if(thoroughfare != null) {
-                location = address.getThoroughfare() +
-                        "\n" + address.getPostalCode() + " " + address.getLocality() +
-                        "\n" + address.getAdminArea() + ", " + address.getCountryName();
+                array[0] = thoroughfare;
+            } if(postalCode != null || locality != null) {
+                if(postalCode != null && locality == null)
+                    array[1] = postalCode;
+                else if(postalCode == null && locality != null)
+                    array[1] = locality;
+                else
+                    array[1] = postalCode + " " + locality;
+            } if(adminArea != null || countryName != null) {
+                if(adminArea != null && countryName == null)
+                    array[2] = adminArea;
+                else if(adminArea == null && countryName != null)
+                    array[2] = countryName;
+                else
+                    array[2] = adminArea + " " + countryName;
             }
-            else{
-                location = address.getPostalCode() + " " + address.getLocality() +
-                        "\n" + address.getAdminArea() + ", " + address.getCountryName();
-            }
+
+            if(array[0] != null){
+                location = array[0];
+                if(array[1] != null)
+                    location = location + "\n" + array[1];
+                if(array[2] != null)
+                    location = location + "\n" + array[2];
+            } else if(array[1] != null){
+                location = array[1];
+                if(array[2] != null)
+                    location = location + "\n" + array[1];
+            } else if(array[2] != null)
+                location = array[2];
+
             return location;
         } catch (IOException e) {
             e.printStackTrace();
